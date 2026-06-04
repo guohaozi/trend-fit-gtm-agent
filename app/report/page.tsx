@@ -1,8 +1,9 @@
 import { CaseSwitcher } from "@/components/CaseSwitcher";
+import { EvidenceComparison } from "@/components/EvidenceComparison";
 import { PageHeader } from "@/components/PageHeader";
 import { ReportViewer } from "@/components/ReportViewer";
 import { WorkflowNav } from "@/components/WorkflowNav";
-import { getDemoCase, getReportFileName, getReportMarkdown } from "@/lib/demo-cases";
+import { getDemoCase, getDemoResult, getEvidenceResult, getReportFileName, getReportMarkdown } from "@/lib/demo-cases";
 
 type PageProps = {
   searchParams?: Promise<{ case?: string }>;
@@ -11,6 +12,8 @@ type PageProps = {
 export default async function ReportPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const demo = getDemoCase(params?.case);
+  const baselineResult = getDemoResult(demo.id);
+  const evidenceResult = getEvidenceResult(demo.id);
   const markdown = getReportMarkdown(demo.id);
 
   return (
@@ -29,6 +32,14 @@ export default async function ReportPage({ searchParams }: PageProps) {
         </a>
         <span className="secondary-action">{getReportFileName(demo.id)}</span>
       </div>
+      {evidenceResult ? (
+        <EvidenceComparison
+          evidenceCase={evidenceResult.evidenceCase}
+          adjustment={evidenceResult.adjustment}
+          baselineResult={baselineResult}
+          adjustedResult={evidenceResult.adjustedResult}
+        />
+      ) : null}
       <ReportViewer markdown={markdown} />
     </div>
   );

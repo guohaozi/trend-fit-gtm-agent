@@ -476,6 +476,77 @@ textarea {
   margin-bottom: 18px;
 }
 
+.evidence-panel {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-bottom: 18px;
+  padding: clamp(18px, 3vw, 28px);
+}
+
+.evidence-panel .section-heading p {
+  color: var(--muted);
+  line-height: 1.55;
+  max-width: 780px;
+}
+
+.evidence-summary-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 18px 0;
+}
+
+.evidence-summary-item {
+  background: #f8faf9;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.evidence-summary-item span,
+.evidence-summary-item small,
+.source-list span,
+.evidence-table small {
+  color: var(--muted);
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.evidence-summary-item strong {
+  display: block;
+  font-size: 24px;
+  margin: 4px 0;
+}
+
+.evidence-table {
+  margin-top: 8px;
+}
+
+.source-list {
+  border-top: 1px solid var(--line);
+  margin-top: 18px;
+  padding-top: 18px;
+}
+
+.source-list ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+
+.source-list li {
+  list-style: none;
+  overflow-wrap: anywhere;
+}
+
+.source-list a {
+  color: var(--teal);
+  font-weight: 700;
+}
+
 .report-viewer {
   background: white;
   border: 1px solid var(--line);
@@ -586,7 +657,8 @@ th {
   .case-switcher,
   .workflow-nav,
   .meta-grid,
-  .summary-grid {
+  .summary-grid,
+  .evidence-summary-grid {
     grid-template-columns: 1fr;
   }
 

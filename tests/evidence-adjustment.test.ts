@@ -1,0 +1,82 @@
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
+import { describe, it } from "node:test";
+import {
+  adjustScores,
+  getMeanEvidenceConfidence,
+  type EvidenceAdjustmentCase,
+  type EvidenceItem
+} from "../lib/evidence-adjustment";
+import { calculateTrendFit } from "../lib/scoring";
+import type { Scores } from "../lib/types";
+
+const dataDir = path.join(process.cwd(), "data");
+
+function readEvidenceCase(fileName: string): EvidenceAdjustmentCase {
+  return JSON.parse(fs.readFileSync(path.join(dataDir, fileName), "utf8")) as EvidenceAdjustmentCase;
+}
+
+describe("evidence adjustment model", () => {
+  it("recomputes the fashion evidence case from 90 to 88 without off-anchor scores", () => {
+    const evidenceCase = readEvidenceCase("demo_fashion_evidence.json");
+    const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
+    const result = calculateTrendFit(adjustment.adjusted, "medium");
+
+    assert.deepEqual(adjustment.adjusted, evidenceCase.expectedAdjustedScores);
+    assert.equal(result.total, evidenceCase.expectedAdjustedTotal);
+    assert.equal(result.recommendation.finalBand, evidenceCase.expectedAdjustedBand);
+  });
+
+  it("returns per-dimension confidence labels matching the structured evidence case", () => {
+    const evidenceCase = readEvidenceCase("demo_fashion_evidence.json");
+    const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
+
+    assert.deepEqual(adjustment.confidenceByDimension, evidenceCase.expectedDimensionConfidence);
+  });
+
+  it("prevents proxy-only evidence from moving a dimension by two anchor steps", () => {
+    const baseline: Scores = {
+      audienceOverlap: 75,
+      useCaseRelevance: 75,
+      messageBridge: 75,
+      creativeFeasibility: 75,
+      commercialIntent: 75,
+      brandSafety: 75,
+      timingSaturation: 75
+    };
+    const proxyEvidence: EvidenceItem[] = [
+      {
+        id: "proxy-1",
+        dimension: "timingSaturation",
+        direction: "down",
+        magnitude: "strong",
+        confidence: "high",
+        sourceTier: "proxy",
+        sourceUrl: "https://example.com/listicle-1",
+        note: "Proxy signal one."
+      },
+      {
+        id: "proxy-2",
+        dimension: "timingSaturation",
+        direction: "down",
+        magnitude: "strong",
+        confidence: "high",
+        sourceTier: "proxy",
+        sourceUrl: "https://example.com/listicle-2",
+        note: "Proxy signal two."
+      }
+    ];
+
+    const adjustment = adjustScores(baseline, proxyEvidence);
+
+    assert.equal(adjustment.adjusted.timingSaturation, 50);
+  });
+
+  it("computes mean confidence as a ranking signal without rewarding assumptions", () => {
+    const evidenceCase = readEvidenceCase("demo_fashion_evidence.json");
+    const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
+
+    assert.equal(getMeanEvidenceConfidence(adjustment.confidenceByDimension), 16 / 7);
+  });
+});

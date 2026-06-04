@@ -2,7 +2,9 @@ import fs from "node:fs";
 import path from "node:path";
 import aiToolDemo from "@/data/demo_ai_tool.json";
 import fashionDemo from "@/data/demo_fashion.json";
+import fashionEvidenceDemo from "@/data/demo_fashion_evidence.json";
 import roboticsDemo from "@/data/demo_robotics.json";
+import { adjustScores, type EvidenceAdjustmentCase } from "@/lib/evidence-adjustment";
 import { calculateTrendFit } from "@/lib/scoring";
 import type { DemoCase, ScoreKey } from "@/lib/types";
 
@@ -19,6 +21,10 @@ export const REPORT_FILES: Record<string, string> = {
   demo_robotics: "demo_robotics_report.md",
   demo_ai_tool: "demo_ai_tool_report.md"
 };
+
+export const EVIDENCE_CASES = [
+  fashionEvidenceDemo
+] as EvidenceAdjustmentCase[];
 
 export const DIMENSION_META: Array<{
   key: ScoreKey;
@@ -79,6 +85,28 @@ export function getDemoResult(id?: string | null) {
   return calculateTrendFit(demo.scores, demo.product.riskTolerance, {
     qualifier: demo.expectedQualifier
   });
+}
+
+export function getEvidenceCase(id?: string | null): EvidenceAdjustmentCase | null {
+  const demo = getDemoCase(id);
+  return EVIDENCE_CASES.find((evidenceCase) => evidenceCase.case === demo.id) ?? null;
+}
+
+export function getEvidenceResult(id?: string | null) {
+  const demo = getDemoCase(id);
+  const evidenceCase = getEvidenceCase(demo.id);
+  if (!evidenceCase) return null;
+
+  const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
+  const adjustedResult = calculateTrendFit(adjustment.adjusted, demo.product.riskTolerance, {
+    qualifier: demo.expectedQualifier
+  });
+
+  return {
+    evidenceCase,
+    adjustment,
+    adjustedResult
+  };
 }
 
 export function getReportMarkdown(id?: string | null): string {
