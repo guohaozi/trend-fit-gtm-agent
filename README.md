@@ -38,6 +38,14 @@ Three fully worked demo cases, each with real scoring rationale (no fabricated m
 Demo briefs → [`outputs/`](outputs/)  
 Demo input data → [`data/`](data/)
 
+**Evidence agent in action:** the fashion case has also been run through real web
+research → [`outputs/demo_fashion_evidence_case.md`](outputs/demo_fashion_evidence_case.md).
+Real sources **revised Timing & Saturation from 75 → 50** (the trend peaked in 2023; the
+affordable-dupe lane is now crowded) and **hardened the classism risk** with named-expert
+quotes (Refinery29) plus cultural-critique context (Essence). Total moved 90 → 88; still
+Strong Go, now defensible.
+This is the line between a strategy scaffold and an evidence agent — see below.
+
 ---
 
 ## How the scoring works

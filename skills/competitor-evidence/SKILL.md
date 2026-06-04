@@ -92,3 +92,18 @@ evidence.
 Return the per-competitor evidence blocks + the synthesis. Keep it tight enough to drop
 into the "Why it fits" and "Risk" sections of the GTM Brief. Always end with a
 **confidence note**: which findings are sourced vs. assumed.
+
+## Worked real example
+
+[`outputs/demo_fashion_evidence_case.md`](../../outputs/demo_fashion_evidence_case.md)
+is this skill run for real (via web research) on the quiet-luxury case. It shows the
+full Assumption → Evidence upgrade: evidence blocks with cited sources, a synthesis, a
+dimension-by-dimension before/after table, and the recomputed score (90 → 88). Use it as
+the template for what "evidence-backed" output looks like in practice.
+
+**Structured output:** the evidence items must be emitted in the typed form defined by
+[`evidence_model.md`](../trend-product-fit/evidence_model.md) (each item tags a
+`dimension`, `direction`, `magnitude`, `confidence`, `sourceTier`, `sourceUrl`) so the
+score adjustment is deterministic, not prose. See
+[`data/demo_fashion_evidence.json`](../../data/demo_fashion_evidence.json) for the machine
+form of the case above.

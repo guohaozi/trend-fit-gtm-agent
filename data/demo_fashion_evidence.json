@@ -1,0 +1,127 @@
+{
+  "id": "demo_fashion_evidence",
+  "case": "demo_fashion",
+  "researchDate": "2026-06-04",
+  "tooling": "WebSearch / WebFetch (gooseworks not installed; same blocks producible from gooseworks Reddit/X scrapes)",
+  "baselineScores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 100,
+    "creativeFeasibility": 100,
+    "commercialIntent": 75,
+    "brandSafety": 50,
+    "timingSaturation": 75
+  },
+  "evidence": [
+    {
+      "id": "ev-audience-1",
+      "dimension": "audienceOverlap",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://thevou.com/blog/affordable-quiet-luxury-brands/",
+      "note": "Affordable quiet luxury examples repeatedly name mid-range brands and budget-conscious styling, confirming the trend can reach the demo brand's practical menswear audience."
+    },
+    {
+      "id": "ev-timing-1",
+      "dimension": "timingSaturation",
+      "direction": "down",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.accio.com/business/is_quiet_luxury_a_trend",
+      "note": "Peak of quiet luxury has passed; trend evolving into 'subtle statement' dressing and niche categories rather than rising."
+    },
+    {
+      "id": "ev-timing-2",
+      "dimension": "timingSaturation",
+      "direction": "down",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.influencers-time.com/the-rise-of-quiet-luxury-and-why-hype-is-declining/",
+      "note": "Hype around quiet luxury is declining as prestige shifts."
+    },
+    {
+      "id": "ev-timing-3",
+      "dimension": "timingSaturation",
+      "direction": "down",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "proxy",
+      "sourceUrl": "https://www.chicstylecollective.com/affordable-quiet-luxury/",
+      "note": "Affordable-dupe lane is crowded: abundant '13 affordable quiet luxury brands' / 'The Row dupes' listicles = saturation signal (proxy/affiliate content)."
+    },
+    {
+      "id": "ev-safety-1",
+      "dimension": "brandSafety",
+      "direction": "confirm",
+      "magnitude": "strong",
+      "confidence": "high",
+      "sourceTier": "primary",
+      "sourceUrl": "https://www.refinery29.com/en-us/2023/05/11382578/quiet-luxury-fashion-trend-succession-tiktok",
+      "note": "Named experts on record: Jonathan Square (Parsons) — 'going for an old money aesthetic, which is clearly classist'; Laura Beltran-Rubio — 'racist undertone... against native cultural expressions of communities who are not the white elite.'"
+    },
+    {
+      "id": "ev-safety-2",
+      "dimension": "brandSafety",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.essence.com/fashion/quiet-luxury-and-its-racist-implications/",
+      "note": "Dedicated cultural critique titled 'Quiet Luxury And Its Racist Implications' (context, not a named-expert quote)."
+    },
+    {
+      "id": "ev-usecase-1",
+      "dimension": "useCaseRelevance",
+      "direction": "confirm",
+      "magnitude": "strong",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://thevou.com/blog/affordable-quiet-luxury-brands/",
+      "note": "An established 'affordable quiet luxury' sub-genre names mid-range brands (Uniqlo, COS, Mango, Massimo Dutti) — the product type belongs natively."
+    },
+    {
+      "id": "ev-bridge-1",
+      "dimension": "messageBridge",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://thevou.com/blog/affordable-quiet-luxury-brands/",
+      "note": "Live consumer frame: 'quiet luxury is all about intention, not price' — confirms the 'look expensive, honest price' bridge."
+    },
+    {
+      "id": "ev-commercial-1",
+      "dimension": "commercialIntent",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "proxy",
+      "sourceUrl": "https://www.chicstylecollective.com/affordable-quiet-luxury/",
+      "note": "High volume of affordable-dupe commerce/listicle content = proxy for shopping intent, NOT measured purchase behavior."
+    }
+  ],
+  "expectedAdjustedScores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 100,
+    "creativeFeasibility": 100,
+    "commercialIntent": 75,
+    "brandSafety": 50,
+    "timingSaturation": 50
+  },
+  "expectedAdjustedTotal": 88,
+  "expectedAdjustedBand": "Strong Go",
+  "expectedDimensionConfidence": {
+    "audienceOverlap": "evidence-confirmed (high)",
+    "useCaseRelevance": "evidence-confirmed (high)",
+    "messageBridge": "evidence-confirmed (high)",
+    "creativeFeasibility": "assumption",
+    "commercialIntent": "evidence-confirmed (medium)",
+    "brandSafety": "evidence-confirmed (high)",
+    "timingSaturation": "evidence-revised (medium)"
+  }
+}

@@ -88,6 +88,63 @@ prose in code.
    anchor validation; the 3 override rules. **Do this before any page.**
 2. Then the 4 pages (Product Profile / Trend Input / Fit Score / Report).
 
+## v1.1 — Evidence → Score layer (NEW, the "middle version")
+
+Spec: [`skills/trend-product-fit/evidence_model.md`](skills/trend-product-fit/evidence_model.md).
+Reference instance + expected output: [`data/demo_fashion_evidence.json`](data/demo_fashion_evidence.json).
+Readable case: [`outputs/demo_fashion_evidence_case.md`](outputs/demo_fashion_evidence_case.md).
+
+**Invariant:** evidence only shifts a dimension by whole anchor steps, so adjusted scores
+are still `0|25|50|75|100` and feed the *existing* `calculateTrendFit()` unchanged. No change
+to scoring.ts's core math, bands, or overrides — you add a pre-step that produces adjusted
+`Scores`, then call the same function.
+
+```ts
+type EvidenceItem = {
+  id: string;
+  dimension: keyof Scores;
+  direction: "up" | "down" | "confirm";
+  magnitude: "weak" | "moderate" | "strong";     // 1 | 2 | 3
+  confidence: "low" | "medium" | "high";          // 1 | 2 | 3
+  sourceTier: "primary" | "secondary" | "proxy";
+  sourceUrl: string;
+  note: string;
+};
+
+const MAG  = { weak: 1, moderate: 2, strong: 3 };
+const CONF = { low: 1, medium: 2, high: 3 };
+const ANCHORS = [0, 25, 50, 75, 100] as const;
+
+// per item: c = CONF[confidence]; if proxy → c = min(c,2)
+//           base = MAG[magnitude]*c; if proxy → base *= 0.5
+//           signed = up:+base | down:-base | confirm:0
+// per dim:  net = Σ signed ; steps = |net|<4?0 : |net|<9?1 : 2
+//           adjustedAnchor = ANCHORS[ clamp(idx(baseline) + sign(net)*steps, 0, 4) ]
+function adjustScores(baseline: Scores, evidence: EvidenceItem[]): {
+  adjusted: Scores;
+  confidenceByDimension: Record<keyof Scores, string>; // "assumption" | "evidence-confirmed (x)" | "evidence-revised (x)"
+};
+```
+
+Then: `calculateTrendFit(adjustScores(baseline, evidence).adjusted, riskTolerance)`.
+
+**Tests to add** (assert against `demo_fashion_evidence.json`):
+- adjusted scores === `expectedAdjustedScores` (timingSaturation 75→50, rest unchanged)
+- adjusted total === `expectedAdjustedTotal` (88), band === `expectedAdjustedBand`
+- per-dimension confidence labels === `expectedDimensionConfidence`
+- proxy items: a proxy-only down-pile must NOT move a score 2 steps (half-weight + cap)
+
+The report page should show **baseline vs evidence-adjusted** side by side, the
+per-dimension confidence label, and the source list — that contrast is the product's
+whole pitch.
+
+## v1.1 — Trend Shortlist (ranking N trends)
+Skill: [`skills/trend-shortlist/SKILL.md`](skills/trend-shortlist/SKILL.md). The "middle
+version" workflow: 1 product + 3-5 manual trends → score + evidence-adjust each → rank →
+return winner's full brief. Ranking order: finalBand priority → adjusted total → mean
+confidence → timingSaturation. Build this AFTER the evidence layer + a multi-trend input
+page. Still no auto-crawl.
+
 ## Don't (v1 scope, per §14)
 No crawlers (TikTok/X), no KOL-email scraping, no ad-platform APIs, no DB/auth/payments.
-Manual trend input only.
+Manual trend input only. (Auto trend *discovery* is the layer AFTER the shortlist works.)

@@ -196,6 +196,7 @@ needed, call [`competitor-evidence`](../competitor-evidence/SKILL.md).
 | [`risk_taxonomy.md`](risk_taxonomy.md) | The named risk categories and how to phrase them |
 | [`brand_voice_rules.md`](brand_voice_rules.md) | Voice-by-segment guidance + words-to-avoid logic |
 | [`examples.md`](examples.md) | Three fully worked demo cases (apparel / robotics / AI tool) |
+| [`evidence_model.md`](evidence_model.md) | The Assumption → Evidence contract: how sourced evidence shifts a dimension by anchor steps (deterministic, testable) |
 
 ---
 
