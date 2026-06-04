@@ -1,0 +1,45 @@
+{
+  "id": "demo_robotics",
+  "product": {
+    "name": "Hearth Robotics — Companion (demo)",
+    "category": "Home robotics / smart home",
+    "targetMarket": ["United States", "Japan"],
+    "audience": "Smart home users, families, pet owners",
+    "priceRange": "$499-$899",
+    "positioning": "Reliable home assistant robot that makes daily routines easier",
+    "sellingPoints": [
+      "Helps with real daily routines, not gimmicks",
+      "Reliable and simple to set up",
+      "Family- and pet-friendly"
+    ],
+    "brandTone": "Warm, trustworthy, practical, slightly futuristic",
+    "competitors": ["iRobot", "Amazon Astro", "Ecovacs"],
+    "campaignGoal": "Awareness + consideration",
+    "riskTolerance": "medium"
+  },
+  "trend": {
+    "name": "AI home gadgets / smart home setup",
+    "platform": "TikTok / YouTube Shorts",
+    "region": "United States, Japan",
+    "description": "Setup tours and 'gadgets that changed my home' videos showcasing smart-home devices in daily life.",
+    "drivenBy": "Smart-home enthusiasts, family-lifestyle and tech creators",
+    "format": "Setup tour, day-in-the-life, gadget review",
+    "whyPopular": "People love optimizing their homes and seeing real gadgets in action",
+    "exampleContent": "Creator shows a week of using smart-home gadgets in their routine",
+    "controversy": "Privacy/surveillance fears; over-promising autonomy; gimmick perception"
+  },
+  "scores": {
+    "audienceOverlap": 75,
+    "useCaseRelevance": 100,
+    "messageBridge": 75,
+    "creativeFeasibility": 50,
+    "commercialIntent": 75,
+    "brandSafety": 50,
+    "timingSaturation": 75
+  },
+  "expectedTotal": 74,
+  "expectedBand": "Go",
+  "expectedQualifier": "trust-building angle",
+  "expectedFinalBand": "Go",
+  "overrideReason": null
+}

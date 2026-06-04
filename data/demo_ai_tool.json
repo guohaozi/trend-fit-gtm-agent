@@ -1,0 +1,45 @@
+{
+  "id": "demo_ai_tool",
+  "product": {
+    "name": "Snapforge AI (demo)",
+    "category": "AI photo-editing tool",
+    "targetMarket": ["United States", "Japan", "Southeast Asia"],
+    "audience": "Creators, photographers, e-commerce sellers",
+    "priceRange": "Free tier + $12/mo Pro",
+    "positioning": "Fast, high-quality AI editing for social content and product photos",
+    "sellingPoints": [
+      "Pro-looking edits in seconds",
+      "Built for creator and e-commerce workflows",
+      "Batch product-photo cleanup"
+    ],
+    "brandTone": "Creative, practical, maker-oriented",
+    "competitors": ["Canva", "Photoroom", "Picsart"],
+    "campaignGoal": "Sign-ups + paid conversion",
+    "riskTolerance": "medium"
+  },
+  "trend": {
+    "name": "AI profile photo / product photo before-after",
+    "platform": "TikTok / Instagram Reels",
+    "region": "United States, Japan, Southeast Asia",
+    "description": "Before/after reveals where a raw photo is transformed into a polished profile or product shot.",
+    "drivenBy": "Creators, sellers, and AI-tool reviewers",
+    "format": "Before/after reveal, screen-record workflow",
+    "whyPopular": "Instant visual payoff; satisfying transformation; practical for sellers",
+    "exampleContent": "Seller shows a messy product photo becoming a clean catalog-ready image",
+    "controversy": "Fake-identity / unrealistic-beauty concerns; 'AI slop' backlash"
+  },
+  "scores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 75,
+    "creativeFeasibility": 100,
+    "commercialIntent": 100,
+    "brandSafety": 75,
+    "timingSaturation": 50
+  },
+  "expectedTotal": 89,
+  "expectedBand": "Strong Go",
+  "expectedQualifier": null,
+  "expectedFinalBand": "Strong Go",
+  "overrideReason": null
+}

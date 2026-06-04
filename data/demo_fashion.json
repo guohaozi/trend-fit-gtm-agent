@@ -1,0 +1,45 @@
+{
+  "id": "demo_fashion",
+  "product": {
+    "name": "Northbound Supply Co. (demo)",
+    "category": "Mid-range men's clothing",
+    "targetMarket": ["United States"],
+    "audience": "20-35 male young professionals",
+    "priceRange": "$30-$90 per piece",
+    "positioning": "Clean fit, comfortable basics, affordable premium look",
+    "sellingPoints": [
+      "Premium-looking pieces at accessible prices",
+      "Versatile basics that read polished",
+      "Comfort-first fabrics"
+    ],
+    "brandTone": "Tasteful, practical, confident",
+    "competitors": ["Uniqlo", "Abercrombie & Fitch", "Buck Mason"],
+    "campaignGoal": "Awareness + sales",
+    "riskTolerance": "medium"
+  },
+  "trend": {
+    "name": "quiet luxury / old money outfit",
+    "platform": "TikTok / Instagram Reels",
+    "region": "United States",
+    "description": "Styling trend toward understated, expensive-looking classic menswear; muted palettes, clean tailoring, no loud logos.",
+    "drivenBy": "Style-conscious 20-35 men and menswear creators",
+    "format": "Outfit styling, get-ready-with-me, lookbook UGC",
+    "whyPopular": "Reaction against logo-maximalism; desire to look refined without obvious spend",
+    "exampleContent": "Creator builds a 'quiet luxury' outfit and reveals the affordable pieces",
+    "controversy": "Class/wealth-signalling undertones; 'fake rich' mockery"
+  },
+  "scores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 100,
+    "creativeFeasibility": 100,
+    "commercialIntent": 75,
+    "brandSafety": 50,
+    "timingSaturation": 75
+  },
+  "expectedTotal": 90,
+  "expectedBand": "Strong Go",
+  "expectedQualifier": null,
+  "expectedFinalBand": "Strong Go",
+  "overrideReason": null
+}
