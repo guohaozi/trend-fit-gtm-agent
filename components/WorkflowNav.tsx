@@ -1,10 +1,10 @@
 import Link from "next/link";
 
 const STEPS = [
-  { href: "/product-profile", label: "Product Profile" },
-  { href: "/trend-input", label: "Trend Input" },
-  { href: "/fit-score", label: "Fit Score" },
-  { href: "/report", label: "GTM Brief" }
+  { href: "/product-profile", label: "产品画像" },
+  { href: "/trend-input", label: "热点输入" },
+  { href: "/fit-score", label: "适配评分" },
+  { href: "/report", label: "GTM 简报" }
 ];
 
 type WorkflowNavProps = {
@@ -14,7 +14,7 @@ type WorkflowNavProps = {
 
 export function WorkflowNav({ activePath, caseId }: WorkflowNavProps) {
   return (
-    <nav className="workflow-nav" aria-label="Workflow">
+    <nav className="workflow-nav" aria-label="工作流">
       {STEPS.map((step, index) => (
         <Link
           key={step.href}

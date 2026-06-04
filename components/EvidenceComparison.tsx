@@ -1,4 +1,10 @@
 import { DIMENSION_META } from "@/lib/demo-cases";
+import {
+  CONFIDENCE_LABELS,
+  formatBand,
+  SOURCE_CONFIDENCE_LABELS,
+  SOURCE_TIER_LABELS
+} from "@/lib/display-labels";
 import { WEIGHTS } from "@/lib/scoring";
 import type { EvidenceAdjustment, EvidenceAdjustmentCase } from "@/lib/evidence-adjustment";
 import type { ScoringResult } from "@/lib/types";
@@ -26,31 +32,30 @@ export function EvidenceComparison({
   );
 
   return (
-    <section className="evidence-panel" aria-label="Evidence adjusted scoring">
+    <section className="evidence-panel" aria-label="证据修正评分">
       <div className="section-heading">
-        <p className="eyebrow">Evidence-adjusted scoring</p>
-        <h2>Baseline vs. Evidence</h2>
+        <p className="eyebrow">证据修正评分</p>
+        <h2>基线分 vs. 证据分</h2>
         <p>
-          The frozen demo score stays intact, then sourced evidence shifts only anchored
-          dimensions before the same scoring function runs again.
+          冻结 demo 分数保持为基线；真实来源只允许推动锚点维度，再交给同一个评分函数重新计算。
         </p>
       </div>
 
       <div className="evidence-summary-grid">
         <div className="evidence-summary-item">
-          <span>Baseline</span>
+          <span>基线分</span>
           <strong>{baselineResult.total}/100</strong>
-          <small>{baselineResult.recommendation.finalBand}</small>
+          <small>{formatBand(baselineResult.recommendation.finalBand)}</small>
         </div>
         <div className="evidence-summary-item">
-          <span>Evidence-adjusted</span>
+          <span>证据修正后</span>
           <strong>{adjustedResult.total}/100</strong>
-          <small>{adjustedResult.recommendation.finalBand}</small>
+          <small>{formatBand(adjustedResult.recommendation.finalBand)}</small>
         </div>
         <div className="evidence-summary-item">
-          <span>Research date</span>
+          <span>调研日期</span>
           <strong>{evidenceCase.researchDate}</strong>
-          <small>{evidenceCase.evidence.length} evidence items</small>
+          <small>{evidenceCase.evidence.length} 条证据</small>
         </div>
       </div>
 
@@ -58,12 +63,12 @@ export function EvidenceComparison({
         <table className="evidence-table">
           <thead>
             <tr>
-              <th>Dimension</th>
-              <th>Base</th>
-              <th>Adjusted</th>
-              <th>Delta</th>
-              <th>Confidence</th>
-              <th>Weighted</th>
+              <th>维度</th>
+              <th>基线</th>
+              <th>修正后</th>
+              <th>变化</th>
+              <th>置信度</th>
+              <th>加权</th>
             </tr>
           </thead>
           <tbody>
@@ -80,7 +85,7 @@ export function EvidenceComparison({
                   <td>{baseline}</td>
                   <td>{adjusted}</td>
                   <td>{formatDelta(delta)}</td>
-                  <td>{adjustment.confidenceByDimension[dimension.key]}</td>
+                  <td>{CONFIDENCE_LABELS[adjustment.confidenceByDimension[dimension.key]]}</td>
                   <td>{(adjusted * WEIGHTS[dimension.key]).toFixed(2)}</td>
                 </tr>
               );
@@ -90,13 +95,13 @@ export function EvidenceComparison({
       </div>
 
       <div className="source-list">
-        <h3>Sources</h3>
+        <h3>证据来源</h3>
         <ul>
           {uniqueSources.map((item) => (
             <li key={item.sourceUrl}>
               <a href={item.sourceUrl}>{item.sourceUrl}</a>
               <span>
-                {item.sourceTier} / {item.confidence}
+                {SOURCE_TIER_LABELS[item.sourceTier]} / {SOURCE_CONFIDENCE_LABELS[item.confidence]}
               </span>
             </li>
           ))}

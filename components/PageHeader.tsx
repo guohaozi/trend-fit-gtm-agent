@@ -17,7 +17,7 @@ export function PageHeader({ eyebrow, title, description, demo }: PageHeaderProp
         <p className="header-copy">{description}</p>
       </div>
       <Link className="text-action" href={`/report?case=${demo.id}`}>
-        View report
+        查看简报
       </Link>
     </header>
   );

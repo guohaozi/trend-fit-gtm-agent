@@ -3,16 +3,19 @@
 @tailwind utilities;
 
 :root {
-  --ink: #18181b;
-  --muted: #71717a;
-  --line: #e4e4e7;
+  --ink: #171923;
+  --muted: #667085;
+  --line: #d9dee7;
   --surface: #ffffff;
-  --wash: #f7f7f4;
-  --teal: #0f766e;
-  --teal-soft: #d9f3ef;
-  --amber: #b45309;
+  --wash: #f4f7f9;
+  --teal: #0b6f68;
+  --teal-soft: #e4f5f2;
+  --amber: #a96207;
   --rose: #be123c;
-  --indigo: #4338ca;
+  --indigo: #3451b2;
+  --steel: #263442;
+  --shadow: 0 14px 38px rgba(23, 25, 35, 0.08);
+  --shadow-soft: 0 8px 24px rgba(23, 25, 35, 0.06);
 }
 
 * {
@@ -26,7 +29,7 @@ html {
 
 body {
   margin: 0;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   letter-spacing: 0;
 }
 
@@ -38,9 +41,8 @@ a {
 .app-shell {
   min-height: 100vh;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(247, 247, 244, 0.94)),
-    radial-gradient(circle at 12% 0%, rgba(15, 118, 110, 0.13), transparent 30%),
-    radial-gradient(circle at 86% 8%, rgba(180, 83, 9, 0.12), transparent 26%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(244, 247, 249, 0.98) 260px),
+    repeating-linear-gradient(90deg, rgba(217, 222, 231, 0.28) 0, rgba(217, 222, 231, 0.28) 1px, transparent 1px, transparent 56px);
 }
 
 .topbar {
@@ -49,8 +51,8 @@ a {
   justify-content: space-between;
   gap: 24px;
   border-bottom: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.86);
-  padding: 18px clamp(20px, 4vw, 56px);
+  background: rgba(255, 255, 255, 0.92);
+  padding: 14px clamp(20px, 4vw, 56px);
   position: sticky;
   top: 0;
   z-index: 20;
@@ -70,7 +72,7 @@ a {
   height: 36px;
   place-items: center;
   border-radius: 8px;
-  background: var(--ink);
+  background: linear-gradient(135deg, var(--steel), var(--teal));
   color: white;
   font-weight: 800;
 }
@@ -82,6 +84,7 @@ a {
 
 .brand-copy strong {
   font-size: 15px;
+  letter-spacing: 0.01em;
 }
 
 .brand-copy span {
@@ -106,11 +109,13 @@ a {
   font-weight: 700;
   min-height: 40px;
   padding: 0 14px;
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
 }
 
 .primary-action {
   background: var(--teal);
   color: white;
+  box-shadow: 0 8px 18px rgba(11, 111, 104, 0.18);
 }
 
 .secondary-action {
@@ -122,10 +127,16 @@ a {
   color: var(--teal);
 }
 
+.primary-action:hover,
+.secondary-action:hover,
+.text-action:hover {
+  transform: translateY(-1px);
+}
+
 .page-wrap {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 34px clamp(20px, 4vw, 56px) 64px;
+  padding: 38px clamp(20px, 4vw, 56px) 72px;
 }
 
 .page-header {
@@ -154,7 +165,8 @@ p {
 
 h1 {
   font-size: clamp(32px, 5vw, 56px);
-  line-height: 1;
+  letter-spacing: 0;
+  line-height: 1.05;
   margin-bottom: 14px;
   max-width: 900px;
 }
@@ -172,7 +184,7 @@ h3 {
 }
 
 .header-copy {
-  color: #4b4b52;
+  color: #495260;
   font-size: 17px;
   line-height: 1.65;
   max-width: 780px;
@@ -187,19 +199,21 @@ h3 {
 
 .workflow-step {
   align-items: center;
-  background: rgba(255, 255, 255, 0.74);
+  background: rgba(255, 255, 255, 0.88);
   border: 1px solid var(--line);
   border-radius: 8px;
   display: flex;
   gap: 10px;
   min-height: 48px;
   padding: 10px;
+  box-shadow: var(--shadow-soft);
 }
 
 .workflow-step.active {
   background: var(--teal-soft);
   border-color: rgba(15, 118, 110, 0.32);
   color: #0f3f3a;
+  box-shadow: inset 0 0 0 1px rgba(11, 111, 104, 0.14), var(--shadow-soft);
 }
 
 .step-index {
@@ -228,11 +242,19 @@ h3 {
   border-radius: 8px;
   min-height: 92px;
   padding: 16px;
+  box-shadow: var(--shadow-soft);
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 
 .case-link.active {
   border-color: rgba(15, 118, 110, 0.5);
   box-shadow: inset 0 0 0 2px rgba(15, 118, 110, 0.1);
+}
+
+.case-link:hover {
+  border-color: rgba(11, 111, 104, 0.42);
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
 }
 
 .case-link span,
@@ -262,6 +284,7 @@ h3 {
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 20px;
+  box-shadow: var(--shadow-soft);
 }
 
 .demo-card {
@@ -296,8 +319,10 @@ h3 {
 
 .meta-item,
 .summary-item {
-  border-top: 1px solid var(--line);
-  padding-top: 12px;
+  background: #f8fafb;
+  border: 1px solid #e7ebf0;
+  border-radius: 8px;
+  padding: 12px;
 }
 
 .meta-item span,
@@ -318,7 +343,7 @@ h3 {
 
 .recommendation-band {
   align-items: center;
-  background: #10231f;
+  background: linear-gradient(135deg, #10231f, #1c3347);
   border-radius: 8px;
   color: white;
   display: grid;
@@ -326,6 +351,7 @@ h3 {
   grid-template-columns: minmax(0, 1fr) auto;
   margin-bottom: 24px;
   padding: 24px;
+  box-shadow: var(--shadow);
 }
 
 .recommendation-band .eyebrow,
@@ -378,6 +404,7 @@ h3 {
   gap: 20px;
   grid-template-columns: minmax(0, 1fr) minmax(220px, 0.45fr);
   padding: 16px;
+  box-shadow: var(--shadow-soft);
 }
 
 .score-title-line {
@@ -450,6 +477,7 @@ textarea {
   line-height: 1.45;
   padding: 12px 13px;
   width: 100%;
+  background: white;
 }
 
 textarea {
@@ -463,6 +491,7 @@ textarea {
   border-radius: 8px;
   margin: 0;
   padding: 14px 18px;
+  box-shadow: var(--shadow-soft);
 }
 
 .field-row li {
@@ -477,11 +506,12 @@ textarea {
 }
 
 .evidence-panel {
-  background: white;
-  border: 1px solid var(--line);
+  background: linear-gradient(180deg, #ffffff, #fbfdfd);
+  border: 1px solid rgba(11, 111, 104, 0.2);
   border-radius: 8px;
   margin-bottom: 18px;
   padding: clamp(18px, 3vw, 28px);
+  box-shadow: var(--shadow);
 }
 
 .evidence-panel .section-heading p {
@@ -498,7 +528,7 @@ textarea {
 }
 
 .evidence-summary-item {
-  background: #f8faf9;
+  background: #f7fbfa;
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 14px;
@@ -516,7 +546,7 @@ textarea {
 
 .evidence-summary-item strong {
   display: block;
-  font-size: 24px;
+  font-size: 28px;
   margin: 4px 0;
 }
 
@@ -552,6 +582,7 @@ textarea {
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: clamp(20px, 4vw, 34px);
+  box-shadow: var(--shadow);
 }
 
 .report-viewer header {
@@ -615,6 +646,7 @@ th {
   color: var(--muted);
   font-size: 12px;
   text-transform: uppercase;
+  background: #f8fafb;
 }
 
 .two-column {

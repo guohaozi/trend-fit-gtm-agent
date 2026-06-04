@@ -70,7 +70,7 @@ export function ReportViewer({ markdown }: ReportViewerProps) {
   return (
     <article className="report-viewer">
       <header>
-        <p className="eyebrow">Gold-standard Markdown</p>
+        <p className="eyebrow">标准 Markdown 简报</p>
         <h2>{titleLine.replace(/^#\s+/, "")}</h2>
       </header>
       {sections.map((section) => (

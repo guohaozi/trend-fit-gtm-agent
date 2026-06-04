@@ -4,6 +4,7 @@ import aiToolDemo from "@/data/demo_ai_tool.json";
 import fashionDemo from "@/data/demo_fashion.json";
 import fashionEvidenceDemo from "@/data/demo_fashion_evidence.json";
 import roboticsDemo from "@/data/demo_robotics.json";
+import { formatCategory } from "@/lib/display-labels";
 import { adjustScores, type EvidenceAdjustmentCase } from "@/lib/evidence-adjustment";
 import { calculateTrendFit } from "@/lib/scoring";
 import type { DemoCase, ScoreKey } from "@/lib/types";
@@ -34,45 +35,45 @@ export const DIMENSION_META: Array<{
 }> = [
   {
     key: "audienceOverlap",
-    label: "Audience Overlap",
+    label: "受众重合度",
     weightLabel: "20%",
-    question: "Does the trend audience overlap the product ICP?"
+    question: "趋势受众是否和产品目标用户重合？"
   },
   {
     key: "useCaseRelevance",
-    label: "Use-case Relevance",
+    label: "使用场景相关性",
     weightLabel: "20%",
-    question: "Can the product join the trend naturally?"
+    question: "产品加入这个热点是否自然、不牵强？"
   },
   {
     key: "messageBridge",
-    label: "Message Bridge",
+    label: "卖点桥接",
     weightLabel: "15%",
-    question: "Is there a clean bridge to a real selling point?"
+    question: "热点能否顺畅连接到真实卖点？"
   },
   {
     key: "creativeFeasibility",
-    label: "Creative Feasibility",
+    label: "内容可执行性",
     weightLabel: "15%",
-    question: "Can the team produce native content for this format?"
+    question: "团队是否能产出适合平台语境的内容？"
   },
   {
     key: "commercialIntent",
-    label: "Commercial Intent",
+    label: "商业意图",
     weightLabel: "10%",
-    question: "Is the audience near a buying, trial, or inquiry mindset?"
+    question: "受众是否接近购买、试用或咨询心态？"
   },
   {
     key: "brandSafety",
-    label: "Brand Safety",
+    label: "品牌安全",
     weightLabel: "10%",
-    question: "How much reputational or claims risk exists?"
+    question: "是否存在声誉、价值观或表达风险？"
   },
   {
     key: "timingSaturation",
-    label: "Timing & Saturation",
+    label: "时机与饱和度",
     weightLabel: "10%",
-    question: "Is there still room to enter with a differentiated angle?"
+    question: "现在进入是否仍有差异化空间？"
   }
 ];
 
@@ -121,5 +122,5 @@ export function getReportFileName(id?: string | null): string {
 }
 
 export function getCaseLabel(demo: DemoCase): string {
-  return `${demo.product.category} x ${demo.trend.name}`;
+  return `${formatCategory(demo.product.category)} × ${demo.trend.name}`;
 }

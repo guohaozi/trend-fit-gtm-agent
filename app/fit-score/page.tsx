@@ -17,9 +17,9 @@ export default async function FitScorePage({ searchParams }: PageProps) {
   return (
     <div className="page-wrap">
       <PageHeader
-        eyebrow="Step 3"
-        title="Fit Score"
-        description="The score is deterministic and auditable: seven anchored dimensions, fixed weights, round-half-up display total, then override rules."
+        eyebrow="第 3 步"
+        title="适配评分"
+        description="评分是确定性、可审计的：七个锚点评分维度、固定权重、四舍五入展示分，再叠加 override 规则。"
         demo={demo}
       />
       <WorkflowNav activePath="/fit-score" caseId={demo.id} />

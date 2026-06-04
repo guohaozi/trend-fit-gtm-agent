@@ -8,7 +8,7 @@ type CaseSwitcherProps = {
 
 export function CaseSwitcher({ activeId, currentPath }: CaseSwitcherProps) {
   return (
-    <nav className="case-switcher" aria-label="Demo cases">
+    <nav className="case-switcher" aria-label="案例切换">
       {DEMO_CASES.map((demo) => {
         const isActive = demo.id === activeId;
         return (

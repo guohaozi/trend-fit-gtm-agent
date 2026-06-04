@@ -15,9 +15,9 @@ export default async function ProductProfilePage({ searchParams }: PageProps) {
   return (
     <div className="page-wrap">
       <PageHeader
-        eyebrow="Step 1"
-        title="Product Profile"
-        description="The product profile anchors the scoring model. Risk tolerance, positioning, ICP, and selling points all feed the final decision."
+        eyebrow="第 1 步"
+        title="产品画像"
+        description="产品画像是评分模型的锚点。风险偏好、定位、ICP 和卖点都会进入最终判断。"
         demo={demo}
       />
       <WorkflowNav activePath="/product-profile" caseId={demo.id} />

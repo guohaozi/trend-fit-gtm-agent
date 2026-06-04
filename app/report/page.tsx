@@ -19,16 +19,16 @@ export default async function ReportPage({ searchParams }: PageProps) {
   return (
     <div className="page-wrap">
       <PageHeader
-        eyebrow="Step 4"
-        title="GTM Brief Report"
-        description="The report page renders the gold-standard Markdown produced by the skill layer, preserving the twelve-section GTM brief contract."
+        eyebrow="第 4 步"
+        title="GTM 简报"
+        description="报告页保留技能层产出的标准 Markdown 简报，同时展示证据修正后的评分闭环。"
         demo={demo}
       />
       <WorkflowNav activePath="/report" caseId={demo.id} />
       <CaseSwitcher activeId={demo.id} currentPath="/report" />
       <div className="report-actions">
         <a className="primary-action" href={`/api/report/${demo.id}`}>
-          Download Markdown
+          下载 Markdown
         </a>
         <span className="secondary-action">{getReportFileName(demo.id)}</span>
       </div>

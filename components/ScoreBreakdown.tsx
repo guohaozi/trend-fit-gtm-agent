@@ -8,10 +8,10 @@ type ScoreBreakdownProps = {
 
 export function ScoreBreakdown({ scores, result }: ScoreBreakdownProps) {
   return (
-    <section className="score-section" aria-label="Score breakdown">
+    <section className="score-section" aria-label="评分拆解">
       <div className="section-heading">
-        <p className="eyebrow">7-dimension contract</p>
-        <h2>Score Breakdown</h2>
+        <p className="eyebrow">七维评分契约</p>
+        <h2>评分拆解</h2>
       </div>
       <div className="score-list">
         {DIMENSION_META.map((dimension) => {
@@ -30,7 +30,7 @@ export function ScoreBreakdown({ scores, result }: ScoreBreakdownProps) {
                   <span style={{ width: `${score}%` }} />
                 </div>
                 <strong>{score}</strong>
-                <small>Weighted {result.weightedScores[dimension.key].toFixed(2)}</small>
+                <small>加权 {result.weightedScores[dimension.key].toFixed(2)}</small>
               </div>
             </article>
           );
