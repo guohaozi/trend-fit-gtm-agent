@@ -6,7 +6,11 @@ import fashionEvidenceDemo from "@/data/demo_fashion_evidence.json";
 import roboticsDemo from "@/data/demo_robotics.json";
 import { formatCategory } from "@/lib/display-labels";
 import { adjustScores, type EvidenceAdjustmentCase } from "@/lib/evidence-adjustment";
-import { calculateTrendFit } from "@/lib/scoring";
+import {
+  applyRecommendationRigor,
+  calculateTrendFitWithProfile,
+  normalizeWeightProfile
+} from "@/lib/recommendation-rigor";
 import type { DemoCase, ScoreKey } from "@/lib/types";
 
 export const DEMO_CASES = [
@@ -81,11 +85,30 @@ export function getDemoCase(id?: string | null): DemoCase {
   return DEMO_CASES.find((demo) => demo.id === id) ?? DEMO_CASES[0];
 }
 
-export function getDemoResult(id?: string | null) {
+export function getDemoResult(id?: string | null, profileInput?: string | null) {
   const demo = getDemoCase(id);
-  return calculateTrendFit(demo.scores, demo.product.riskTolerance, {
+  const profile = normalizeWeightProfile(profileInput ?? demo.profileUsed);
+  return calculateTrendFitWithProfile(demo.scores, demo.product.riskTolerance, profile, {
     qualifier: demo.expectedQualifier
   });
+}
+
+export function getDemoRigorResult(id?: string | null, profileInput?: string | null) {
+  const demo = getDemoCase(id);
+  const profile = normalizeWeightProfile(profileInput ?? demo.profileUsed);
+  const result = calculateTrendFitWithProfile(demo.scores, demo.product.riskTolerance, profile, {
+    qualifier: demo.expectedQualifier
+  });
+
+  return {
+    result,
+    rigor: applyRecommendationRigor({
+      scores: demo.scores,
+      result,
+      profile,
+      evidence: []
+    })
+  };
 }
 
 export function getEvidenceCase(id?: string | null): EvidenceAdjustmentCase | null {
@@ -93,20 +116,28 @@ export function getEvidenceCase(id?: string | null): EvidenceAdjustmentCase | nu
   return EVIDENCE_CASES.find((evidenceCase) => evidenceCase.case === demo.id) ?? null;
 }
 
-export function getEvidenceResult(id?: string | null) {
+export function getEvidenceResult(id?: string | null, profileInput?: string | null) {
   const demo = getDemoCase(id);
   const evidenceCase = getEvidenceCase(demo.id);
   if (!evidenceCase) return null;
 
   const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
-  const adjustedResult = calculateTrendFit(adjustment.adjusted, demo.product.riskTolerance, {
+  const profile = normalizeWeightProfile(profileInput ?? evidenceCase.profileUsed ?? demo.profileUsed);
+  const adjustedResult = calculateTrendFitWithProfile(adjustment.adjusted, demo.product.riskTolerance, profile, {
     qualifier: demo.expectedQualifier
+  });
+  const rigor = applyRecommendationRigor({
+    scores: adjustment.adjusted,
+    result: adjustedResult,
+    profile,
+    evidence: evidenceCase.evidence
   });
 
   return {
     evidenceCase,
     adjustment,
-    adjustedResult
+    adjustedResult,
+    rigor
   };
 }
 

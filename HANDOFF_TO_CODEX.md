@@ -145,6 +145,64 @@ return winner's full brief. Ranking order: finalBand priority → adjusted total
 confidence → timingSaturation. Build this AFTER the evidence layer + a multi-trend input
 page. Still no auto-crawl.
 
+## v1.2 — Rigor layer: weight profiles + evidence gate + caps + fragility (NEW)
+
+Per the scoring-improvement brief. **All additive — `calculateTrendFit` core math, the
+frozen `data/*.json` raw fields, and existing tests are untouched.** These are layers on
+top that produce new fields. Specs:
+[`weight_profiles.md`](skills/trend-product-fit/weight_profiles.md),
+[`scoring_rubric.md`](skills/trend-product-fit/scoring_rubric.md) (no-evidence caps),
+[`evidence_model.md`](skills/trend-product-fit/evidence_model.md) §3a/§5a–§5d.
+
+```ts
+type WeightProfile = "default" | "brand_awareness" | "ecommerce_conversion"
+                   | "b2b_pipeline" | "creator_seeding" | "risk_sensitive";
+// PROFILES[p] is a Record<ScoreKey, number> summing to 1.0; default === existing WEIGHTS.
+// calculateTrendFit(scores, risk, PROFILES[profile]) — pass weights in; same math.
+
+type EvidenceGate = "pass" | "partial" | "fail";
+type Stability = "stable" | "moderate" | "fragile";
+type DecisionType = "No-go" | "observe" | "small test" | "creator seeding"
+                  | "organic push" | "paid push";
+
+type GatedRecommendation = {
+  profileUsed: WeightProfile;
+  evidenceGate: EvidenceGate;
+  gateMissing: string[];          // required dims lacking evidence
+  gatedBand: Band;                // finalBand, downgraded one step if Strong Go && gate != pass
+  dimensionCaps: ScoreKey[];      // dims scored >75 without non-proxy evidence
+  recommendationStability: Stability;
+  decisionType: DecisionType;
+  nextValidationAction: string;
+};
+```
+
+**Rules (all deterministic, in evidence_model.md):**
+- *No-evidence caps:* Audience/Creative/Commercial/Timing >75 require non-proxy evidence;
+  else list in `dimensionCaps` (advisory; don't mutate the raw total).
+- *Strong Go gate:* require non-proxy evidence on Timing, BrandSafety, (Audience OR
+  Use-case) [+ non-proxy Commercial for `ecommerce_conversion`/`b2b_pipeline`]. Miss →
+  downgrade a Strong Go to Go (`gatedBand`), set gate `partial`/`fail`.
+- *Fragility:* fragile if gate fail OR margin-to-band-edge ≤3 OR any `dimensionCaps` OR a
+  −1 anchor step on an assumption/proxy dim flips the band.
+- *decisionType:* table in evidence_model §5d (fragile ⇒ never "paid push").
+
+**Tests to add (assert against the demo JSONs' new `expected*` fields):**
+- `demo_fashion`/`demo_ai_tool` (assumption-only): gate `fail` → `gatedBand` "Go",
+  `dimensionCaps` non-empty, stability `fragile`, decisionType "small test".
+- `demo_robotics`: gate `fail`, `gatedBand` "Go", caps `[]`, fragile, "small test".
+- `demo_fashion_evidence`: The VOU/listicle items are proxy, so gate `partial`,
+  `gatedBand` "Go", caps `["audienceOverlap", "creativeFeasibility"]`, fragile,
+  decisionType "small test".
+- weight profiles: each sums to 1.0; fashion scores give risk_sensitive → 81 (Go),
+  ecommerce_conversion → 88, others 90.
+- UI: show rawBand vs gatedBand, the gate badge, stability, and `nextValidationAction`.
+
+**NOT doing (explicit, honest):** the 20–50 case calibration set. No real campaign-outcome
+data exists; fabricating it would violate the evidence rule and the scoring philosophy.
+Weights stay labelled expert-priors until real outcomes exist. This is a deliberate
+boundary, not an omission.
+
 ## Don't (v1 scope, per §14)
 No crawlers (TikTok/X), no KOL-email scraping, no ad-platform APIs, no DB/auth/payments.
 Manual trend input only. (Auto trend *discovery* is the layer AFTER the shortlist works.)

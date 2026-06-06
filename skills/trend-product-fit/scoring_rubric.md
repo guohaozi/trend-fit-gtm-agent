@@ -5,8 +5,30 @@ pick the lower one and explain the gap — disciplined scoring beats generous sc
 Each score needs a one-line reason grounded in the Product Profile + Trend Input (or a
 labelled `Assumption:`). Never anchor a score to a metric you did not measure.
 
-Weights (fixed): Audience 20 · Use-case 20 · Bridge 15 · Creative 15 · Commercial 10 ·
-Brand Safety 10 · Timing 10.
+Weights (default): Audience 20 · Use-case 20 · Bridge 15 · Creative 15 · Commercial 10 ·
+Brand Safety 10 · Timing 10. (Goal-based alternates in
+[`weight_profiles.md`](weight_profiles.md); the default keeps the demos at 90/74/89.)
+
+## No-evidence caps (read before scoring)
+
+Some dimensions are dangerously easy to over-assume. **Without at least one supporting
+non-proxy evidence item, these dimensions cap at 75 — you may not assign 100 on
+assumption alone:**
+
+| Dimension | Cap without evidence | Why it's easy to over-assume |
+|-----------|----------------------|------------------------------|
+| Audience Overlap | **75** | "young people watch it" ≠ your ICP is actually present (B2B especially) |
+| Creative Feasibility | **75** | 100 assumes assets/team/shoot capacity you haven't confirmed |
+| Commercial Intent | **75** | entertainment virality ≠ buying intent; proxy/listicle traffic isn't purchase behavior |
+| Timing & Saturation | **75** | "still rising" is a guess without Google Trends / platform search / competitor-volume data |
+
+To score any of these at **100** you need real evidence (raw trend data, a community/
+review corpus, named-source confirmation, observed competitor activity — **not** a
+proxy/listicle source). A 100 with no evidence is a contract smell: cap it at 75 and add
+the dimension to `dimensionCaps` in the output. Brand Safety, Use-case, and Message
+Bridge can be reasoned from the product+trend text itself, but Brand Safety ≥ 75 is far
+stronger with evidence too. See [`evidence_model.md`](evidence_model.md) for how evidence
+lifts the cap and feeds the Strong Go gate.
 
 ---
 

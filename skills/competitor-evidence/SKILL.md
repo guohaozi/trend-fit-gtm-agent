@@ -58,6 +58,19 @@ For each relevant competitor (cap at the top 3 for a trend decision):
 - **Price point:** {price / tier} [source] (mark "unverified" if not confirmed)
 ```
 
+Every finding you intend to use as a score input must be emitted as a typed evidence item
+(per [`evidence_model.md`](../trend-product-fit/evidence_model.md) §2/§3a) carrying:
+`dimension`, `direction`, `magnitude`, `confidence`, **`sourceTier`** (primary/secondary/
+proxy), `sourceUrl`. A finding with no `sourceTier` is not usable for scoring.
+
+**Hard rule — do not launder source strength:**
+- A **listicle / affiliate / SEO blog** is `proxy`. It gives *direction*, never proof,
+  and **cannot** be used to claim Commercial Intent or Audience Overlap as measured
+  purchase/audience behavior. "Lots of 'affordable dupe' listicles" is a saturation
+  signal, not a "people are buying" signal.
+- Reserve `primary` for raw platform data, a real review/comment corpus, named-expert
+  quotes, or directly-observed campaigns. When unsure, downgrade the tier.
+
 Then a synthesis:
 
 ```markdown

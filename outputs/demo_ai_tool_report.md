@@ -10,6 +10,10 @@ saturation: the AI-edit space is crowded, so differentiation must come from
 speed/workflow and honesty (real, reproducible results), not from the transformation
 alone.
 **Total Fit Score: 89/100**
+> **Gate note (v1.2):** assumption-based brief, so the evidence gate is **fail** → gated
+> recommendation **Go, pending evidence** (raw 89 is not an earned Strong Go). Stability:
+> **fragile** (Audience, Creative, Commercial are unsupported-high). Decision type: **small
+> test** until Timing / Brand Safety / Audience / Commercial evidence is gathered.
 
 ## 2. Score breakdown
 | Dimension | Weight | Score | Weighted | Why this score |

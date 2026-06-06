@@ -2,6 +2,68 @@
 
 This changelog records project-level changes and the reasoning behind them. It is intended for handoff between Codex / Claude conversations, not just release notes.
 
+## 2026-06-06 — v1.2 Rigor Layer, Evidence Gate, And Profile Switching
+
+Status:
+
+- v1.2 handoff entry. Check `git log -1 --oneline` for the exact commit hash after the handoff commit.
+
+What landed:
+
+- Implemented the v1.2 rigor layer in TypeScript, not just in skill docs.
+- Added `lib/recommendation-rigor.ts` with:
+  - goal-based weight profiles
+  - evidence gate
+  - no-evidence caps
+  - recommendation stability
+  - decision type
+  - next validation action
+- Added `components/RigorSummary.tsx` to show the actual stand-behind recommendation.
+- Added `components/ProfileSwitcher.tsx` to expose weight profiles in the app UI.
+- Updated `/fit-score` and `/report` so `?profile=...` changes the scoring lens.
+- Updated score breakdown and evidence comparison tables to show active profile weights.
+- Updated `data/*.json`, `outputs/*.md`, `HANDOFF_TO_CODEX.md`, and skills to include gate fields and v1.2 behavior.
+- Added `tests/recommendation-rigor.test.ts`.
+
+Key design decisions:
+
+- Base scoring remains frozen: anchors, rounding, bands, and overrides are unchanged.
+- v1.2 is additive: raw score is the analyst claim; `gatedBand` is the recommendation the agent is allowed to stand behind.
+- A pure-assumption `90 Strong Go` is no longer allowed to stand as a true Strong Go; it becomes gated `Go` until required non-proxy evidence exists.
+- Strong Go gate requires non-proxy evidence for Timing, Brand Safety, and Audience or Use-case. Conversion profiles also require non-proxy Commercial Intent.
+- Proxy/listicle/affiliate/SEO content can inform direction, but cannot satisfy the Strong Go gate.
+- Historical calibration was deliberately not created because there are no real labelled campaign outcomes yet. Fake calibration would undermine the project's honesty.
+
+Important correction:
+
+- The VOU and Chic Style Collective are now treated as `proxy` sources.
+- Essence is `secondary` cultural context.
+- Refinery29 is the strongest `primary` source for named expert critique.
+- The evidence-backed fashion case is raw `88 Strong Go`, but gated `Go` because audience/use-case evidence remains proxy/listicle-based.
+
+Verified examples:
+
+- Fashion under `default`: raw `90`, Strong Go, gated `Go` because assumption-only.
+- Fashion under `risk_sensitive`: raw `81`, Go; Brand Safety weight displays as `25%`.
+- Fashion evidence case under `default`: raw `88`, Strong Go, gated `Go`, `evidenceGate=partial`, `decisionType=small test`.
+
+Verification:
+
+- `npm test` passed with 21 tests across 4 suites.
+- `npm run build` passed.
+- Local page smoke checks returned 200 for:
+  - `/fit-score?case=demo_fashion`
+  - `/fit-score?case=demo_fashion&profile=risk_sensitive`
+  - `/report?case=demo_fashion&profile=risk_sensitive`
+
+Known limitations after this change:
+
+- No automatic trend discovery yet.
+- No automatic multi-source evidence collection yet.
+- No real outcome-calibrated weight set yet.
+- Commercial Intent is still proxy-based in the fashion evidence case.
+- Creative Feasibility remains assumption-based in the fashion evidence case.
+
 ## 2026-06-04 — Initial MVP Baseline
 
 Commit:
@@ -162,7 +224,7 @@ Key messaging:
 
 Status:
 
-- Current working tree, not committed yet at the time of this handoff.
+- Superseded by the 2026-06-06 v1.2 rigor-layer work, which keeps the evidence case but tightens its claims.
 
 Files changed:
 
@@ -178,8 +240,8 @@ What landed:
 
 Main result:
 
-- Original deterministic demo: `90`, Strong Go
-- Evidence-backed read: `88`, Strong Go
+- Original deterministic demo: raw `90`, gated `Go` because it is assumption-only
+- Evidence-backed read: raw `88`, gated `Go` because the Audience / Use-case support is still proxy/listicle-based
 - Timing & Saturation revised from `75` to `50`
 - Brand Safety remains `50`, but the risk is now evidence-backed
 
@@ -191,7 +253,7 @@ Evidence used:
 - Essence:
   - additional cultural/racial critique context
 - The VOU / Chic Style Collective / The Nod Mag:
-  - affordable quiet luxury / budget-dupe / mid-market brand activity
+  - affordable quiet luxury / budget-dupe / mid-market brand activity, treated as proxy evidence under v1.2
 - Accio / Influencers Time:
   - secondary trend-analysis support for post-peak timing
 
@@ -207,26 +269,15 @@ Known limitations:
 - Commercial Intent is still proxy-based.
 - Creative Feasibility remains an assumption.
 
-Recommended commit:
-
-```bash
-git add README.md skills/competitor-evidence/SKILL.md outputs/demo_fashion_evidence_case.md docs/current-state.md docs/changelog.md
-git commit -m "Add real evidence case for quiet luxury"
-```
-
 ## Next Recommended Changelog Entry
 
 Planned:
 
 - Portfolio case study and screenshots.
-
-Target files may include:
-
-- `docs/case-study.md`
-- README screenshot section
-- images under a future `public/` or `docs/assets/` directory
+- A small trend-shortlist demo: 1 product + 3 candidate trends -> evidence/gate-aware ranking.
+- Optional route smoke tests for `/`, `/fit-score`, and `/report`.
 
 Recommended scope:
 
-- Keep it presentation-focused.
-- Do not change scoring contract unless a new test fails first.
+- Keep the base scoring contract frozen unless a new test fails first.
+- Treat historical calibration as future work unless real campaign outcomes are available.

@@ -18,6 +18,37 @@ opportunities others miss. A confident "No-go" is as valuable as a "Strong Go".
 
 ---
 
+## 0. Scoring philosophy (read this first)
+
+**This is an explainable GTM *decision* framework, not a sales *prediction* model.**
+
+The score answers "should this product follow this trend, from what angle, with what
+risk?" — it does **not** forecast views, revenue, CTR, or conversion. Never present a
+score as a guarantee of commercial outcome.
+
+What the number is and isn't:
+- ✅ It is a **structured, auditable argument** — every dimension is a claim a human can
+  challenge, and the total is the weighted sum of those claims.
+- ✅ It makes a GTM judgment **discussable, contestable, and evidence-able**.
+- ❌ It is **not** outcome-calibrated. The weights are expert-set, not regressed on real
+  campaign results (see [`weight_profiles.md`](weight_profiles.md) and the calibration
+  roadmap there).
+- ❌ A high score is **not** permission to spend. Confidence comes from *evidence* and
+  *stability*, not from the number alone — that is what the evidence gate (§5a) enforces.
+
+Three honesty mechanisms make the framework rigorous rather than precise-looking:
+1. **No-evidence caps** — assumption-only dimensions can't claim top marks
+   (see `scoring_rubric.md`).
+2. **Strong Go evidence gate** — the top recommendation must be *earned* with evidence,
+   not asserted (see §5a and `evidence_model.md`).
+3. **Sensitivity / fragility** — every recommendation is labelled stable / moderate /
+   fragile, so a borderline call is never dressed up as a sure thing.
+
+If asked "will this make sales go up?", the honest answer is: "this tells you whether
+it's a defensible bet and how to de-risk it — outcome still depends on execution."
+
+---
+
 ## 1. When to use this skill
 
 Use it when there is **a named product** AND **a named trend**, and the user wants a
@@ -122,6 +153,36 @@ drives logic, color, and filtering. Keep them separate so downstream code stays 
 Always show your work: the per-dimension score, the weighted contribution, the total,
 and the band — so a human can audit and override.
 
+### Weight profiles
+The default weights above are one lens. The campaign **goal** changes what matters — an
+e-commerce conversion push weights Commercial Intent far more than a brand-awareness
+play. Select a profile from [`weight_profiles.md`](weight_profiles.md) based on the
+product's `campaignGoal`; if unsure, use `default` and say so. Report `profileUsed` in the
+brief. Profiles only change weights — the 7 dimensions, anchors, bands, and overrides are
+identical, so the math stays compatible.
+
+## 4a. The evidence gate, caps, and fragility (earning the recommendation)
+
+A score is a claim; this layer decides what you can actually stand behind. Full
+deterministic rules: [`evidence_model.md`](evidence_model.md).
+
+- **No-evidence caps.** Audience, Creative, Commercial, and Timing cannot be scored above
+  **75 without supporting (non-proxy) evidence**. Flag any that are as `dimensionCaps` —
+  they are unsupported-high claims. (See `scoring_rubric.md`.)
+- **Strong Go evidence gate.** A **Strong Go** must be *earned*: it requires real evidence
+  on **Timing & Saturation**, **Brand Safety**, and **(Audience OR Use-case)** — plus
+  **Commercial Intent** evidence for conversion-goal profiles. If the required evidence is
+  missing, set `evidenceGate: partial|fail` and **downgrade the displayed recommendation
+  to Go** (`gatedBand`). An assumption-only 90 is a *Go pending evidence*, not a Strong Go.
+- **Fragility.** Label every recommendation `stable` / `moderate` / `fragile`. It is
+  **fragile** if the gate fails, the total sits ≤3 points from a band edge, there are
+  unsupported-high caps, or a single one-notch drop on an assumption/proxy dimension would
+  change the band. Fragile recommendations get a **small test**, never a big-budget push.
+
+These three layers sit on top of the raw score; they never produce off-anchor values and
+never mutate `rawBand`/`finalBand` — they add `gatedBand`, `evidenceGate`, `dimensionCaps`,
+and `recommendationStability`.
+
 ---
 
 ## 5. Output: the GTM Brief
@@ -134,8 +195,11 @@ for tone and depth.
 # Trend-Fit GTM Brief — {Product} × {Trend}
 
 ## 1. Executive recommendation
-{Strong Go / Go / Cautious test / Weak fit / No-go} — {one-sentence why}.
-**Total Fit Score: {N}/100**
+{gatedBand: Strong Go / Go / Cautious test / Weak fit / No-go} — {one-sentence why}.
+**Total Fit Score: {N}/100** · Profile: {profileUsed} · Evidence gate: {pass/partial/fail}
+· Stability: {stable/moderate/fragile}
+{If gatedBand < rawBand, one line: "Raw score is {rawBand}; downgraded because {missing
+evidence dims}."}
 
 ## 2. Score breakdown
 | Dimension | Weight | Score | Weighted | Why this score |
@@ -176,7 +240,10 @@ mitigation for each real risk. Be specific, not boilerplate.}
 {One short creator-outreach DM the BD team could send today.}
 
 ## 12. Final decision
-{Go / No-go, the conditions, and the smallest next step to validate.}
+**Decision type:** {No-go / observe / small test / creator seeding / organic push / paid push}
+{The conditions, and the smallest next step to validate.}
+**Next validation action:** {the single most decision-changing thing to verify next — which
+dimension's evidence to gather, or what small test to run. Tie to the fragility/caps above.}
 ```
 
 Sections 4–11 can be enriched by the sibling skills:

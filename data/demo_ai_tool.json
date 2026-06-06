@@ -41,5 +41,12 @@
   "expectedBand": "Strong Go",
   "expectedQualifier": null,
   "expectedFinalBand": "Strong Go",
-  "overrideReason": null
+  "overrideReason": null,
+  "profileUsed": "default",
+  "expectedEvidenceGate": "fail",
+  "expectedGatedBand": "Go",
+  "expectedGateMissing": ["timingSaturation", "brandSafety", "audienceOrUseCase"],
+  "expectedDimensionCaps": ["audienceOverlap", "creativeFeasibility", "commercialIntent"],
+  "expectedStability": "fragile",
+  "expectedDecisionType": "small test"
 }

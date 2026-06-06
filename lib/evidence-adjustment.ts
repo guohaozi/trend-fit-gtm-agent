@@ -39,6 +39,13 @@ export type EvidenceAdjustmentCase = {
   expectedAdjustedScores: Scores;
   expectedAdjustedTotal: number;
   expectedAdjustedBand: Band;
+  profileUsed?: string;
+  expectedEvidenceGate?: string;
+  expectedGatedBand?: Band;
+  expectedGateMissing?: string[];
+  expectedDimensionCaps?: ScoreKey[];
+  expectedStability?: string;
+  expectedDecisionType?: string;
   expectedDimensionConfidence: Record<ScoreKey, DimensionConfidenceLabel>;
 };
 

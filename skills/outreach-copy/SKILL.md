@@ -10,6 +10,17 @@ target (tier + niche). This skill writes the actual outreach: a DM the BD team c
 send today, plus an email variant and a short follow-up. It fills **§11 of the GTM
 Brief**.
 
+### Evidence gate: discovery before DMs
+Check the fit brief's evidence on **Audience Overlap** and **Commercial Intent** first:
+- If **either is assumption-only or proxy** (no non-proxy evidence — see
+  `evidence_model.md`), do **not** write a send-ready mass DM. The audience/intent isn't
+  verified, so a blast would be premature. Instead output a **creator-discovery task**:
+  what to look for (creator niche, audience-fit signals, where they post), and the
+  evidence to gather (real audience overlap, "where to buy" intent) before outreach.
+- Only when Audience **and** Commercial Intent have real evidence (or the user explicitly
+  has named creators) do you produce ready-to-send DMs.
+This prevents spraying DMs off an unverified audience guess.
+
 ## Inputs
 - Creator type / niche from the fit brief (never invent specific creator names/handles
   unless the user or `competitor-evidence` supplied real ones).

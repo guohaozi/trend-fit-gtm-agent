@@ -8,9 +8,14 @@
 > cited sources. This is the *evidence agent* in action.
 >
 > **Headline result:** real evidence **revised Timing & Saturation from 75 → 50**
-> (total 90 → **88**, still Strong Go) and **hardened the Brand Safety risk from an
-> assumption into a documented, named-source reputational minefield.** The decision
-> survived; the reasoning is now defensible.
+> (total 90 → **88**) and **hardened the Brand Safety risk from an assumption into a
+> documented, named-source reputational minefield.** Crucially, because the required
+> Timing and Brand Safety are now evidenced, but the Audience / Use-case support still
+> relies on commerce/listicle sources that v1.2 classifies as **proxy**. This therefore
+> lands as **evidence gate: partial** and a gated **Go**, not an earned Strong Go yet.
+> Stability is **fragile** (Audience and Creative remain unsupported-high → decision type
+> "small test"). The decision improved, but it still needs stronger non-proxy audience or
+> competitor evidence before the project can honestly call it Strong Go.
 >
 > Research date: 2026-06-04. Tooling: WebSearch / WebFetch (gooseworks not installed in
 > this environment; the same blocks would be produced from gooseworks Reddit/X scrapes).
@@ -100,13 +105,15 @@
 
 ### Recomputed total
 `100·.2 + 100·.2 + 100·.15 + 100·.15 + 75·.1 + 50·.1 + 50·.1 = 87.5 → 88`
-**88 / 100 → Strong Go** (band unchanged; the score is now honest about saturation).
+**88 / 100 → raw Strong Go; gated Go** (band would be Strong Go on score alone, but v1.2
+requires non-proxy evidence before the top tier is earned).
 
 ---
 
 ## 4. What the evidence changes in the brief
-- **Recommendation:** still Strong Go, but reframed — *"Go, but you are late; win on a
-  differentiated anti-classist angle, not on being first."*
+- **Recommendation:** raw Strong Go becomes a gated Go — *"Go, but you are late; win on a
+  differentiated anti-classist angle, then collect non-proxy audience/use-case evidence
+  before calling it Strong Go."*
 - **Risk section:** upgrade classism from "a risk to watch" to "a documented backlash" —
   cite that critics call the aesthetic classist/racist, so the affordability-and-access
   framing is mandatory, not optional.

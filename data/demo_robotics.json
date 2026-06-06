@@ -41,5 +41,12 @@
   "expectedBand": "Go",
   "expectedQualifier": "trust-building angle",
   "expectedFinalBand": "Go",
-  "overrideReason": null
+  "overrideReason": null,
+  "profileUsed": "default",
+  "expectedEvidenceGate": "fail",
+  "expectedGatedBand": "Go",
+  "expectedGateMissing": ["timingSaturation", "brandSafety", "audienceOrUseCase"],
+  "expectedDimensionCaps": [],
+  "expectedStability": "fragile",
+  "expectedDecisionType": "small test"
 }

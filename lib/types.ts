@@ -52,6 +52,7 @@ export type ScoringResult = {
   totalRaw: number;
   total: number;
   recommendation: Recommendation;
+  weights: Record<ScoreKey, number>;
   weightedScores: Record<ScoreKey, number>;
 };
 
@@ -65,4 +66,11 @@ export type DemoCase = {
   expectedFinalBand: Band;
   expectedQualifier: string | null;
   overrideReason: string | null;
+  profileUsed?: string;
+  expectedEvidenceGate?: string;
+  expectedGatedBand?: Band;
+  expectedGateMissing?: string[];
+  expectedDimensionCaps?: ScoreKey[];
+  expectedStability?: string;
+  expectedDecisionType?: string;
 };

@@ -95,6 +95,28 @@ items, steps == 0 → "evidence-confirmed (" + maxEffectiveConfidence + ")"
 
 ---
 
+## 3a. Source-tier rubric (what counts as what)
+
+`sourceTier` is the honesty governor. Classify every source honestly:
+
+| Tier | What qualifies | Can affect | Max movement | Lifts a no-evidence cap? |
+|------|----------------|-----------|--------------|--------------------------|
+| **primary** | Raw platform data (Google Trends export, native analytics), a real review/comment corpus, named-expert quotes in reputable press, directly-observed competitor campaigns | any dimension | 2 steps | **Yes** |
+| **secondary** | Reputable journalism/industry analysis summarizing data or trends; established reports | any dimension | 2 steps (usually 1) | **Yes** |
+| **proxy** | Listicles, affiliate/SEO content, marketing blogs, single anecdotes, vendor copy | directional context only | **1 step** (half-weight + confidence capped at medium) | **No** |
+
+Rules that follow from this:
+- **Proxy can never confirm a no-evidence cap dimension at 100.** A pile of "affordable
+  dupe" listicles is a real saturation/awareness signal but is *not* measured purchase
+  behavior or measured audience overlap. Proxy supplies direction, never proof.
+- **"Non-proxy evidence"** (primary or secondary) is what the no-evidence caps
+  (`scoring_rubric.md`) and the Strong Go gate (§5a) require. Proxy items do not satisfy
+  either.
+- When unsure between secondary and proxy, choose **proxy**. Under-claiming source
+  strength is the safe error.
+
+---
+
 ## 4. Worked instance — fashion / quiet luxury
 
 Matches [`data/demo_fashion_evidence.json`](../../data/demo_fashion_evidence.json) and the
@@ -104,10 +126,10 @@ readable [`outputs/demo_fashion_evidence_case.md`](../../outputs/demo_fashion_ev
 |-----------|----------|-------------------------|-----|-------|----------|-------|
 | timingSaturation | 75 | Accio decline −4, Influencers −2, listicle-saturation (proxy) −2 | −8 | −1 | **50** | evidence-revised (medium) |
 | brandSafety | 50 | Refinery29 named-expert confirm 0, Essence confirm 0 | 0 | 0 | 50 | evidence-confirmed (high) |
-| useCaseRelevance | 100 | The VOU named mid-brands confirm 0 | 0 | 0 | 100 | evidence-confirmed (high) |
+| useCaseRelevance | 100 | The VOU named mid-brands (proxy) confirm 0 | 0 | 0 | 100 | evidence-confirmed (medium) |
 | commercialIntent | 75 | listicle commerce (proxy) confirm 0 | 0 | 0 | 75 | evidence-confirmed (medium) |
-| audienceOverlap | 100 | (covered by useCase evidence) | 0 | 0 | 100 | evidence-confirmed (high) |
-| messageBridge | 100 | The VOU "intention not price" confirm 0 | 0 | 0 | 100 | evidence-confirmed (high) |
+| audienceOverlap | 100 | The VOU mid-brand reach (proxy) confirm 0 | 0 | 0 | 100 | evidence-confirmed (medium) |
+| messageBridge | 100 | The VOU "intention not price" (proxy) confirm 0 | 0 | 0 | 100 | evidence-confirmed (medium) |
 | creativeFeasibility | 100 | none | 0 | 0 | 100 | assumption |
 
 Adjusted total `= 100·.2+100·.2+100·.15+100·.15+75·.1+50·.1+50·.1 = 87.5 → 88` → **Strong
@@ -120,6 +142,87 @@ Evidence adjustment happens **before** the override rules in `SKILL.md`. If evid
 drives `brandSafety` down to ≤ 25, the existing override (cap at Cautious test) fires on
 the adjusted score automatically — no special casing. Evidence and overrides are
 independent layers that stack cleanly because both operate on anchors.
+
+---
+
+## 5a. Strong Go evidence gate
+
+A Strong Go must be **earned with evidence**, not asserted. The gate runs *after*
+overrides, on `finalBand`.
+
+```
+hasNonProxyEvidence(dim)= any item on dim with sourceTier in {primary, secondary}
+
+required(profile) = [ timingSaturation, brandSafety, (audienceOverlap OR useCaseRelevance) ]
+                    + (profile ∈ {ecommerce_conversion, b2b_pipeline}
+                         ? [ commercialIntent (non-proxy) ] : [])
+# Every required slot must be satisfied by non-proxy evidence. Proxy is useful context,
+# but it cannot earn the top recommendation tier.
+
+metCount = number of required slots satisfied   # the (Audience OR Use-case) slot counts once
+
+evidenceGate =
+   all required satisfied        ? "pass"
+ : metCount >= 1                  ? "partial"
+ :                                 "fail"
+
+gatedBand =
+   (finalBand == "Strong Go" && evidenceGate != "pass")  ? downgradeOneBand(finalBand)  // → "Go"
+ :                                                          finalBand
+```
+
+The gate only guards the **top tier** — it never *upgrades*, and for Go/Cautious/Weak/
+No-go it reports coverage but does not change the band. An assumption-only 90 therefore
+reports `finalBand: Strong Go` but `gatedBand: Go` with `evidenceGate: fail` — *"a Go
+pending evidence."* That contrast is the product's whole point.
+
+`gateMissing` = the list of required dimensions lacking evidence (drives the "downgraded
+because…" line and the `nextValidationAction`).
+
+## 5b. No-evidence caps (link)
+Defined in `scoring_rubric.md`: Audience / Creative / Commercial / Timing cannot exceed
+**75** without non-proxy evidence. Report violations as `dimensionCaps` — they are
+unsupported-high claims, and they feed fragility (§5c). Caps are a scoring-time rule for
+new cases; for already-scored inputs, surface them as advisory flags.
+
+## 5c. Sensitivity & fragility
+
+Every recommendation is labelled so a borderline call is never dressed up as certainty.
+
+```
+thresholds = [85, 70, 55, 40]                  # band lower-bounds
+margin     = min(|displayTotal - t|) over thresholds
+flipDown(dim) = getBand changes when dim drops one anchor step (recompute display)
+
+fragile  if  evidenceGate == "fail"
+          OR margin <= 3
+          OR dimensionCaps not empty
+          OR any flipDown(dim) where dim has NO non-proxy evidence   # assumption/proxy leg
+moderate if  not fragile AND ( margin <= 8 OR any flipDown(dim) on an evidenced dim )
+stable   otherwise
+```
+
+A **fragile** recommendation never gets a big-budget `decisionType` — cap it at a small
+test (see below). `stable` requires both evidence coverage *and* comfortable margin; the
+current demos are all fragile-or-near precisely because they are assumption-heavy — which
+is the honest signal, not a bug.
+
+## 5d. decisionType (what to actually do)
+
+```
+No-go        → "No-go"
+Weak fit     → "observe"
+Cautious test→ "small test"
+Go           → fragile ? "small test"
+              : hasNonProxyEvidence(commercialIntent) && stability=="stable" ? "organic push"
+              : "creator seeding"
+Strong Go    → fragile ? "organic push"          // never go paid on a fragile top call
+              : (hasNonProxyEvidence(commercialIntent) && stability=="stable") ? "paid push"
+              : "organic push"
+```
+
+`nextValidationAction` = the single most decision-changing thing to verify next — usually
+the first `gateMissing` dimension, or the `dimensionCaps` leg the recommendation leans on.
 
 ---
 

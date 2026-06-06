@@ -8,6 +8,11 @@
 delivers the "expensive-looking, understated" look the trend rewards. The only real job
 is wording: ride the *look*, never the *class*.
 **Total Fit Score: 90/100**
+> **Gate note (v1.2):** this brief is assumption-based, so the evidence gate is **fail** →
+> gated recommendation is **Go, pending evidence** (a raw 90 is not an earned Strong Go).
+> Stability: **fragile** (Audience & Creative are unsupported-high). The evidenced version
+> improves the case but still remains gated Go until it gets non-proxy audience/use-case evidence:
+> [`demo_fashion_evidence_case.md`](demo_fashion_evidence_case.md).
 
 ## 2. Score breakdown
 | Dimension | Weight | Score | Weighted | Why this score |

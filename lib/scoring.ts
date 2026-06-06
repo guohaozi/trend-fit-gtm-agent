@@ -20,6 +20,8 @@ export const WEIGHTS = {
   timingSaturation: 0.1
 } as const satisfies Record<keyof Scores, number>;
 
+export type ScoreWeights = Record<keyof Scores, number>;
+
 const BAND_RANK: Record<Band, number> = {
   "No-go": 0,
   "Weak fit": 1,
@@ -100,13 +102,14 @@ export function applyOverrides(
 export function calculateTrendFit(
   scores: Scores,
   riskTolerance: RiskTolerance,
-  options: { qualifier?: string | null } = {}
+  options: { qualifier?: string | null; weights?: ScoreWeights } = {}
 ): ScoringResult {
   validateScores(scores);
+  const weights = options.weights ?? WEIGHTS;
 
   const weightedScores = SCORE_KEYS.reduce(
     (acc, key) => {
-      acc[key] = scores[key] * WEIGHTS[key];
+      acc[key] = scores[key] * weights[key];
       return acc;
     },
     {} as Record<keyof Scores, number>
@@ -119,6 +122,7 @@ export function calculateTrendFit(
   return {
     totalRaw,
     total,
+    weights,
     weightedScores,
     recommendation: applyOverrides(rawBand, scores, riskTolerance, options.qualifier ?? null)
   };

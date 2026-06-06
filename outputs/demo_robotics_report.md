@@ -9,6 +9,9 @@ it belongs in this trend natively. What holds it back from a "Strong Go" is exec
 risk: hardware content lives or dies on *believable demos*, and the category carries
 privacy and over-promising landmines. Win by showing real, honest, everyday use.
 **Total Fit Score: 74/100**
+> **Gate note (v1.2):** assumption-based brief → evidence gate **fail**, stability
+> **fragile**; gated recommendation stays **Go** but the honest decision type is **small
+> test**, not a push. Gather Timing / Brand Safety / Audience evidence to firm it up.
 
 ## 2. Score breakdown
 | Dimension | Weight | Score | Weighted | Why this score |

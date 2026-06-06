@@ -42,6 +42,27 @@ export const SOURCE_CONFIDENCE_LABELS: Record<string, string> = {
   high: "高置信"
 };
 
+export const EVIDENCE_GATE_LABELS: Record<string, string> = {
+  pass: "证据门槛通过",
+  partial: "证据部分通过",
+  fail: "证据不足"
+};
+
+export const STABILITY_LABELS: Record<string, string> = {
+  stable: "稳定",
+  moderate: "中等敏感",
+  fragile: "脆弱"
+};
+
+export const DECISION_TYPE_LABELS: Record<string, string> = {
+  "No-go": "不执行",
+  observe: "观察",
+  "small test": "小测试",
+  "creator seeding": "创作者种草",
+  "organic push": "自然流量推进",
+  "paid push": "付费放大"
+};
+
 export const QUALIFIER_LABELS: Record<string, string> = {
   "trust-building angle": "信任建设角度"
 };

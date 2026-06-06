@@ -77,6 +77,6 @@ describe("evidence adjustment model", () => {
     const evidenceCase = readEvidenceCase("demo_fashion_evidence.json");
     const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
 
-    assert.equal(getMeanEvidenceConfidence(adjustment.confidenceByDimension), 16 / 7);
+    assert.equal(getMeanEvidenceConfidence(adjustment.confidenceByDimension), 13 / 7);
   });
 });

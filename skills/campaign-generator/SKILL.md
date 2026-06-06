@@ -10,6 +10,19 @@ skill produces the creative the GTM Brief promises: **campaign angles (§4), con
 ideas (§5), and sample ad copy (§10)**. It does **not** re-decide whether to ride the
 trend — that's already settled. If the fit verdict is No-go / Weak fit, stop and say so.
 
+### Output scales to the decision tier (gate-aware)
+Read `gatedBand` + `decisionType` (from `evidence_model.md`), not the raw band:
+- **Strong Go / Go, gate `pass`, stable** → full campaign: 2-3 angles, 3-5 content ideas,
+  paid + organic copy.
+- **Go but `fragile` / gate `partial`**, or **decisionType = "small test"/"creator
+  seeding"** → a **single small-test concept**: one angle, 1-2 organic-only content ideas,
+  no paid spend. Label it a test, and name what result would justify scaling.
+- **Cautious test** → one minimal, controlled probe only.
+- **No-go / Weak fit** → produce nothing; restate the blocking reason.
+
+Generating a full paid campaign for a fragile or ungated recommendation is the failure
+mode this rule prevents.
+
 ## Inputs it expects
 - The fit decision + score breakdown.
 - The **campaign angle** seed, **brand voice**, and **words-to-use / words-to-avoid**

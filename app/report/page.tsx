@@ -1,19 +1,31 @@
 import { CaseSwitcher } from "@/components/CaseSwitcher";
 import { EvidenceComparison } from "@/components/EvidenceComparison";
 import { PageHeader } from "@/components/PageHeader";
+import { ProfileSwitcher } from "@/components/ProfileSwitcher";
 import { ReportViewer } from "@/components/ReportViewer";
+import { RigorSummary } from "@/components/RigorSummary";
 import { WorkflowNav } from "@/components/WorkflowNav";
-import { getDemoCase, getDemoResult, getEvidenceResult, getReportFileName, getReportMarkdown } from "@/lib/demo-cases";
+import {
+  getDemoCase,
+  getDemoResult,
+  getDemoRigorResult,
+  getEvidenceResult,
+  getReportFileName,
+  getReportMarkdown
+} from "@/lib/demo-cases";
+import { normalizeWeightProfile } from "@/lib/recommendation-rigor";
 
 type PageProps = {
-  searchParams?: Promise<{ case?: string }>;
+  searchParams?: Promise<{ case?: string; profile?: string }>;
 };
 
 export default async function ReportPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const demo = getDemoCase(params?.case);
-  const baselineResult = getDemoResult(demo.id);
-  const evidenceResult = getEvidenceResult(demo.id);
+  const profile = normalizeWeightProfile(params?.profile);
+  const baselineResult = getDemoResult(demo.id, profile);
+  const baselineRigor = getDemoRigorResult(demo.id, profile);
+  const evidenceResult = getEvidenceResult(demo.id, profile);
   const markdown = getReportMarkdown(demo.id);
 
   return (
@@ -25,20 +37,29 @@ export default async function ReportPage({ searchParams }: PageProps) {
         demo={demo}
       />
       <WorkflowNav activePath="/report" caseId={demo.id} />
-      <CaseSwitcher activeId={demo.id} currentPath="/report" />
+      <CaseSwitcher activeId={demo.id} currentPath="/report" profile={profile} />
+      <ProfileSwitcher activeProfile={profile} caseId={demo.id} currentPath="/report" />
       <div className="report-actions">
         <a className="primary-action" href={`/api/report/${demo.id}`}>
           下载 Markdown
         </a>
         <span className="secondary-action">{getReportFileName(demo.id)}</span>
       </div>
+      <RigorSummary result={baselineRigor.result} rigor={baselineRigor.rigor} />
       {evidenceResult ? (
-        <EvidenceComparison
-          evidenceCase={evidenceResult.evidenceCase}
-          adjustment={evidenceResult.adjustment}
-          baselineResult={baselineResult}
-          adjustedResult={evidenceResult.adjustedResult}
-        />
+        <>
+          <RigorSummary
+            title="证据修正后的实际结论"
+            result={evidenceResult.adjustedResult}
+            rigor={evidenceResult.rigor}
+          />
+          <EvidenceComparison
+            evidenceCase={evidenceResult.evidenceCase}
+            adjustment={evidenceResult.adjustment}
+            baselineResult={baselineResult}
+            adjustedResult={evidenceResult.adjustedResult}
+          />
+        </>
       ) : null}
       <ReportViewer markdown={markdown} />
     </div>

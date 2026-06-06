@@ -5,7 +5,6 @@ import {
   SOURCE_CONFIDENCE_LABELS,
   SOURCE_TIER_LABELS
 } from "@/lib/display-labels";
-import { WEIGHTS } from "@/lib/scoring";
 import type { EvidenceAdjustment, EvidenceAdjustmentCase } from "@/lib/evidence-adjustment";
 import type { ScoringResult } from "@/lib/types";
 
@@ -80,13 +79,13 @@ export function EvidenceComparison({
                 <tr key={dimension.key}>
                   <td>
                     <strong>{dimension.label}</strong>
-                    <small>{dimension.weightLabel}</small>
+                    <small>{Math.round(adjustedResult.weights[dimension.key] * 100)}%</small>
                   </td>
                   <td>{baseline}</td>
                   <td>{adjusted}</td>
                   <td>{formatDelta(delta)}</td>
                   <td>{CONFIDENCE_LABELS[adjustment.confidenceByDimension[dimension.key]]}</td>
-                  <td>{(adjusted * WEIGHTS[dimension.key]).toFixed(2)}</td>
+                  <td>{(adjusted * adjustedResult.weights[dimension.key]).toFixed(2)}</td>
                 </tr>
               );
             })}

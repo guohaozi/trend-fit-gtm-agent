@@ -16,12 +16,13 @@ export function ScoreBreakdown({ scores, result }: ScoreBreakdownProps) {
       <div className="score-list">
         {DIMENSION_META.map((dimension) => {
           const score = scores[dimension.key];
+          const weightLabel = `${Math.round(result.weights[dimension.key] * 100)}%`;
           return (
             <article className="score-row" key={dimension.key}>
               <div className="score-copy">
                 <div className="score-title-line">
                   <h3>{dimension.label}</h3>
-                  <span>{dimension.weightLabel}</span>
+                  <span>{weightLabel}</span>
                 </div>
                 <p>{dimension.question}</p>
               </div>

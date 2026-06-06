@@ -59,32 +59,45 @@ into anchor-step adjustments. Each trend now has an **evidence-adjusted total, b
 per-dimension confidence**.
 
 ### Step 4 — Rank
+First pick **one weight profile** for the whole comparison from the product's
+`campaignGoal` (see [`weight_profiles.md`](../trend-product-fit/weight_profiles.md)) and
+score every trend under the *same* profile — comparing trends across different profiles is
+meaningless. Then apply the **gate, caps, and fragility** (`evidence_model.md` §5a–§5c) to
+each trend before ranking.
+
 Sort the trends by, in order:
-1. **Final band** priority: Strong Go > Go > Cautious test > Weak fit > No-go (after
-   overrides). A trend whose Brand Safety evidence triggered an override drops here,
-   regardless of raw total.
+1. **Gated band** priority: Strong Go > Go > Cautious test > Weak fit > No-go. Use
+   `gatedBand` (after overrides AND the Strong Go evidence gate), **not** the raw band — an
+   assumption-only "Strong Go" is really a gated "Go" and must rank as one. A trend whose
+   Brand Safety evidence triggered an override also drops here.
 2. **Evidence-adjusted display total** (descending).
-3. **Mean dimension confidence** (descending) — when two trends tie on score, prefer the
-   one whose score we actually have evidence for. An assumption-only 80 ranks below an
-   evidence-confirmed 80.
+3. **Stability**: `stable` > `moderate` > `fragile`. A stable Go outranks a fragile Go;
+   an evidenced score outranks an assumption-only one of equal total.
 4. **Lower saturation risk** (higher Timing & Saturation score) as the final tie-break.
+
+**Fragile #1 rule:** if the top-ranked trend is `fragile` (or its gate is not `pass`), the
+recommendation is a **small test**, not a big push — say so explicitly and name the
+`nextValidationAction` (the evidence that would promote it to a confident Go/Strong Go).
+Do not present a fragile winner as a green light.
 
 ### Step 5 — Output
 ```markdown
-## Trend shortlist for {Product}
+## Trend shortlist for {Product}  (profile: {profileUsed})
 
-| Rank | Trend | Baseline | Evidence-adj | Band | Confidence | One-line verdict |
-|------|-------|----------|--------------|------|------------|------------------|
-| 1 | … | 90 | 88 | Strong Go | high | Best fit; ride with X angle. |
-| 2 | … | 84 | 72 | Go | medium | Viable but late — saturated. |
-| 3 | … | 78 | 55 | Cautious | high | Skip: documented brand-safety risk. |
+| Rank | Trend | Adj total | Gated band | Gate | Stability | Decision | One-line verdict |
+|------|-------|-----------|------------|------|-----------|----------|------------------|
+| 1 | … | 88 | Strong Go | pass | fragile | organic push | Best fit; validate creative first. |
+| 2 | … | 84 | Go | partial | moderate | creator seeding | Viable but late — saturated. |
+| 3 | … | 72 | Cautious | fail | fragile | small test | Documented brand-safety risk. |
 | … |
 
 ### Why #1 wins
-{2-3 sentences: what the evidence confirmed/revised and why it beat #2.}
+{2-3 sentences: what the evidence confirmed/revised and why it beat #2. If #1 is fragile,
+state the small test + nextValidationAction instead of a green light.}
 
 ### Recommended campaign — {winning trend}
-{The winner's FULL GTM brief, via trend-product-fit §1-12, on evidence-adjusted scores.}
+{The winner's FULL GTM brief, via trend-product-fit §1-12, on evidence-adjusted scores,
+showing rawBand vs gatedBand, gate status, stability, and decision type.}
 
 ### The rest, briefly
 - **{Trend 2}** — {one line: the single reason it's not #1.}
