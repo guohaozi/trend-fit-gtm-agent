@@ -63,13 +63,20 @@ Every finding you intend to use as a score input must be emitted as a typed evid
 `dimension`, `direction`, `magnitude`, `confidence`, **`sourceTier`** (primary/secondary/
 proxy), `sourceUrl`. A finding with no `sourceTier` is not usable for scoring.
 
-**Hard rule — do not launder source strength:**
-- A **listicle / affiliate / SEO blog** is `proxy`. It gives *direction*, never proof,
-  and **cannot** be used to claim Commercial Intent or Audience Overlap as measured
-  purchase/audience behavior. "Lots of 'affordable dupe' listicles" is a saturation
-  signal, not a "people are buying" signal.
+**Hard rule — do not launder source strength.** Do not assign `sourceTier` by feel; run
+every source through the literal checklist in
+[`source_tier_classifier.md`](../trend-product-fit/source_tier_classifier.md) **before**
+writing the tier. In particular:
+- **Verify first:** fetch the URL and confirm the claim is actually there. Can't fetch →
+  cap at `proxy` + `confidence: low` + mark `UNVERIFIED`. Claim not there → drop the item.
+- **Forced proxy (any match → `proxy`, no upgrade):** vendor copy (a company's own
+  marketing page), vendor documentation (its own help docs), listicles / affiliate / SEO
+  blogs, press releases, single social threads used as measured signals.
+- A **listicle / affiliate / SEO blog** gives *direction*, never proof, and **cannot** be
+  used to claim Commercial Intent or Audience Overlap as measured behavior. "Lots of
+  'affordable dupe' listicles" is a saturation signal, not a "people are buying" signal.
 - Reserve `primary` for raw platform data, a real review/comment corpus, named-expert
-  quotes, or directly-observed campaigns. When unsure, downgrade the tier.
+  quotes, or directly-observed campaigns. When unsure, **downgrade** the tier.
 
 Then a synthesis:
 

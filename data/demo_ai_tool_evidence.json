@@ -49,9 +49,9 @@
       "direction": "confirm",
       "magnitude": "strong",
       "confidence": "high",
-      "sourceTier": "primary",
+      "sourceTier": "proxy",
       "sourceUrl": "https://help.shopify.com/en/manual/shopify-admin/productivity-tools/shopify-magic",
-      "note": "Shopify Magic is integrated into Shopify admin media workflows for product-image background removal and asset creation, confirming the product-photo use case for ecommerce sellers."
+      "note": "Shopify Magic (vendor documentation) shows product-image background removal and asset creation inside merchant workflows. Vendor copy is proxy-tier per the source-tier rubric: it gives directional support for the product-photo use case, not measured demand."
     },
     {
       "id": "ev-bridge-1",
@@ -69,9 +69,9 @@
       "direction": "confirm",
       "magnitude": "strong",
       "confidence": "high",
-      "sourceTier": "primary",
+      "sourceTier": "proxy",
       "sourceUrl": "https://www.shopify.com/magic",
-      "note": "Shopify's Magic page directly demonstrates product images being placed on generated backgrounds and background removal, confirming that before-after creative execution is easy to show."
+      "note": "Shopify's Magic marketing page demonstrates product images on generated backgrounds and background removal. This is vendor copy (proxy-tier): it is directional evidence the format is producible, but it cannot lift the creativeFeasibility no-evidence cap on its own."
     },
     {
       "id": "ev-commercial-1",
@@ -89,9 +89,9 @@
       "direction": "confirm",
       "magnitude": "moderate",
       "confidence": "medium",
-      "sourceTier": "primary",
+      "sourceTier": "proxy",
       "sourceUrl": "https://help.picsart.io/hc/en-us/articles/11012242140829-What-is-Remove-Background-from-my-images-How-does-it-work",
-      "note": "Picsart Enterprise documents product-listing image automation, including choosing a high-quality image and removing its background, confirming business workflow demand."
+      "note": "Picsart (vendor documentation) describes product-listing image automation. Proxy-tier: directional support for business workflow demand. CommercialIntent stays above the cap on the strength of the PetaPixel secondary source, not this one."
     },
     {
       "id": "ev-safety-1",
@@ -129,14 +129,14 @@
   "expectedEvidenceGate": "pass",
   "expectedGatedBand": "Strong Go",
   "expectedGateMissing": [],
-  "expectedDimensionCaps": [],
+  "expectedDimensionCaps": ["creativeFeasibility"],
   "expectedStability": "fragile",
   "expectedDecisionType": "organic push",
   "expectedDimensionConfidence": {
     "audienceOverlap": "evidence-confirmed (medium)",
-    "useCaseRelevance": "evidence-confirmed (high)",
+    "useCaseRelevance": "evidence-confirmed (medium)",
     "messageBridge": "evidence-confirmed (medium)",
-    "creativeFeasibility": "evidence-confirmed (high)",
+    "creativeFeasibility": "evidence-confirmed (medium)",
     "commercialIntent": "evidence-confirmed (medium)",
     "brandSafety": "evidence-revised (medium)",
     "timingSaturation": "evidence-confirmed (medium)"

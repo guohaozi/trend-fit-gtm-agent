@@ -2,6 +2,52 @@
 
 This changelog records project-level changes and the reasoning behind them. It is intended for handoff between Codex / Claude conversations, not just release notes.
 
+## 2026-06-08 — Review + Fix: Source-Tier Inflation In Evidence Cases
+
+Status:
+
+- Claude review pass over the evidence cases Codex produced, plus a fix and a structural prevention.
+
+What was checked:
+
+- **Anti-fabrication rule held.** Spot-verified cited sources via web search — The Drum (Dr Ella Ward / Ehrenberg-Bass), Shake Shack's Dubai Chocolate Pistachio Shake details, and PetaPixel's exact "44% of US adults" survey figure all real. Codex did not invent URLs or numbers.
+- Anchor-step math and all 26 tests verified correct.
+
+Bug found:
+
+- Codex tagged three vendor-owned pages as `primary`: `shopify.com/magic`, `help.shopify.com/...`, `help.picsart.io/...`.
+- The project's own `evidence_model.md` §3a rubric classifies vendor copy / vendor docs as `proxy`.
+- Consequence: AI-tool `creativeFeasibility = 100` was supported only by a vendor marketing page, so it should have appeared in `dimensionCaps`, but `dimensionCaps` was empty.
+- Why tests missed it: `sourceTier` is human-judgment input, not computed. A mis-graded tier flows through the deterministic engine and the unit test (which compares engine output to the JSON's own expected fields) still passes green.
+
+What landed (fix):
+
+- `data/demo_ai_tool_evidence.json`: three vendor sources re-tiered `primary → proxy`; `expectedDimensionCaps` now `["creativeFeasibility"]`; `useCaseRelevance` and `creativeFeasibility` confidence labels `high → medium` (proxy caps confidence at medium).
+- `outputs/demo_ai_tool_evidence_case.md`: discloses the `creativeFeasibility` cap; vendor sources labeled proxy in the evidence and recommendation sections.
+- Result unchanged where it matters: raw `86`, Strong Go, gate `pass` — the Strong Go is still genuinely earned because the gate-required evidence (Accio timing, TechRadar/Digital Camera World safety, PetaPixel/Reddit audience) was never vendor copy. The fix removed inflated support, not real support.
+- All 26 tests still pass; the engine now computes `dimensionCaps: ["creativeFeasibility"]` matching the updated expected field, proving the fix is real.
+
+What landed (structural prevention):
+
+- Added `skills/trend-product-fit/source_tier_classifier.md` — a deterministic, checklist-driven tier classifier:
+  - **Verify-first gate:** fetch the URL and confirm the cited claim before tiering above proxy. Can't fetch → cap at proxy + `confidence: low` + mark `UNVERIFIED`. Claim absent → drop the item (fabrication guard). An agent that cannot browse may not assert `primary`/`secondary`.
+  - **Forced-proxy list:** vendor copy, vendor docs, listicles/affiliate/SEO, press releases, and single social threads (as measured signals) → always `proxy`, no manual upgrade.
+  - **Tie-breaker → lower tier.**
+  - Includes the worked Shopify/Picsart re-classification.
+- Wired in as a mandatory pre-step from `evidence_model.md §3a` and `competitor-evidence/SKILL.md`.
+
+Key design decision / root cause:
+
+- The failure mode is that the same agent that *gathers* evidence also *grades its strength* and drifts optimistic. `sourceTier` is the one field with no math check, so a biased grade silently poisons the chain. The fix is to make tiering a deterministic, conservative, verify-first checklist rather than a judgment call.
+
+Known issue carried forward:
+
+- The classifier is currently a soft (prose) constraint. The recommended next step is a CI/test guard that fails when a vendor/listicle URL pattern is tagged non-proxy in any `*_evidence.json`. Fashion and snack cases were not re-audited against the classifier this round.
+
+Verification:
+
+- `npm test` passed: 26 tests, 4 suites.
+
 ## 2026-06-08 — Handoff Commit For Evidence Case Expansion
 
 Status:

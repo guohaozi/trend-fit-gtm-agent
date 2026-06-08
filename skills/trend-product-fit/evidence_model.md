@@ -115,6 +115,14 @@ Rules that follow from this:
 - When unsure between secondary and proxy, choose **proxy**. Under-claiming source
   strength is the safe error.
 
+> **`sourceTier` is the one field with no downstream math check** — everything after it is
+> deterministic, so an optimistically-graded tier silently poisons the whole chain while
+> the tests still pass. **Do not assign `sourceTier` by feel.** Run it through the literal
+> checklist in [`source_tier_classifier.md`](source_tier_classifier.md): verify the URL
+> first, then apply the forced-proxy list (vendor copy, vendor docs, listicles, single
+> threads → always `proxy`), then take the lower tier on any tie. This is mandatory before
+> a tier is written.
+
 ---
 
 ## 4. Worked instance — fashion / quiet luxury

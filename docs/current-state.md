@@ -9,9 +9,34 @@ This file is a handoff snapshot for starting a fresh Codex / Claude conversation
 - Project path: `/Users/guo/gtm/trend-fit-gtm-agent`
 - Git branch: `main`
 - Current state: v1.2 rigor layer is implemented in docs, skills, TypeScript, tests, UI, and three evidence-backed demo cases.
-- This handoff round added the AI photo-tool evidence case and the snack / Dubai-style chocolate evidence case, then prepared the repo for a clean commit.
-- Latest baseline before this round: `1ae23f7 Initial Trend-Fit GTM Agent MVP`
+- This handoff round was a Claude **review + fix** pass on the evidence cases Codex produced: it verified the cited sources are real, found a source-tier inflation bug in the AI-tool case, fixed it, and added a deterministic source-tier classifier to prevent recurrence.
+- Previous round added the AI photo-tool evidence case and the snack / Dubai-style chocolate evidence case.
 - The exact latest commit hash should be checked with `git log -1 --oneline`.
+
+## This Round (Claude review + fix of Codex evidence cases)
+
+What was checked and found:
+
+- **Sources are real (anti-fabrication rule held).** Spot-verified The Drum, Shake Shack, and PetaPixel citations via web search — including the exact "44% of US adults" survey figure. Codex did not fabricate URLs or numbers.
+- **Anchor-step math and all 26 tests are correct.**
+- **Bug found — source-tier inflation.** Codex tagged three vendor-owned pages (`shopify.com/magic`, `help.shopify.com/...`, `help.picsart.io/...`) as `primary`, but the project's own §3a rubric classifies vendor copy/docs as `proxy`. Consequence: AI-tool `creativeFeasibility = 100` was held up solely by a vendor marketing page, so it should have been flagged in `dimensionCaps` — but `dimensionCaps` was empty. The unit test could not catch this because `sourceTier` is human-judgment input, not computed: a mis-graded tier passes green.
+
+What was fixed:
+
+- Re-tiered the three vendor sources `primary → proxy` in `data/demo_ai_tool_evidence.json`.
+- `expectedDimensionCaps` now correctly contains `["creativeFeasibility"]`; two confidence labels dropped `high → medium` (proxy caps confidence at medium).
+- `outputs/demo_ai_tool_evidence_case.md` now discloses the `creativeFeasibility` cap and labels the vendor sources as proxy.
+- The AI-tool Strong Go is still **genuinely earned**: the gate-required evidence (Timing = Accio, Brand Safety = TechRadar/Digital Camera World, Audience = PetaPixel/Reddit) was never vendor copy. The fix only removed inflated support, not real support.
+- All 26 tests still pass (the engine now computes `dimensionCaps: ["creativeFeasibility"]`, matching the updated expected field — proof the fix is real, not cosmetic).
+
+Root-cause / process improvement:
+
+- Diagnosed the method weakness: the same agent that *gathers* evidence also *grades its strength*, and drifts optimistic. `sourceTier` is the only field with no downstream math check, so a biased grade silently poisons the chain.
+- Added `skills/trend-product-fit/source_tier_classifier.md` — a deterministic, checklist-driven classifier that removes the discretion:
+  - **Verify-first gate:** fetch the URL and confirm the claim before tiering above proxy; can't fetch → cap at proxy + mark UNVERIFIED; claim not present → drop the item (fabrication guard).
+  - **Forced-proxy list:** vendor copy, vendor docs, listicles/affiliate/SEO, press releases, single social threads → always `proxy`, no manual upgrade.
+  - **Tie-breaker → lower tier.**
+- Wired it in as a hard pre-step from `evidence_model.md §3a` and `competitor-evidence/SKILL.md` (tier must not be assigned by feel).
 
 ## What The Project Is
 
@@ -238,7 +263,8 @@ Key result — AI photo tool:
 - Original deterministic demo: raw `89`, gated `Go` because it is assumption-only
 - Evidence-backed read: raw `86`, gated `Strong Go` because required non-proxy evidence exists
 - Brand Safety revised from `75` to `50` due to recruiter authenticity concerns and AI-headshot backlash
-- Stability remains `fragile` because the score is only one point above the Strong Go threshold, so the recommended action is `organic push`, not paid push
+- `creativeFeasibility = 100` is now flagged in `dimensionCaps` (CORRECTED this round): its only evidence was a vendor marketing page (proxy), which cannot lift a no-evidence cap. Score stays 100 (caps are advisory for already-scored baselines) but it is honestly flagged as unsupported-high.
+- Stability remains `fragile` (now via both margin ≤ 3 and a non-empty `dimensionCaps`), so the recommended action is `organic push`, not paid push
 
 Key result — snack / Dubai-style chocolate:
 
@@ -255,7 +281,7 @@ Evidence source quality:
 - Essence = `secondary`, cultural/racial critique context
 - Accio / Influencers Time = `secondary`, directional timing/saturation evidence
 - The VOU / Chic Style Collective = `proxy`, affordable-dupe/listicle/commercial-direction evidence only
-- Shopify / Picsart docs = `primary`, direct product-workflow evidence for AI product-photo use cases
+- Shopify / Picsart pages = `proxy` (CORRECTED this round). These are vendor marketing/help pages — directional support only, not measured demand. They were wrongly tagged `primary` and are now `proxy` per `source_tier_classifier.md`.
 - Reddit threads = `primary`, raw user-language evidence, but usually medium-confidence because each thread is narrow
 - PetaPixel / TechRadar / Digital Camera World = `secondary`, market and risk context for AI headshot adoption/backlash
 - Shake Shack official product page = `primary`, directly observed brand adaptation for snack/food trend fit
@@ -280,6 +306,7 @@ Core skill:
   - `examples.md`
   - `evidence_model.md`
   - `weight_profiles.md`
+  - `source_tier_classifier.md` (NEW this round — deterministic, checklist-driven source-tier assignment with a verify-first gate and a forced-proxy list; mandatory before any `sourceTier` is written)
 
 Sibling skills:
 
@@ -330,6 +357,8 @@ git commit -m "Add evidence-backed AI and snack cases"
 - Commercial Intent in the fashion evidence case is still proxy-based, not measured purchase behavior or live "where to buy" comments.
 - Creative Feasibility in the fashion evidence case remains an assumption.
 - Reddit evidence in AI and snack cases is useful raw user language, but each thread is narrow and should not be treated as market-wide measurement.
+- **`source_tier_classifier.md` is currently a soft constraint** — it is prose an agent is told to follow, not a code check. A future agent (Codex) could still hand-write an inflated `sourceTier` and the tests would pass. The recommended next step is to add a CI/test guard that scans every `*_evidence.json` and fails if a known vendor/listicle URL pattern is tagged non-proxy (see Next Steps #2). Until then, the classifier depends on agent discipline.
+- The fashion and snack evidence cases have **not** been re-audited against the new classifier this round (snack looked clean on inspection; fashion was not re-checked dimension-by-dimension).
 - The evidence-backed cases are not model-training labels. They are analyst-reviewed examples used to pressure-test and improve the scoring logic, evidence gate, and case-study story.
 - Timing & Saturation should eventually use raw Google Trends / SEO timeseries instead of secondary trend-analysis pages.
 - The app does not yet auto-discover trends; trends are still manual/demo inputs.
@@ -340,7 +369,9 @@ git commit -m "Add evidence-backed AI and snack cases"
 ## Recommended Next Steps
 
 1. Start the next conversation from this file, `docs/changelog.md`, and the latest commit shown by `git log -1 --oneline`.
-2. Turn the repeated manual workflow into a reusable `evidence-collector` skill or script: trend + product -> source candidates -> source tiering -> `data/*_evidence.json`.
+2. **Make source-tiering enforceable in code (high leverage, directly closes this round's bug class).** Add a test that scans every `data/*_evidence.json`; if a `sourceUrl` matches a vendor/listicle pattern (e.g. `help.*`, a tool's own domain, "best-10"/"dupe" slugs) but is tagged non-proxy, fail. This turns `source_tier_classifier.md` from agent discipline into a real guard so a mis-graded tier can no longer pass green.
+3. Re-audit the fashion and snack evidence cases against `source_tier_classifier.md` (this round only fixed the AI-tool case).
+4. Turn the repeated manual workflow into a reusable `evidence-collector` skill or script: trend + product -> source candidates -> **verify-first source tiering (per `source_tier_classifier.md`)** -> `data/*_evidence.json`. Chain the already-installed `reddit-icp-monitor` (Reddit user-language for Audience/Use-case) and `seo-keyword-research` (Google Trends for Timing) as the collection front-end.
 3. Add a small trend shortlist demo: 1 product + 3 candidate trends -> evidence-adjusted gated ranking.
 4. Add route smoke tests for `/`, `/fit-score`, and `/report`, including `demo_ai_tool` and `demo_snack`.
 5. Add portfolio screenshots and a short case-study page/doc showing the three evidence-backed examples.
