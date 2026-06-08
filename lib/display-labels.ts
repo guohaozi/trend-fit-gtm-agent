@@ -17,7 +17,8 @@ export const RISK_LABELS: Record<RiskTolerance, string> = {
 export const CATEGORY_LABELS: Record<string, string> = {
   "Mid-range men's clothing": "中端男装",
   "Home robotics / smart home": "家用机器人 / 智能家居",
-  "AI photo-editing tool": "AI 图片编辑工具"
+  "AI photo-editing tool": "AI 图片编辑工具",
+  "Snack / confectionery": "零食 / 巧克力糖果"
 };
 
 export const CONFIDENCE_LABELS: Record<string, string> = {

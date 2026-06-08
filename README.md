@@ -27,23 +27,33 @@ This is what the agent produces — not a list of trending topics, not a KOL dir
 
 ## Demo results
 
-Three fully worked demo cases, each with real scoring rationale (no fabricated metrics):
+Four fully worked demo cases, each with real scoring rationale (no fabricated metrics):
 
 | Product | Trend | Score | Decision |
 |---------|-------|-------|----------|
 | Mid-range men's clothing | Quiet luxury / old money outfit | **90 / 100** | Strong Go |
 | Home robotics brand | AI home gadgets / smart home setup | **74 / 100** | Go — trust-building angle |
 | AI photo editing tool | AI profile photo / product photo before-after | **89 / 100** | Strong Go |
+| Snack / confectionery brand | Dubai-style pistachio kunafa chocolate | **81 / 100** | Go |
 
 Demo briefs → [`outputs/`](outputs/)  
 Demo input data → [`data/`](data/)
 
-**Evidence agent in action:** the fashion case has also been run through real web
-research → [`outputs/demo_fashion_evidence_case.md`](outputs/demo_fashion_evidence_case.md).
-Real sources **revised Timing & Saturation from 75 → 50** (the trend peaked in 2023; the
-affordable-dupe lane is now crowded) and **hardened the classism risk** with named-expert
-quotes (Refinery29) plus cultural-critique context (Essence). Total moved 90 → 88; still
-Strong Go, now defensible.
+**Evidence agent in action:** three demo cases now include real evidence layers:
+
+- Fashion / quiet luxury → [`outputs/demo_fashion_evidence_case.md`](outputs/demo_fashion_evidence_case.md):
+  real sources **revised Timing & Saturation from 75 → 50** and hardened the classism risk.
+  Total moved 90 → 88; raw Strong Go, but gated Go because audience/use-case support is
+  still proxy/listicle-based.
+- AI photo tool / before-after → [`outputs/demo_ai_tool_evidence_case.md`](outputs/demo_ai_tool_evidence_case.md):
+  evidence confirmed audience, use case, creative feasibility, and commercial intent, but
+  revised Brand Safety from 75 → 50. Total moved 89 → 86; gate passes, but stability remains
+  fragile because it sits close to the Strong Go threshold.
+- Snack / Dubai-style pistachio kunafa chocolate → [`outputs/demo_snack_evidence_case.md`](outputs/demo_snack_evidence_case.md):
+  project-local skills were used to classify evidence; saturation, price skepticism, and
+  copycat risk moved the read from 81 → 74. Gate passes, but the decision remains a
+  fragile Go / small test rather than a broad launch.
+
 This is the line between a strategy scaffold and an evidence agent — see below.
 
 ---

@@ -1,0 +1,144 @@
+{
+  "id": "demo_ai_tool_evidence",
+  "case": "demo_ai_tool",
+  "researchDate": "2026-06-07",
+  "tooling": "WebSearch / WebFetch (GooseWorks CLI unavailable in the Codex environment)",
+  "baselineScores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 75,
+    "creativeFeasibility": 100,
+    "commercialIntent": 100,
+    "brandSafety": 75,
+    "timingSaturation": 50
+  },
+  "evidence": [
+    {
+      "id": "ev-timing-1",
+      "dimension": "timingSaturation",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.accio.com/business/ai-headshot-trend",
+      "note": "Google Trends analysis summarized by Accio shows AI headshot query interest was active but generally declining from January 2025 to January 2026, confirming a crowded rather than early timing read."
+    },
+    {
+      "id": "ev-audience-1",
+      "dimension": "audienceOverlap",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://petapixel.com/2025/10/23/the-ai-generated-headshot-market-is-booming/",
+      "note": "PetaPixel reports broad professional interest in AI headshots and cites a survey where 44% of US adults would consider using one, confirming creator and professional-user overlap."
+    },
+    {
+      "id": "ev-audience-2",
+      "dimension": "audienceOverlap",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "primary",
+      "sourceUrl": "https://www.reddit.com/r/careeradvice/comments/1sf6d1c/whats_the_best_ai_headshot_generator_that/",
+      "note": "A recent career-advice thread asks for AI headshot tools that look realistic for LinkedIn, websites, and work profiles, giving direct user-language evidence for the target audience."
+    },
+    {
+      "id": "ev-usecase-1",
+      "dimension": "useCaseRelevance",
+      "direction": "confirm",
+      "magnitude": "strong",
+      "confidence": "high",
+      "sourceTier": "primary",
+      "sourceUrl": "https://help.shopify.com/en/manual/shopify-admin/productivity-tools/shopify-magic",
+      "note": "Shopify Magic is integrated into Shopify admin media workflows for product-image background removal and asset creation, confirming the product-photo use case for ecommerce sellers."
+    },
+    {
+      "id": "ev-bridge-1",
+      "dimension": "messageBridge",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "primary",
+      "sourceUrl": "https://www.reddit.com/r/automation/comments/1rsyczq/are_people_actually_using_ai_to_generate_product/",
+      "note": "A recent automation thread frames the workflow as turning one product photo into multiple usable assets for site, ads, and social, confirming the before-after transformation bridge."
+    },
+    {
+      "id": "ev-creative-1",
+      "dimension": "creativeFeasibility",
+      "direction": "confirm",
+      "magnitude": "strong",
+      "confidence": "high",
+      "sourceTier": "primary",
+      "sourceUrl": "https://www.shopify.com/magic",
+      "note": "Shopify's Magic page directly demonstrates product images being placed on generated backgrounds and background removal, confirming that before-after creative execution is easy to show."
+    },
+    {
+      "id": "ev-commercial-1",
+      "dimension": "commercialIntent",
+      "direction": "confirm",
+      "magnitude": "strong",
+      "confidence": "medium",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://petapixel.com/2025/10/23/the-ai-generated-headshot-market-is-booming/",
+      "note": "PetaPixel describes customers choosing AI headshots partly because professional sessions are expensive, confirming a concrete paid alternative and strong conversion context."
+    },
+    {
+      "id": "ev-commercial-2",
+      "dimension": "commercialIntent",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "primary",
+      "sourceUrl": "https://help.picsart.io/hc/en-us/articles/11012242140829-What-is-Remove-Background-from-my-images-How-does-it-work",
+      "note": "Picsart Enterprise documents product-listing image automation, including choosing a high-quality image and removing its background, confirming business workflow demand."
+    },
+    {
+      "id": "ev-safety-1",
+      "dimension": "brandSafety",
+      "direction": "down",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.techradar.com/pro/the-growing-trend-of-ai-generated-headshots-what-recruiters-think-and-what-it-means-for-job-applicants",
+      "note": "TechRadar reports recruiter concerns around AI headshots, including strong preference for disclosure and risk of being perceived as inauthentic, lowering the brand-safety read."
+    },
+    {
+      "id": "ev-safety-2",
+      "dimension": "brandSafety",
+      "direction": "down",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.digitalcameraworld.com/photography/photo-editing/we-missed-the-mark-and-we-are-sorry-evoto-responds-to-ai-headshot-generator-backlash",
+      "note": "Digital Camera World documents Evoto's AI Headshot Generator backlash and apology, showing real trust risk when AI portrait tools appear to cross creator or training-data boundaries."
+    }
+  ],
+  "expectedAdjustedScores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 75,
+    "creativeFeasibility": 100,
+    "commercialIntent": 100,
+    "brandSafety": 50,
+    "timingSaturation": 50
+  },
+  "expectedAdjustedTotal": 86,
+  "expectedAdjustedBand": "Strong Go",
+  "profileUsed": "default",
+  "expectedEvidenceGate": "pass",
+  "expectedGatedBand": "Strong Go",
+  "expectedGateMissing": [],
+  "expectedDimensionCaps": [],
+  "expectedStability": "fragile",
+  "expectedDecisionType": "organic push",
+  "expectedDimensionConfidence": {
+    "audienceOverlap": "evidence-confirmed (medium)",
+    "useCaseRelevance": "evidence-confirmed (high)",
+    "messageBridge": "evidence-confirmed (medium)",
+    "creativeFeasibility": "evidence-confirmed (high)",
+    "commercialIntent": "evidence-confirmed (medium)",
+    "brandSafety": "evidence-revised (medium)",
+    "timingSaturation": "evidence-confirmed (medium)"
+  }
+}

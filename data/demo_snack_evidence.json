@@ -1,0 +1,114 @@
+{
+  "id": "demo_snack_evidence",
+  "case": "demo_snack",
+  "researchDate": "2026-06-08",
+  "tooling": "Project skills: trend-product-fit, competitor-evidence, evidence_model. GooseWorks CLI unavailable; evidence gathered through web research fallback.",
+  "baselineScores": {
+    "audienceOverlap": 75,
+    "useCaseRelevance": 100,
+    "messageBridge": 75,
+    "creativeFeasibility": 100,
+    "commercialIntent": 75,
+    "brandSafety": 75,
+    "timingSaturation": 50
+  },
+  "evidence": [
+    {
+      "id": "ev-usecase-1",
+      "dimension": "useCaseRelevance",
+      "direction": "confirm",
+      "magnitude": "strong",
+      "confidence": "high",
+      "sourceTier": "primary",
+      "sourceUrl": "https://shakeshack.com/blog/our-events/dubai-chocolate-pistachio-shake-is-back",
+      "note": "Shake Shack directly launched a Dubai Chocolate Pistachio Shake nationally after a sell-out test, confirming that pistachio-kataifi flavor can be adapted naturally into mainstream snack and dessert formats."
+    },
+    {
+      "id": "ev-creative-1",
+      "dimension": "creativeFeasibility",
+      "direction": "confirm",
+      "magnitude": "strong",
+      "confidence": "high",
+      "sourceTier": "primary",
+      "sourceUrl": "https://shakeshack.com/blog/our-events/dubai-chocolate-pistachio-shake-is-back",
+      "note": "Shake Shack highlights the crackable chocolate shell, real pistachio custard, kataifi crunch, chopped pistachios, and crunchy topping, confirming that the sensory crack/crunch format is easy to demonstrate visually."
+    },
+    {
+      "id": "ev-bridge-1",
+      "dimension": "messageBridge",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://apnews.com/article/dubai-chocolate-bars-7e951b8efcca8ceb38e481f6c2718d21",
+      "note": "AP reports that the trend has expanded beyond bars into croissants, milkshakes, dates, nuts, pancakes, ice cream, cakes, and more, confirming the bridge from viral chocolate bar to broader snack innovation."
+    },
+    {
+      "id": "ev-timing-1",
+      "dimension": "timingSaturation",
+      "direction": "down",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.foodnavigator.com/Article/2025/04/22/the-international-dubai-chocolate-pistachio-shortage/",
+      "note": "FoodNavigator reports many brands launching Dubai chocolate iterations and ingredient pressure from the craze, indicating the trend is crowded rather than early."
+    },
+    {
+      "id": "ev-commercial-1",
+      "dimension": "commercialIntent",
+      "direction": "down",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "primary",
+      "sourceUrl": "https://www.reddit.com/r/chocolate/comments/1lz23id/why_is_dubai_chocolate_so_expensive_but_it_is_so/",
+      "note": "Raw consumer discussion questions whether Dubai chocolate is overpriced or hype-driven, reducing confidence that the trend carries clean purchase intent for a value snack brand."
+    },
+    {
+      "id": "ev-safety-1",
+      "dimension": "brandSafety",
+      "direction": "down",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.thedrum.com/opinion/dubai-choc",
+      "note": "The Drum warns that brands chasing Dubai chocolate cues can dilute brand identity by abandoning core colors and overusing viral visual codes, lowering the brand-safety score for generic copycat execution."
+    },
+    {
+      "id": "ev-safety-2",
+      "dimension": "brandSafety",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.foodnavigator.com/Article/2025/04/22/the-international-dubai-chocolate-pistachio-shortage/",
+      "note": "FoodNavigator reports scams and imitation sites around Dubai chocolate, confirming that the trend needs authenticity and sourcing guardrails even when it is not inherently unsafe."
+    }
+  ],
+  "expectedAdjustedScores": {
+    "audienceOverlap": 75,
+    "useCaseRelevance": 100,
+    "messageBridge": 75,
+    "creativeFeasibility": 100,
+    "commercialIntent": 50,
+    "brandSafety": 50,
+    "timingSaturation": 25
+  },
+  "expectedAdjustedTotal": 74,
+  "expectedAdjustedBand": "Go",
+  "profileUsed": "default",
+  "expectedEvidenceGate": "pass",
+  "expectedGatedBand": "Go",
+  "expectedGateMissing": [],
+  "expectedDimensionCaps": [],
+  "expectedStability": "fragile",
+  "expectedDecisionType": "small test",
+  "expectedDimensionConfidence": {
+    "audienceOverlap": "assumption",
+    "useCaseRelevance": "evidence-confirmed (high)",
+    "messageBridge": "evidence-confirmed (medium)",
+    "creativeFeasibility": "evidence-confirmed (high)",
+    "commercialIntent": "evidence-revised (medium)",
+    "brandSafety": "evidence-revised (medium)",
+    "timingSaturation": "evidence-revised (medium)"
+  }
+}

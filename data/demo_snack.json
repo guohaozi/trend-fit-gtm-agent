@@ -1,0 +1,52 @@
+{
+  "id": "demo_snack",
+  "product": {
+    "name": "CrunchCraft Minis (demo)",
+    "category": "Snack / confectionery",
+    "targetMarket": ["United States", "Japan", "Southeast Asia"],
+    "audience": "Gen Z and millennial snack buyers, convenience-store shoppers, food-trend followers",
+    "priceRange": "$3-$6 per pack",
+    "positioning": "Affordable, crunchy chocolate snacks built for limited drops and social discovery",
+    "sellingPoints": [
+      "Crunchy layered texture in bite-size format",
+      "Affordable limited-edition flavors",
+      "Shareable pack for convenience-store and social snacking"
+    ],
+    "brandTone": "Playful, sensory, affordable-premium",
+    "competitors": ["Lindt", "Trader Joe's", "Shake Shack", "local bakeries"],
+    "campaignGoal": "Limited drop + retail trial",
+    "riskTolerance": "medium"
+  },
+  "trend": {
+    "name": "Dubai-style pistachio kunafa chocolate",
+    "platform": "TikTok / Instagram Reels",
+    "region": "United States, Japan, Southeast Asia",
+    "description": "Videos cracking open chocolate bars filled with pistachio cream and crunchy kataifi or kunafa pastry.",
+    "drivenBy": "Food creators, dessert shops, chocolate brands, limited-edition snack hunters",
+    "format": "Crack-open close-up, ASMR bite, limited-drop taste test, convenience-store find",
+    "whyPopular": "Highly visual green filling, strong crunch, scarcity, indulgence, and easy copycat recipes",
+    "exampleContent": "Creator snaps a mini chocolate wafer to reveal pistachio-kunafa filling and rates the crunch.",
+    "controversy": "Overpriced hype, copycat fatigue, supply pressure on pistachios, and authenticity concerns around the Dubai label"
+  },
+  "scores": {
+    "audienceOverlap": 75,
+    "useCaseRelevance": 100,
+    "messageBridge": 75,
+    "creativeFeasibility": 100,
+    "commercialIntent": 75,
+    "brandSafety": 75,
+    "timingSaturation": 50
+  },
+  "expectedTotal": 81,
+  "expectedBand": "Go",
+  "expectedQualifier": null,
+  "expectedFinalBand": "Go",
+  "overrideReason": null,
+  "profileUsed": "default",
+  "expectedEvidenceGate": "fail",
+  "expectedGatedBand": "Go",
+  "expectedGateMissing": ["timingSaturation", "brandSafety", "audienceOrUseCase"],
+  "expectedDimensionCaps": ["creativeFeasibility"],
+  "expectedStability": "fragile",
+  "expectedDecisionType": "small test"
+}

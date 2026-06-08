@@ -1,9 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
 import aiToolDemo from "@/data/demo_ai_tool.json";
+import aiToolEvidenceDemo from "@/data/demo_ai_tool_evidence.json";
 import fashionDemo from "@/data/demo_fashion.json";
 import fashionEvidenceDemo from "@/data/demo_fashion_evidence.json";
 import roboticsDemo from "@/data/demo_robotics.json";
+import snackDemo from "@/data/demo_snack.json";
+import snackEvidenceDemo from "@/data/demo_snack_evidence.json";
 import { formatCategory } from "@/lib/display-labels";
 import { adjustScores, type EvidenceAdjustmentCase } from "@/lib/evidence-adjustment";
 import {
@@ -16,7 +19,8 @@ import type { DemoCase, ScoreKey } from "@/lib/types";
 export const DEMO_CASES = [
   fashionDemo,
   roboticsDemo,
-  aiToolDemo
+  aiToolDemo,
+  snackDemo
 ] as DemoCase[];
 
 export const DEFAULT_DEMO_ID = "demo_fashion";
@@ -24,11 +28,14 @@ export const DEFAULT_DEMO_ID = "demo_fashion";
 export const REPORT_FILES: Record<string, string> = {
   demo_fashion: "demo_fashion_report.md",
   demo_robotics: "demo_robotics_report.md",
-  demo_ai_tool: "demo_ai_tool_report.md"
+  demo_ai_tool: "demo_ai_tool_report.md",
+  demo_snack: "demo_snack_report.md"
 };
 
 export const EVIDENCE_CASES = [
-  fashionEvidenceDemo
+  fashionEvidenceDemo,
+  aiToolEvidenceDemo,
+  snackEvidenceDemo
 ] as EvidenceAdjustmentCase[];
 
 export const DIMENSION_META: Array<{

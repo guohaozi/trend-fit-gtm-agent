@@ -2,6 +2,121 @@
 
 This changelog records project-level changes and the reasoning behind them. It is intended for handoff between Codex / Claude conversations, not just release notes.
 
+## 2026-06-08 — Handoff Commit For Evidence Case Expansion
+
+Status:
+
+- Prepared this conversation's evidence-case expansion for commit.
+
+What landed in this round:
+
+- Added a second evidence-backed case for the AI photo-tool demo.
+- Added a fourth baseline demo plus a third evidence-backed case for snack / Dubai-style chocolate.
+- Updated app demo loading, labels, tests, README, current-state docs, and evidence-case outputs.
+- Used project-local skills as the decision lens:
+  - `skills/trend-product-fit/SKILL.md` for the seven-dimension fit rubric.
+  - `skills/trend-product-fit/evidence_model.md` for source tiers and evidence-to-score adjustment.
+  - `skills/competitor-evidence/SKILL.md` for evidence discipline and anti-overclaiming.
+
+Key design decisions:
+
+- Evidence-backed cases are not fake training data or historical calibration. They are analyst-reviewed cases used to improve and demonstrate the scoring and gate logic.
+- Historical calibration remains future work until real labelled campaign outcomes exist.
+- Project skills can guide collection and judgment, but there is still no automated collector that turns trend + product into structured `evidence.json`.
+- The snack case intentionally lands at `Go` / `small test`, showing that evidence can validate fit while preventing a broad launch recommendation.
+
+Known issues carried forward:
+
+- Evidence collection is still mostly manual web research, not an integrated GooseWorks / Trends / SEO pipeline.
+- Raw Google Trends timeseries has not been wired into Timing & Saturation.
+- The three evidence-backed cases are a portfolio proof of concept, not statistical calibration.
+
+Next recommended move:
+
+- Build either a reusable `evidence-collector` skill/script or a trend-shortlist demo that runs one product against three candidate trends using evidence-adjusted gated scoring.
+
+Verification:
+
+- `npm test` passed with 26 tests across 4 suites.
+- `npm run build` passed.
+- `git diff --check` passed.
+
+## 2026-06-08 — Snack Evidence-backed Case For Dubai-style Chocolate
+
+Status:
+
+- Added a snack / confectionery demo and a structured evidence-backed case.
+
+What landed:
+
+- Added `data/demo_snack.json`.
+- Added `data/demo_snack_evidence.json`.
+- Added `outputs/demo_snack_report.md`.
+- Added `outputs/demo_snack_evidence_case.md`.
+- Updated `lib/demo-cases.ts` so `case=demo_snack` is available in app flows.
+- Updated `lib/display-labels.ts` with the snack category label.
+- Extended scoring, evidence adjustment, and recommendation rigor tests.
+- Updated README and current-state docs.
+
+How project skills were used:
+
+- `skills/trend-product-fit/SKILL.md` supplied the seven-dimension GTM scoring lens.
+- `skills/competitor-evidence/SKILL.md` supplied the evidence discipline and source-tier caution.
+- `skills/trend-product-fit/evidence_model.md` supplied the typed evidence-to-score contract.
+
+Key result:
+
+- Baseline deterministic demo: raw `81`, Go, assumption-heavy.
+- Evidence-backed read: raw `74`, Go, evidence gate `pass`.
+- Timing & Saturation revised from `50` to `25` because the trend is crowded and late-stage.
+- Commercial Intent revised from `75` to `50` because raw consumer discussion shows price and hype skepticism.
+- Brand Safety revised from `75` to `50` because generic copying can dilute identity and create origin/authenticity risk.
+- Stability remains `fragile`, so decision type is `small test`.
+
+Why this matters:
+
+- The case adds a consumer-packaged-goods / snack example, not another fashion or software case.
+- It demonstrates a useful middle outcome: evidence validates the trend-product fit but prevents a broad launch recommendation.
+
+Verification:
+
+- `npm test` passed with 26 tests across 4 suites.
+- Final handoff verification also passed `npm run build` and `git diff --check`.
+
+## 2026-06-07 — Second Evidence-backed Case For AI Photo Tool
+
+Status:
+
+- Added a second structured evidence case for the AI photo-editing demo.
+
+What landed:
+
+- Added `data/demo_ai_tool_evidence.json`.
+- Added `outputs/demo_ai_tool_evidence_case.md`.
+- Updated `lib/demo-cases.ts` so `/fit-score?case=demo_ai_tool` and `/report?case=demo_ai_tool` can load the AI evidence comparison.
+- Extended `tests/evidence-adjustment.test.ts` and `tests/recommendation-rigor.test.ts` to verify the new case.
+- Updated `README.md` and `docs/current-state.md` so project handoff no longer implies fashion is the only evidence-backed case.
+
+Key result:
+
+- Original deterministic demo: raw `89`, Strong Go, gated `Go` because assumption-only.
+- Evidence-backed read: raw `86`, Strong Go, gate `pass`, gated `Strong Go`.
+- Brand Safety revised from `75` to `50` due to recruiter authenticity concerns and AI-headshot backlash.
+- Recommendation stability remains `fragile` because the adjusted total sits one point above the Strong Go threshold.
+- Decision type is `organic push`, not paid push.
+
+Why this matters:
+
+- The project now has two contrasting evidence examples:
+  - Fashion: raw Strong Go but gated Go because key support is proxy/listicle-based.
+  - AI tool: raw Strong Go preserved after non-proxy evidence, but still fragile.
+- This gives the evidence gate a clearer portfolio story: it can both downgrade unsupported confidence and preserve a top recommendation when evidence coverage is good.
+
+Verification:
+
+- `npm test` passed with 23 tests across 4 suites.
+- `npm run build` passed.
+
 ## 2026-06-06 — v1.2 Rigor Layer, Evidence Gate, And Profile Switching
 
 Status:

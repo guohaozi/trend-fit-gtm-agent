@@ -35,6 +35,28 @@ describe("evidence adjustment model", () => {
     assert.deepEqual(adjustment.confidenceByDimension, evidenceCase.expectedDimensionConfidence);
   });
 
+  it("recomputes the AI tool evidence case with brand-safety risk revised down", () => {
+    const evidenceCase = readEvidenceCase("demo_ai_tool_evidence.json");
+    const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
+    const result = calculateTrendFit(adjustment.adjusted, "medium");
+
+    assert.deepEqual(adjustment.adjusted, evidenceCase.expectedAdjustedScores);
+    assert.equal(result.total, evidenceCase.expectedAdjustedTotal);
+    assert.equal(result.recommendation.finalBand, evidenceCase.expectedAdjustedBand);
+    assert.deepEqual(adjustment.confidenceByDimension, evidenceCase.expectedDimensionConfidence);
+  });
+
+  it("recomputes the snack evidence case with saturation revised down", () => {
+    const evidenceCase = readEvidenceCase("demo_snack_evidence.json");
+    const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
+    const result = calculateTrendFit(adjustment.adjusted, "medium");
+
+    assert.deepEqual(adjustment.adjusted, evidenceCase.expectedAdjustedScores);
+    assert.equal(result.total, evidenceCase.expectedAdjustedTotal);
+    assert.equal(result.recommendation.finalBand, evidenceCase.expectedAdjustedBand);
+    assert.deepEqual(adjustment.confidenceByDimension, evidenceCase.expectedDimensionConfidence);
+  });
+
   it("prevents proxy-only evidence from moving a dimension by two anchor steps", () => {
     const baseline: Scores = {
       audienceOverlap: 75,

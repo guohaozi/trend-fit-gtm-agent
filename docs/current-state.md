@@ -1,6 +1,6 @@
 # Current State — Trend-Fit GTM Agent
 
-Last updated: 2026-06-06
+Last updated: 2026-06-08
 
 This file is a handoff snapshot for starting a fresh Codex / Claude conversation.
 
@@ -8,7 +8,8 @@ This file is a handoff snapshot for starting a fresh Codex / Claude conversation
 
 - Project path: `/Users/guo/gtm/trend-fit-gtm-agent`
 - Git branch: `main`
-- Current state: v1.2 rigor layer is implemented in docs, skills, TypeScript, tests, and UI.
+- Current state: v1.2 rigor layer is implemented in docs, skills, TypeScript, tests, UI, and three evidence-backed demo cases.
+- This handoff round added the AI photo-tool evidence case and the snack / Dubai-style chocolate evidence case, then prepared the repo for a clean commit.
 - Latest baseline before this round: `1ae23f7 Initial Trend-Fit GTM Agent MVP`
 - The exact latest commit hash should be checked with `git log -1 --oneline`.
 
@@ -61,23 +62,27 @@ Routes:
 
 Supported query parameters:
 
-- `case=demo_fashion | demo_robotics | demo_ai_tool`
+- `case=demo_fashion | demo_robotics | demo_ai_tool | demo_snack`
 - `profile=default | brand_awareness | ecommerce_conversion | b2b_pipeline | creator_seeding | risk_sensitive`
 
 Examples:
 
 - `/fit-score?case=demo_fashion`
 - `/fit-score?case=demo_fashion&profile=risk_sensitive`
+- `/report?case=demo_ai_tool`
 - `/report?case=demo_fashion&profile=risk_sensitive`
+- `/report?case=demo_snack`
 
 Verification:
 
-- `npm test` passes: 21 tests, 4 suites.
+- `npm test` passes: 26 tests, 4 suites.
 - `npm run build` passes.
 - Local page smoke checks passed for:
   - `/fit-score?case=demo_fashion`
   - `/fit-score?case=demo_fashion&profile=risk_sensitive`
   - `/report?case=demo_fashion&profile=risk_sensitive`
+  - `/report?case=demo_ai_tool`
+  - `/report?case=demo_snack`
 - The sandbox may block `npm test` because `tsx` creates a local IPC pipe under `/var/folders/...`; rerun with elevated permissions if the error is `listen EPERM ... tsx-501/*.pipe`.
 - Avoid running `npm run build` while `npm run dev` is active because both can write `.next/` and trigger stale chunk errors.
 
@@ -193,6 +198,8 @@ Important verified example:
 - Fashion demo under `default`: raw `90`, Strong Go, gated `Go` because assumption-only
 - Fashion demo under `risk_sensitive`: raw `81`, Go; Brand Safety weight becomes `25%`
 - Evidence-backed fashion under `default`: raw `88`, Strong Go, but gated `Go` because audience/use-case support is still proxy/listicle-based
+- Evidence-backed AI tool under `default`: raw `86`, Strong Go, gate `pass`, stability `fragile`, decision type `organic push`
+- Evidence-backed snack under `default`: raw `74`, Go, gate `pass`, stability `fragile`, decision type `small test`
 
 UI support:
 
@@ -206,21 +213,41 @@ Structured evidence assets:
 
 - `skills/trend-product-fit/evidence_model.md`
 - `data/demo_fashion_evidence.json`
+- `data/demo_ai_tool_evidence.json`
+- `data/demo_snack_evidence.json`
 - `outputs/demo_fashion_evidence_case.md`
+- `outputs/demo_ai_tool_evidence_case.md`
+- `outputs/demo_snack_evidence_case.md`
 - `tests/evidence-adjustment.test.ts`
 
 Purpose:
 
 - Demonstrates the shift from strategy scaffold to evidence agent.
-- Uses real web research for the fashion / quiet luxury case.
+- Uses real web research for the fashion / quiet luxury, AI photo-tool, and snack / Dubai-style chocolate cases.
 - Keeps frozen demo data compatible with the base contract.
 
-Key result:
+Key result — fashion:
 
 - Original deterministic demo: raw `90`, gated `Go` because it is assumption-only
 - Evidence-backed read: raw `88`, gated `Go` because the Audience / Use-case support is still proxy/listicle-based
 - Timing & Saturation revised from `75` to `50`
 - Brand Safety remains `50`, but the classism/racial-cultural risk is evidence-backed rather than merely assumed
+
+Key result — AI photo tool:
+
+- Original deterministic demo: raw `89`, gated `Go` because it is assumption-only
+- Evidence-backed read: raw `86`, gated `Strong Go` because required non-proxy evidence exists
+- Brand Safety revised from `75` to `50` due to recruiter authenticity concerns and AI-headshot backlash
+- Stability remains `fragile` because the score is only one point above the Strong Go threshold, so the recommended action is `organic push`, not paid push
+
+Key result — snack / Dubai-style chocolate:
+
+- Original deterministic demo: raw `81`, Go, assumption-heavy
+- Evidence-backed read: raw `74`, Go, evidence gate `pass`
+- Timing & Saturation revised from `50` to `25` because the trend is late-stage and crowded
+- Commercial Intent revised from `75` to `50` because raw consumer discussion questions hype-driven pricing
+- Brand Safety revised from `75` to `50` because generic Dubai-chocolate copying can dilute brand identity and create origin/authenticity risk
+- Stability remains `fragile`, so the recommended action is `small test`
 
 Evidence source quality:
 
@@ -228,6 +255,11 @@ Evidence source quality:
 - Essence = `secondary`, cultural/racial critique context
 - Accio / Influencers Time = `secondary`, directional timing/saturation evidence
 - The VOU / Chic Style Collective = `proxy`, affordable-dupe/listicle/commercial-direction evidence only
+- Shopify / Picsart docs = `primary`, direct product-workflow evidence for AI product-photo use cases
+- Reddit threads = `primary`, raw user-language evidence, but usually medium-confidence because each thread is narrow
+- PetaPixel / TechRadar / Digital Camera World = `secondary`, market and risk context for AI headshot adoption/backlash
+- Shake Shack official product page = `primary`, directly observed brand adaptation for snack/food trend fit
+- AP / FoodNavigator / The Drum = `secondary`, market, timing, and brand-risk context for Dubai-style chocolate
 
 Critical correction:
 
@@ -284,8 +316,8 @@ If this state is ever found uncommitted, use:
 git status
 npm test
 npm run build
-git add .
-git commit -m "Add v1.2 rigor layer with evidence gate and profiles"
+git add <current-round-files>
+git commit -m "Add evidence-backed AI and snack cases"
 ```
 
 ## Known Issues / Caveats
@@ -293,10 +325,12 @@ git commit -m "Add v1.2 rigor layer with evidence gate and profiles"
 - No real historical calibration set exists yet.
 - Do not invent a 20-50 case calibration set without real campaign outcomes.
 - The current weights are expert priors, not empirically calibrated posteriors.
-- GooseWorks CLI is not installed locally, so the first evidence case used web research instead of GooseWorks.
-- Raw Google Trends timeseries was not used.
-- Commercial Intent in the evidence case is still proxy-based, not measured purchase behavior or live "where to buy" comments.
-- Creative Feasibility in the evidence case remains an assumption.
+- GooseWorks CLI is not available in the current Codex environment; project-local skills were used as scoring / evidence discipline, while source collection still used manual web research fallback.
+- Raw Google Trends / SEO timeseries was not used.
+- Commercial Intent in the fashion evidence case is still proxy-based, not measured purchase behavior or live "where to buy" comments.
+- Creative Feasibility in the fashion evidence case remains an assumption.
+- Reddit evidence in AI and snack cases is useful raw user language, but each thread is narrow and should not be treated as market-wide measurement.
+- The evidence-backed cases are not model-training labels. They are analyst-reviewed examples used to pressure-test and improve the scoring logic, evidence gate, and case-study story.
 - Timing & Saturation should eventually use raw Google Trends / SEO timeseries instead of secondary trend-analysis pages.
 - The app does not yet auto-discover trends; trends are still manual/demo inputs.
 - The app does not yet run automatic multi-source evidence collection.
@@ -305,16 +339,17 @@ git commit -m "Add v1.2 rigor layer with evidence gate and profiles"
 
 ## Recommended Next Steps
 
-1. Start the next conversation from this file plus `docs/changelog.md`.
-2. Add portfolio screenshots and a short case-study page/doc.
-3. Add smoke tests for `/`, `/fit-score`, and `/report`.
-4. Add a small trend shortlist demo: 1 product + 3 candidate trends -> gated ranking.
-5. Later, integrate a real evidence toolchain:
+1. Start the next conversation from this file, `docs/changelog.md`, and the latest commit shown by `git log -1 --oneline`.
+2. Turn the repeated manual workflow into a reusable `evidence-collector` skill or script: trend + product -> source candidates -> source tiering -> `data/*_evidence.json`.
+3. Add a small trend shortlist demo: 1 product + 3 candidate trends -> evidence-adjusted gated ranking.
+4. Add route smoke tests for `/`, `/fit-score`, and `/report`, including `demo_ai_tool` and `demo_snack`.
+5. Add portfolio screenshots and a short case-study page/doc showing the three evidence-backed examples.
+6. Later, integrate a real evidence toolchain:
    - GooseWorks for Reddit/X comments, competitor activity, and creator discovery
    - Google Trends / SEO timeseries for Timing & Saturation
    - Product/competitor research skill for deeper product-market context
-6. Much later, build a real historical calibration set only from labelled campaign outcomes.
+7. Much later, build a real historical calibration set only from labelled campaign outcomes.
 
 ## Best One-Sentence Framing
 
-This is not just a prompt bundle: it is a deterministic GTM scoring scaffold with tests, goal-based lenses, evidence gates, source-tier discipline, and a real evidence case showing the path toward an evidence-aware trend-fit agent.
+This is not just a prompt bundle: it is a deterministic GTM scoring scaffold with tests, goal-based lenses, evidence gates, source-tier discipline, and three evidence-backed cases showing the path toward an evidence-aware trend-fit agent.
