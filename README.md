@@ -50,9 +50,9 @@ Demo input data → [`data/`](data/)
   revised Brand Safety from 75 → 50. Total moved 89 → 86; gate passes, but stability remains
   fragile because it sits close to the Strong Go threshold.
 - Snack / Dubai-style pistachio kunafa chocolate → [`outputs/demo_snack_evidence_case.md`](outputs/demo_snack_evidence_case.md):
-  project-local skills were used to classify evidence; saturation, price skepticism, and
-  copycat risk moved the read from 81 → 74. Gate passes, but the decision remains a
-  fragile Go / small test rather than a broad launch.
+  project-local skills were used to classify evidence; saturation and copycat risk moved
+  the read from 81 → 76. Gate passes with moderate stability, but price skepticism remains
+  proxy-tier directional caution rather than measured purchase behavior.
 
 This is the line between a strategy scaffold and an evidence agent — see below.
 

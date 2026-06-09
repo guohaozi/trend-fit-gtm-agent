@@ -115,7 +115,7 @@ describe("v1.2 recommendation rigor layer", () => {
     assert.equal(rigor.decisionType, evidenceCase.expectedDecisionType);
   });
 
-  it("keeps the snack trend as a small test after saturation evidence", () => {
+  it("keeps the snack trend as a guarded Go after saturation evidence", () => {
     const evidenceCase = readEvidenceCase("demo_snack_evidence.json");
     const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
     const result = calculateTrendFitWithProfile(adjustment.adjusted, "medium", "default");

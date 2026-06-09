@@ -18,7 +18,7 @@
       "dimension": "audienceOverlap",
       "direction": "confirm",
       "magnitude": "moderate",
-      "confidence": "high",
+      "confidence": "medium",
       "sourceTier": "proxy",
       "sourceUrl": "https://thevou.com/blog/affordable-quiet-luxury-brands/",
       "note": "Affordable quiet luxury examples repeatedly name mid-range brands and budget-conscious styling, confirming the trend can reach the demo brand's practical menswear audience."
@@ -78,7 +78,7 @@
       "dimension": "useCaseRelevance",
       "direction": "confirm",
       "magnitude": "strong",
-      "confidence": "high",
+      "confidence": "medium",
       "sourceTier": "proxy",
       "sourceUrl": "https://thevou.com/blog/affordable-quiet-luxury-brands/",
       "note": "An established 'affordable quiet luxury' sub-genre names mid-range brands (Uniqlo, COS, Mango, Massimo Dutti) — the product type belongs natively."
@@ -88,7 +88,7 @@
       "dimension": "messageBridge",
       "direction": "confirm",
       "magnitude": "moderate",
-      "confidence": "high",
+      "confidence": "medium",
       "sourceTier": "proxy",
       "sourceUrl": "https://thevou.com/blog/affordable-quiet-luxury-brands/",
       "note": "Live consumer frame: 'quiet luxury is all about intention, not price' — confirms the 'look expensive, honest price' bridge."

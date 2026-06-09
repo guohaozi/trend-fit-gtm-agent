@@ -48,7 +48,7 @@
       "dimension": "useCaseRelevance",
       "direction": "confirm",
       "magnitude": "strong",
-      "confidence": "high",
+      "confidence": "medium",
       "sourceTier": "proxy",
       "sourceUrl": "https://help.shopify.com/en/manual/shopify-admin/productivity-tools/shopify-magic",
       "note": "Shopify Magic (vendor documentation) shows product-image background removal and asset creation inside merchant workflows. Vendor copy is proxy-tier per the source-tier rubric: it gives directional support for the product-photo use case, not measured demand."
@@ -59,16 +59,16 @@
       "direction": "confirm",
       "magnitude": "moderate",
       "confidence": "medium",
-      "sourceTier": "primary",
+      "sourceTier": "proxy",
       "sourceUrl": "https://www.reddit.com/r/automation/comments/1rsyczq/are_people_actually_using_ai_to_generate_product/",
-      "note": "A recent automation thread frames the workflow as turning one product photo into multiple usable assets for site, ads, and social, confirming the before-after transformation bridge."
+      "note": "A recent single Reddit automation thread frames the workflow as turning one product photo into multiple usable assets for site, ads, and social. Per the source-tier classifier, a single thread is proxy for messageBridge: useful directional language, not measured evidence."
     },
     {
       "id": "ev-creative-1",
       "dimension": "creativeFeasibility",
       "direction": "confirm",
       "magnitude": "strong",
-      "confidence": "high",
+      "confidence": "medium",
       "sourceTier": "proxy",
       "sourceUrl": "https://www.shopify.com/magic",
       "note": "Shopify's Magic marketing page demonstrates product images on generated backgrounds and background removal. This is vendor copy (proxy-tier): it is directional evidence the format is producible, but it cannot lift the creativeFeasibility no-evidence cap on its own."

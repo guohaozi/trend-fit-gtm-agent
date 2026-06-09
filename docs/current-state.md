@@ -1,6 +1,6 @@
 # Current State — Trend-Fit GTM Agent
 
-Last updated: 2026-06-08
+Last updated: 2026-06-09
 
 This file is a handoff snapshot for starting a fresh Codex / Claude conversation.
 
@@ -9,11 +9,31 @@ This file is a handoff snapshot for starting a fresh Codex / Claude conversation
 - Project path: `/Users/guo/gtm/trend-fit-gtm-agent`
 - Git branch: `main`
 - Current state: v1.2 rigor layer is implemented in docs, skills, TypeScript, tests, UI, and three evidence-backed demo cases.
+- Latest round implemented the source-tier classifier as an executable test guard and re-audited the fashion, AI-tool, and snack evidence cases against it.
 - This handoff round was a Claude **review + fix** pass on the evidence cases Codex produced: it verified the cited sources are real, found a source-tier inflation bug in the AI-tool case, fixed it, and added a deterministic source-tier classifier to prevent recurrence.
 - Previous round added the AI photo-tool evidence case and the snack / Dubai-style chocolate evidence case.
 - The exact latest commit hash should be checked with `git log -1 --oneline`.
 
-## This Round (Claude review + fix of Codex evidence cases)
+## This Round (Codex source-tier guard + evidence-case re-audit)
+
+What landed:
+
+- Added `tests/source-tier-classifier.test.ts`, an executable guard that scans every `data/*_evidence.json` and fails if:
+  - vendor help/docs, known vendor marketing pages, or listicle/affiliate-style URL patterns are tagged non-proxy;
+  - proxy evidence uses `confidence: high`;
+  - a single Reddit thread is treated as `primary` outside Audience / Use-case raw user-language evidence.
+- Re-audited evidence cases against `source_tier_classifier.md`:
+  - Fashion: proxy/listicle evidence confidence labels dropped to `medium`.
+  - AI-tool: the Reddit automation thread for `messageBridge` changed `primary → proxy`; vendor proxy confidence labels are now `medium`.
+  - Snack: the Reddit commercial-intent thread changed `primary → proxy`.
+- Snack expected result changed because one Reddit thread is not strong enough to revise Commercial Intent down an anchor: evidence-adjusted read is now `76 / Go`, gate `pass`, stability `moderate`, decision type `creator seeding`.
+
+Verification:
+
+- Targeted verification passed: `npx tsx --test tests/source-tier-classifier.test.ts tests/evidence-adjustment.test.ts tests/recommendation-rigor.test.ts` → 16 tests, 3 suites.
+- Full verification passed: `npm test` → 29 tests, 5 suites; `npm run build` → production build succeeds.
+
+## Previous Round (Claude review + fix of Codex evidence cases)
 
 What was checked and found:
 
@@ -74,6 +94,7 @@ Core app files:
 - `tests/scoring.test.ts` — frozen scoring contract tests
 - `tests/evidence-adjustment.test.ts` — evidence adjustment tests
 - `tests/recommendation-rigor.test.ts` — v1.2 rigor-layer tests
+- `tests/source-tier-classifier.test.ts` — executable source-tier guard for evidence JSON
 - `tests/report-markdown.test.ts` — Markdown parsing regression tests
 
 Routes:
@@ -100,7 +121,7 @@ Examples:
 
 Verification:
 
-- `npm test` passes: 26 tests, 4 suites.
+- `npm test` passes: 29 tests, 5 suites.
 - `npm run build` passes.
 - Local page smoke checks passed for:
   - `/fit-score?case=demo_fashion`
@@ -224,7 +245,7 @@ Important verified example:
 - Fashion demo under `risk_sensitive`: raw `81`, Go; Brand Safety weight becomes `25%`
 - Evidence-backed fashion under `default`: raw `88`, Strong Go, but gated `Go` because audience/use-case support is still proxy/listicle-based
 - Evidence-backed AI tool under `default`: raw `86`, Strong Go, gate `pass`, stability `fragile`, decision type `organic push`
-- Evidence-backed snack under `default`: raw `74`, Go, gate `pass`, stability `fragile`, decision type `small test`
+- Evidence-backed snack under `default`: raw `76`, Go, gate `pass`, stability `moderate`, decision type `creator seeding`
 
 UI support:
 
@@ -269,11 +290,11 @@ Key result — AI photo tool:
 Key result — snack / Dubai-style chocolate:
 
 - Original deterministic demo: raw `81`, Go, assumption-heavy
-- Evidence-backed read: raw `74`, Go, evidence gate `pass`
+- Evidence-backed read: raw `76`, Go, evidence gate `pass`
 - Timing & Saturation revised from `50` to `25` because the trend is late-stage and crowded
-- Commercial Intent revised from `75` to `50` because raw consumer discussion questions hype-driven pricing
+- Commercial Intent remains `75`: one Reddit thread questions hype-driven pricing, but the source-tier classifier treats that as proxy-tier directional caution, not measured purchase behavior strong enough to revise the anchor down.
 - Brand Safety revised from `75` to `50` because generic Dubai-chocolate copying can dilute brand identity and create origin/authenticity risk
-- Stability remains `fragile`, so the recommended action is `small test`
+- Stability is now `moderate`, so the recommended action is `creator seeding`
 
 Evidence source quality:
 
@@ -282,7 +303,7 @@ Evidence source quality:
 - Accio / Influencers Time = `secondary`, directional timing/saturation evidence
 - The VOU / Chic Style Collective = `proxy`, affordable-dupe/listicle/commercial-direction evidence only
 - Shopify / Picsart pages = `proxy` (CORRECTED this round). These are vendor marketing/help pages — directional support only, not measured demand. They were wrongly tagged `primary` and are now `proxy` per `source_tier_classifier.md`.
-- Reddit threads = `primary`, raw user-language evidence, but usually medium-confidence because each thread is narrow
+- Reddit threads = `primary` only for raw user-language evidence on Audience / Use-case, and medium-confidence max. Single Reddit threads used for Message Bridge or Commercial Intent are `proxy`.
 - PetaPixel / TechRadar / Digital Camera World = `secondary`, market and risk context for AI headshot adoption/backlash
 - Shake Shack official product page = `primary`, directly observed brand adaptation for snack/food trend fit
 - AP / FoodNavigator / The Drum = `secondary`, market, timing, and brand-risk context for Dubai-style chocolate
@@ -357,8 +378,8 @@ git commit -m "Add evidence-backed AI and snack cases"
 - Commercial Intent in the fashion evidence case is still proxy-based, not measured purchase behavior or live "where to buy" comments.
 - Creative Feasibility in the fashion evidence case remains an assumption.
 - Reddit evidence in AI and snack cases is useful raw user language, but each thread is narrow and should not be treated as market-wide measurement.
-- **`source_tier_classifier.md` is currently a soft constraint** — it is prose an agent is told to follow, not a code check. A future agent (Codex) could still hand-write an inflated `sourceTier` and the tests would pass. The recommended next step is to add a CI/test guard that scans every `*_evidence.json` and fails if a known vendor/listicle URL pattern is tagged non-proxy (see Next Steps #2). Until then, the classifier depends on agent discipline.
-- The fashion and snack evidence cases have **not** been re-audited against the new classifier this round (snack looked clean on inspection; fashion was not re-checked dimension-by-dimension).
+- `source_tier_classifier.md` now has an executable guard in `tests/source-tier-classifier.test.ts`; it is no longer only a soft prose constraint.
+- Fashion, AI-tool, and snack evidence cases have been re-audited against the classifier. Remaining limitation: this is a deterministic pattern guard, not a live URL content verifier.
 - The evidence-backed cases are not model-training labels. They are analyst-reviewed examples used to pressure-test and improve the scoring logic, evidence gate, and case-study story.
 - Timing & Saturation should eventually use raw Google Trends / SEO timeseries instead of secondary trend-analysis pages.
 - The app does not yet auto-discover trends; trends are still manual/demo inputs.
@@ -369,9 +390,7 @@ git commit -m "Add evidence-backed AI and snack cases"
 ## Recommended Next Steps
 
 1. Start the next conversation from this file, `docs/changelog.md`, and the latest commit shown by `git log -1 --oneline`.
-2. **Make source-tiering enforceable in code (high leverage, directly closes this round's bug class).** Add a test that scans every `data/*_evidence.json`; if a `sourceUrl` matches a vendor/listicle pattern (e.g. `help.*`, a tool's own domain, "best-10"/"dupe" slugs) but is tagged non-proxy, fail. This turns `source_tier_classifier.md` from agent discipline into a real guard so a mis-graded tier can no longer pass green.
-3. Re-audit the fashion and snack evidence cases against `source_tier_classifier.md` (this round only fixed the AI-tool case).
-4. Turn the repeated manual workflow into a reusable `evidence-collector` skill or script: trend + product -> source candidates -> **verify-first source tiering (per `source_tier_classifier.md`)** -> `data/*_evidence.json`. Chain the already-installed `reddit-icp-monitor` (Reddit user-language for Audience/Use-case) and `seo-keyword-research` (Google Trends for Timing) as the collection front-end.
+2. Turn the repeated manual workflow into a reusable `evidence-collector` skill or script: trend + product -> source candidates -> **verify-first source tiering (per `source_tier_classifier.md`)** -> `data/*_evidence.json`. Chain the already-installed `reddit-icp-monitor` (Reddit user-language for Audience/Use-case) and `seo-keyword-research` (Google Trends for Timing) as the collection front-end.
 3. Add a small trend shortlist demo: 1 product + 3 candidate trends -> evidence-adjusted gated ranking.
 4. Add route smoke tests for `/`, `/fit-score`, and `/report`, including `demo_ai_tool` and `demo_snack`.
 5. Add portfolio screenshots and a short case-study page/doc showing the three evidence-backed examples.

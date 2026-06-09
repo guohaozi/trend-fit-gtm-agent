@@ -17,8 +17,8 @@ That baseline is intentionally optimistic but not reckless:
   snack format.
 - The weak spot is timing. The trend is already mature and copycat-heavy.
 
-The v1.2 gate correctly treats the baseline as assumption-heavy: it is a Go, but still a
-small test until the trend is evidenced.
+The v1.2 gate correctly treats the baseline as assumption-heavy: it is a Go, but still
+needs evidence before the project should recommend more than exploratory activation.
 
 ## How project skills shaped the research
 
@@ -30,7 +30,8 @@ auditable GTM argument, not a sales prediction.
 - every claim needs a source;
 - observed brand launches count more than generic listicles;
 - Reddit can supply raw user-language evidence, but a single thread stays medium
-  confidence;
+  confidence and only counts as primary for Audience / Use-case; for Commercial Intent it
+  remains proxy-tier directional caution;
 - copycat and authenticity risk must be surfaced rather than smoothed over.
 
 `evidence_model.md` converted each finding into typed evidence with source tier,
@@ -66,7 +67,8 @@ direction, magnitude, and confidence. No off-anchor score was introduced.
 
 - A **Reddit r/chocolate thread** asks why Dubai chocolate is so expensive and includes
   comments calling prices hype-driven or inflated. This does not kill purchase intent,
-  but it weakens the clean conversion read for a value snack brand.
+  and because it is only a single thread it is treated as proxy-tier directional caution,
+  not strong enough by itself to revise Commercial Intent down an anchor.
   Source: https://www.reddit.com/r/chocolate/comments/1lz23id/why_is_dubai_chocolate_so_expensive_but_it_is_so/
 
 ### Brand-safety evidence
@@ -90,29 +92,30 @@ direction, magnitude, and confidence. No off-anchor score was introduced.
 | Use-case Relevance | 100 | Confirmed | 100 | Observed dessert and snack adaptations show the product belongs naturally. |
 | Message Bridge | 75 | Confirmed | 75 | The trend can bridge to "viral crunch in a snack-size pack." |
 | Creative Feasibility | 100 | Confirmed | 100 | Crackable shell, green filling, kataifi crunch, and ASMR bite are easy to film. |
-| Commercial Intent | 75 | Revised down | 50 | Real consumer discussion questions whether the trend is overpriced hype. |
+| Commercial Intent | 75 | Confirmed with caution | 75 | One Reddit thread raises price/hype skepticism, but a single thread is proxy-tier and not enough to revise purchase intent down an anchor. |
 | Brand Safety | 75 | Revised down | 50 | Copycat, identity dilution, scam, and origin-confusion risks require guardrails. |
 | Timing & Saturation | 50 | Revised down | 25 | Multiple brand launches and commodity pressure show a crowded, late-stage trend. |
 
 Adjusted total:
 
-`75*.20 + 100*.20 + 75*.15 + 100*.15 + 50*.10 + 50*.10 + 25*.10 = 73.75 -> 74`
+`75*.20 + 100*.20 + 75*.15 + 100*.15 + 75*.10 + 50*.10 + 25*.10 = 76.25 -> 76`
 
 ## Recommendation after evidence gate
 
 - Baseline: **81 / Go**
-- Evidence-adjusted: **74 / Go**
+- Evidence-adjusted: **76 / Go**
 - Evidence gate: **pass**
 - Gated band: **Go**
-- Stability: **fragile**
-- Decision type: **small test**
+- Stability: **moderate**
+- Decision type: **creator seeding**
 
 This is a useful Go, not a big green light. Evidence confirms the product and creative
-fit, but it also documents saturation, price skepticism, and copycat risk.
+fit, but it also documents saturation, price skepticism, and copycat risk. The source-tier
+audit keeps price skepticism as a caution rather than an over-weighted score drop.
 
 ## Practical GTM read
 
-The correct move is a **limited drop**, not a full rebrand.
+The correct move is **creator seeding around a limited drop**, not a full rebrand.
 
 Lead with:
 

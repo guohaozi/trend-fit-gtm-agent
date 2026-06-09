@@ -70,8 +70,9 @@
   *"quiet luxury is all about intention, not price"* [The VOU] — i.e. the demo's
   campaign angle ("look expensive without luxury prices") is exactly what is already
   working.
-- *Confidence:* High for "the sub-genre and named brands exist"; medium for relative
-  saturation (directional, not a measured share-of-voice).
+- *Confidence:* Medium after source-tier audit: the sub-genre and named brands are useful
+  directional evidence, but the sources are commerce/listicle pages and cannot be treated
+  as high-confidence proof.
 
 ---
 

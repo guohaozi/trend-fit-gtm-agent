@@ -36,7 +36,7 @@ The baseline issue was not the conclusion. It was that the Strong Go was assumpt
 
 ### Message bridge and creative feasibility
 
-- A recent **Reddit automation thread** describes the workflow as turning one product photo into assets for product pages, ads, and social. That directly supports the "raw photo -> polished campaign asset" bridge.
+- A recent **Reddit automation thread** describes the workflow as turning one product photo into assets for product pages, ads, and social. As a single thread, it is proxy-tier for Message Bridge: useful directional language, not measured evidence.
   Source: https://www.reddit.com/r/automation/comments/1rsyczq/are_people_actually_using_ai_to_generate_product/
 
 - **Shopify Magic** (vendor marketing page, proxy-tier) demonstrates background removal and generated product backgrounds. This is directional support that the before/after format is producible — but as vendor copy it does not lift the creativeFeasibility cap.

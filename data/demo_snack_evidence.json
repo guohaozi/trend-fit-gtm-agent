@@ -59,9 +59,9 @@
       "direction": "down",
       "magnitude": "moderate",
       "confidence": "medium",
-      "sourceTier": "primary",
+      "sourceTier": "proxy",
       "sourceUrl": "https://www.reddit.com/r/chocolate/comments/1lz23id/why_is_dubai_chocolate_so_expensive_but_it_is_so/",
-      "note": "Raw consumer discussion questions whether Dubai chocolate is overpriced or hype-driven, reducing confidence that the trend carries clean purchase intent for a value snack brand."
+      "note": "A single Reddit thread questions whether Dubai chocolate is overpriced or hype-driven. Per the source-tier classifier, one thread is proxy for commercialIntent: useful directional caution, not measured purchase behavior."
     },
     {
       "id": "ev-safety-1",
@@ -89,25 +89,25 @@
     "useCaseRelevance": 100,
     "messageBridge": 75,
     "creativeFeasibility": 100,
-    "commercialIntent": 50,
+    "commercialIntent": 75,
     "brandSafety": 50,
     "timingSaturation": 25
   },
-  "expectedAdjustedTotal": 74,
+  "expectedAdjustedTotal": 76,
   "expectedAdjustedBand": "Go",
   "profileUsed": "default",
   "expectedEvidenceGate": "pass",
   "expectedGatedBand": "Go",
   "expectedGateMissing": [],
   "expectedDimensionCaps": [],
-  "expectedStability": "fragile",
-  "expectedDecisionType": "small test",
+  "expectedStability": "moderate",
+  "expectedDecisionType": "creator seeding",
   "expectedDimensionConfidence": {
     "audienceOverlap": "assumption",
     "useCaseRelevance": "evidence-confirmed (high)",
     "messageBridge": "evidence-confirmed (medium)",
     "creativeFeasibility": "evidence-confirmed (high)",
-    "commercialIntent": "evidence-revised (medium)",
+    "commercialIntent": "evidence-confirmed (medium)",
     "brandSafety": "evidence-revised (medium)",
     "timingSaturation": "evidence-revised (medium)"
   }

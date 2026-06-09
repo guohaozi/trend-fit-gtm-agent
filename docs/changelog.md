@@ -2,6 +2,37 @@
 
 This changelog records project-level changes and the reasoning behind them. It is intended for handoff between Codex / Claude conversations, not just release notes.
 
+## 2026-06-09 — Enforce Source-Tier Guard + Re-audit Evidence Cases
+
+Status:
+
+- Implemented the previously recommended CI/test-style guard for source-tier discipline and re-audited the existing evidence cases against the deterministic classifier.
+
+What landed:
+
+- Added `tests/source-tier-classifier.test.ts`, which scans every `data/*_evidence.json` and fails when:
+  - forced-proxy URL patterns (vendor help/docs, known vendor marketing pages, listicle/affiliate-style slugs) are tagged non-proxy;
+  - proxy evidence is assigned `confidence: high`;
+  - a single Reddit thread is treated as `primary` outside the allowed raw user-language dimensions (`audienceOverlap` / `useCaseRelevance`) or with high confidence.
+- Re-audited fashion, AI-tool, and snack evidence data:
+  - Fashion proxy/listicle confidence labels dropped `high → medium`.
+  - AI-tool Reddit automation thread for `messageBridge` changed `primary → proxy`; vendor proxy confidence labels dropped to `medium`.
+  - Snack Reddit commercial-intent thread changed `primary → proxy`.
+- Updated evidence-case Markdown and README to reflect the stricter tiering.
+
+Key result:
+
+- The source-tier classifier is no longer only a prose constraint; it now has an executable regression test.
+- Snack evidence read changed after the stricter audit: raw `76` / `Go`, evidence gate `pass`, stability `moderate`, decision type `creator seeding`. The prior `74` / `small test` over-weighted a single Reddit thread as commercial-intent evidence.
+- AI-tool Strong Go still holds: raw `86`, gate `pass`, `creativeFeasibility` remains capped/fragile because its support is vendor copy.
+- Fashion remains raw `88`, gated `Go` because audience/use-case evidence is still proxy/listicle-based.
+
+Verification:
+
+- `npx tsx --test tests/source-tier-classifier.test.ts tests/evidence-adjustment.test.ts tests/recommendation-rigor.test.ts` passed: 16 tests, 3 suites.
+- `npm test` passed: 29 tests, 5 suites.
+- `npm run build` passed.
+
 ## 2026-06-08 — Review + Fix: Source-Tier Inflation In Evidence Cases
 
 Status:
