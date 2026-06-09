@@ -135,4 +135,25 @@ describe("v1.2 recommendation rigor layer", () => {
     assert.equal(rigor.recommendationStability, evidenceCase.expectedStability);
     assert.equal(rigor.decisionType, evidenceCase.expectedDecisionType);
   });
+
+  it("lets the protein drink case reach Strong Go but keeps it fragile near the threshold", () => {
+    const evidenceCase = readEvidenceCase("demo_protein_drink_evidence.json");
+    const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
+    const result = calculateTrendFitWithProfile(adjustment.adjusted, "medium", "default");
+    const rigor = applyRecommendationRigor({
+      scores: adjustment.adjusted,
+      result,
+      profile: "default",
+      evidence: evidenceCase.evidence
+    });
+
+    assert.equal(result.total, evidenceCase.expectedAdjustedTotal);
+    assert.equal(result.recommendation.finalBand, evidenceCase.expectedAdjustedBand);
+    assert.equal(rigor.evidenceGate, evidenceCase.expectedEvidenceGate);
+    assert.equal(rigor.gatedBand, evidenceCase.expectedGatedBand);
+    assert.deepEqual(rigor.gateMissing, evidenceCase.expectedGateMissing);
+    assert.deepEqual(rigor.dimensionCaps, evidenceCase.expectedDimensionCaps);
+    assert.equal(rigor.recommendationStability, evidenceCase.expectedStability);
+    assert.equal(rigor.decisionType, evidenceCase.expectedDecisionType);
+  });
 });

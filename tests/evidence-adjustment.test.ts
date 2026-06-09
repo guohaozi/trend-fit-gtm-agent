@@ -57,6 +57,17 @@ describe("evidence adjustment model", () => {
     assert.deepEqual(adjustment.confidenceByDimension, evidenceCase.expectedDimensionConfidence);
   });
 
+  it("recomputes the protein drink evidence case with audience and commercial intent revised up", () => {
+    const evidenceCase = readEvidenceCase("demo_protein_drink_evidence.json");
+    const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
+    const result = calculateTrendFit(adjustment.adjusted, "medium");
+
+    assert.deepEqual(adjustment.adjusted, evidenceCase.expectedAdjustedScores);
+    assert.equal(result.total, evidenceCase.expectedAdjustedTotal);
+    assert.equal(result.recommendation.finalBand, evidenceCase.expectedAdjustedBand);
+    assert.deepEqual(adjustment.confidenceByDimension, evidenceCase.expectedDimensionConfidence);
+  });
+
   it("prevents proxy-only evidence from moving a dimension by two anchor steps", () => {
     const baseline: Scores = {
       audienceOverlap: 75,

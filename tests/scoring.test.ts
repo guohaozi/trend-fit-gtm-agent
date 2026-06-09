@@ -22,7 +22,8 @@ describe("Trend-Fit scoring contract", () => {
     ["demo_fashion.json", 90, "Strong Go", null],
     ["demo_robotics.json", 74, "Go", "trust-building angle"],
     ["demo_ai_tool.json", 89, "Strong Go", null],
-    ["demo_snack.json", 81, "Go", null]
+    ["demo_snack.json", 81, "Go", null],
+    ["demo_protein_drink.json", 78, "Go", null]
   ] as const;
 
   for (const [fileName, total, band, qualifier] of demos) {

@@ -27,7 +27,7 @@ This is what the agent produces — not a list of trending topics, not a KOL dir
 
 ## Demo results
 
-Four fully worked demo cases, each with real scoring rationale (no fabricated metrics):
+Five fully worked demo cases, each with real scoring rationale (no fabricated metrics):
 
 | Product | Trend | Score | Decision |
 |---------|-------|-------|----------|
@@ -35,11 +35,12 @@ Four fully worked demo cases, each with real scoring rationale (no fabricated me
 | Home robotics brand | AI home gadgets / smart home setup | **74 / 100** | Go — trust-building angle |
 | AI photo editing tool | AI profile photo / product photo before-after | **89 / 100** | Strong Go |
 | Snack / confectionery brand | Dubai-style pistachio kunafa chocolate | **81 / 100** | Go |
+| Convenience-store protein drink | Everyday protein / lifestyle weight management | **78 / 100** | Go |
 
 Demo briefs → [`outputs/`](outputs/)  
 Demo input data → [`data/`](data/)
 
-**Evidence agent in action:** three demo cases now include real evidence layers:
+**Evidence agent in action:** four demo cases now include real evidence layers:
 
 - Fashion / quiet luxury → [`outputs/demo_fashion_evidence_case.md`](outputs/demo_fashion_evidence_case.md):
   real sources **revised Timing & Saturation from 75 → 50** and hardened the classism risk.
@@ -53,6 +54,11 @@ Demo input data → [`data/`](data/)
   project-local skills were used to classify evidence; saturation and copycat risk moved
   the read from 81 → 76. Gate passes with moderate stability, but price skepticism remains
   proxy-tier directional caution rather than measured purchase behavior.
+- Protein drink / everyday protein → [`outputs/demo_protein_drink_evidence_case.md`](outputs/demo_protein_drink_evidence_case.md):
+  the new evidence-collector workflow turned candidate sources into typed evidence. China
+  health/fitness and sports-nutrition signals moved the read from 78 → 85, but the result
+  is fragile because it sits exactly on the Strong Go threshold and health-claim risk
+  remains real.
 
 This is the line between a strategy scaffold and an evidence agent — see below.
 
@@ -101,10 +107,11 @@ A confident "No-go" is as valuable as a "Strong Go."
 
 ---
 
-## Architecture: five skills
+## Architecture: six skills
 
 ```
 trend-product-fit/          ← core scoring + GTM brief generation
+evidence-collector/         ← verified candidates → typed evidence items
 competitor-evidence/        ← evidence layer (upgrades Assumption → Evidence)
 trend-shortlist/            ← rank several candidate trends for one product
 campaign-generator/         ← angles, content ideas, sample copy
@@ -134,7 +141,7 @@ npm run dev
 | `/fit-score` | See the seven-dimension score breakdown and the recommendation |
 | `/report` | Full GTM brief: angle, risk, voice, words, KOL type, copy, outreach DM |
 
-For demo mode, load any of the four baseline cases from [`data/`](data/) directly from the homepage.
+For demo mode, load any of the five baseline cases from [`data/`](data/) directly from the homepage.
 
 ### Tests
 
@@ -152,8 +159,8 @@ anchor validation, and report Markdown parsing.
 **This version does:**
 - Deterministic scoring from manual product + trend input
 - Full GTM brief output with 12 structured sections
-- Four fully worked baseline demo cases with defensible reasoning
-- Three evidence-backed case studies that show how real sources revise or validate the
+- Five fully worked baseline demo cases with defensible reasoning
+- Four evidence-backed case studies that show how real sources revise or validate the
   baseline score
 - Evidence gates, source-tier discipline, recommendation stability, and goal-based weight
   profiles
@@ -193,6 +200,8 @@ trend-fit-gtm-agent/
 │   ├── scoring.ts                # calculateTrendFit(), validateScores(), overrides
 │   ├── recommendation-rigor.ts    # evidence gate, profiles, caps, stability
 │   ├── evidence-adjustment.ts     # typed evidence -> anchor-step score adjustment
+│   ├── source-tier-classifier.ts   # verify-first source-tier classifier
+│   ├── evidence-collector.ts       # candidate sources -> typed evidence draft
 │   ├── demo-cases.ts             # demo and evidence case loading
 │   ├── report-sections.ts        # GTM brief section generators
 │   └── report-markdown.ts        # Markdown export
@@ -200,6 +209,8 @@ trend-fit-gtm-agent/
 │   ├── scoring.test.ts
 │   ├── evidence-adjustment.test.ts
 │   ├── recommendation-rigor.test.ts
+│   ├── source-tier-classifier.test.ts
+│   ├── evidence-collector.test.ts
 │   └── report-markdown.test.ts
 ├── data/                         # Demo input JSON and structured evidence cases
 │   ├── demo_fashion.json
@@ -208,7 +219,9 @@ trend-fit-gtm-agent/
 │   ├── demo_ai_tool.json
 │   ├── demo_ai_tool_evidence.json
 │   ├── demo_snack.json
-│   └── demo_snack_evidence.json
+│   ├── demo_snack_evidence.json
+│   ├── demo_protein_drink.json
+│   └── demo_protein_drink_evidence.json
 ├── outputs/                      # Pre-generated GTM brief reports (Markdown)
 │   ├── demo_fashion_report.md
 │   ├── demo_fashion_evidence_case.md
@@ -216,7 +229,9 @@ trend-fit-gtm-agent/
 │   ├── demo_ai_tool_report.md
 │   ├── demo_ai_tool_evidence_case.md
 │   ├── demo_snack_report.md
-│   └── demo_snack_evidence_case.md
+│   ├── demo_snack_evidence_case.md
+│   ├── demo_protein_drink_report.md
+│   └── demo_protein_drink_evidence_case.md
 ├── docs/
 │   ├── current-state.md          # handoff state for fresh agent sessions
 │   └── changelog.md              # project-level iteration log
@@ -230,6 +245,7 @@ trend-fit-gtm-agent/
     │   ├── weight_profiles.md
     │   ├── source_tier_classifier.md
     │   └── examples.md
+    ├── evidence-collector/SKILL.md
     ├── competitor-evidence/SKILL.md
     ├── trend-shortlist/SKILL.md
     ├── campaign-generator/SKILL.md

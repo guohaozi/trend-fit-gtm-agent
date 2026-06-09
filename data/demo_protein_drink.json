@@ -1,0 +1,52 @@
+{
+  "id": "demo_protein_drink",
+  "product": {
+    "name": "FitMilk Daily Protein (demo)",
+    "category": "RTD protein beverage",
+    "targetMarket": ["China", "Japan benchmark"],
+    "audience": "Urban office workers, light-fitness users, weight-management consumers, and convenience-store shoppers who want easier daily protein intake",
+    "priceRange": "RMB 10-18 per 250ml bottle",
+    "positioning": "A convenience-store ready-to-drink protein milk for everyday health routines, not a bodybuilding supplement or meal-replacement shake",
+    "sellingPoints": [
+      "15g protein in a familiar chilled milk-drink format",
+      "Low-fat, controlled-sugar formulation",
+      "Convenience-store availability for breakfast, office snacking, and post-workout recovery"
+    ],
+    "brandTone": "Practical, everyday, non-anxious, health-literate",
+    "competitors": ["Meiji SAVAS", "protein powder brands", "meal-replacement shakes", "low-sugar milk tea", "functional bottled drinks"],
+    "campaignGoal": "Retail trial + category education",
+    "riskTolerance": "medium"
+  },
+  "trend": {
+    "name": "Everyday protein for lifestyle weight management",
+    "platform": "Douyin / Xiaohongshu / convenience-store discovery",
+    "region": "China, with Japan as a reference market",
+    "description": "Light-fitness and weight-management consumers treat protein as a daily routine: breakfast backup, office snack, post-workout drink, or lower-sugar replacement for sweet drinks.",
+    "drivenBy": "Fitness content, weight-management creators, convenience-store discovery, active-lifestyle nutrition brands, and Japan-style RTD protein benchmarks",
+    "format": "What I drink in a calorie deficit, convenience-store protein find, breakfast in a rush, office snack swap, post-workout bottle check",
+    "whyPopular": "Healthier living is becoming less gym-only and more routine-based; consumers want easy protein without mixing powder or committing to meal-replacement products.",
+    "exampleContent": "Creator compares a normal sweet drink with a 15g protein RTD milk after a light workout or during an office afternoon slump.",
+    "controversy": "Protein and weight-management claims can drift into diet anxiety, meal-replacement overclaiming, kidney-health concerns for some users, or pseudo-scientific fitness marketing."
+  },
+  "scores": {
+    "audienceOverlap": 75,
+    "useCaseRelevance": 100,
+    "messageBridge": 75,
+    "creativeFeasibility": 75,
+    "commercialIntent": 75,
+    "brandSafety": 50,
+    "timingSaturation": 75
+  },
+  "expectedTotal": 78,
+  "expectedBand": "Go",
+  "expectedQualifier": null,
+  "expectedFinalBand": "Go",
+  "overrideReason": null,
+  "profileUsed": "default",
+  "expectedEvidenceGate": "fail",
+  "expectedGatedBand": "Go",
+  "expectedGateMissing": ["timingSaturation", "brandSafety", "audienceOrUseCase"],
+  "expectedDimensionCaps": [],
+  "expectedStability": "fragile",
+  "expectedDecisionType": "small test"
+}

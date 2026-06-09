@@ -145,6 +145,32 @@ return winner's full brief. Ranking order: finalBand priority → adjusted total
 confidence → timingSaturation. Build this AFTER the evidence layer + a multi-trend input
 page. Still no auto-crawl.
 
+## v1.3 — Evidence Collector (candidate sources → typed evidence)
+
+First reusable layer is now in place:
+
+- [`skills/evidence-collector/SKILL.md`](skills/evidence-collector/SKILL.md)
+- [`lib/source-tier-classifier.ts`](lib/source-tier-classifier.ts)
+- [`lib/evidence-collector.ts`](lib/evidence-collector.ts)
+- [`tests/evidence-collector.test.ts`](tests/evidence-collector.test.ts)
+
+Purpose:
+
+- GooseWorks, browser research, or user-supplied URLs produce `EvidenceCandidate`
+  records.
+- The project-owned classifier decides whether each candidate can become score-ready
+  evidence.
+- Contradicted sources are dropped; unverified sources become `proxy` / `low` with an
+  `UNVERIFIED:` note; requested confidence is clamped to the tier ceiling.
+- The output is a draft, not a finished case: accepted evidence can be promoted into
+  `data/*_evidence.json` after expected adjusted scores and rigor fields are computed.
+
+Boundary:
+
+- This is not a network crawler and not automatic verification. A sandboxed/offline agent
+  cannot assert `primary` or `secondary`; it must mark sources as unverified and accept the
+  proxy/low cap.
+
 ## v1.2 — Rigor layer: weight profiles + evidence gate + caps + fragility (NEW)
 
 Per the scoring-improvement brief. **All additive — `calculateTrendFit` core math, the

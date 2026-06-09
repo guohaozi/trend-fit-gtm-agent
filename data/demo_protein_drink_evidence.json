@@ -1,0 +1,104 @@
+{
+  "id": "demo_protein_drink_evidence",
+  "case": "demo_protein_drink",
+  "researchDate": "2026-06-09",
+  "tooling": "Evidence-collector workflow. GooseWorks CLI unavailable in this environment; candidate sources gathered through web research fallback, then classified with lib/source-tier-classifier.ts and shaped with lib/evidence-collector.ts.",
+  "baselineScores": {
+    "audienceOverlap": 75,
+    "useCaseRelevance": 100,
+    "messageBridge": 75,
+    "creativeFeasibility": 75,
+    "commercialIntent": 75,
+    "brandSafety": 50,
+    "timingSaturation": 75
+  },
+  "evidence": [
+    {
+      "id": "ev-audience-1",
+      "dimension": "audienceOverlap",
+      "direction": "up",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.frontiersin.org/journals/sports-and-active-living/articles/10.3389/fspor.2025.1578817/full",
+      "note": "A 2025 Frontiers review of China's national fitness context describes continued public-policy support and participation growth around exercise and healthy living, supporting a broader audience than only serious gym users."
+    },
+    {
+      "id": "ev-usecase-1",
+      "dimension": "useCaseRelevance",
+      "direction": "confirm",
+      "magnitude": "strong",
+      "confidence": "medium",
+      "sourceTier": "proxy",
+      "sourceUrl": "https://www.meiji.com/global/food/protein/",
+      "note": "Meiji's SAVAS page shows a ready-to-drink protein format positioned around protein supplementation and everyday availability. Classified as proxy because this is vendor copy about its own product, but it is a useful Japan benchmark for use-case direction."
+    },
+    {
+      "id": "ev-bridge-1",
+      "dimension": "messageBridge",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "proxy",
+      "sourceUrl": "https://www.meiji.com/global/wellness-stories/changing-protein-images.html",
+      "note": "Meiji's story on changing protein images emphasizes making protein easier to drink after exercise and less heavy than old supplement formats. Proxy because it is brand-owned storytelling, but it supports the message bridge from supplement to daily drink."
+    },
+    {
+      "id": "ev-commercial-1",
+      "dimension": "commercialIntent",
+      "direction": "up",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.glanbianutritionals.com/en-au/node/2346",
+      "note": "Glanbia's 2025 China sports-nutrition outlook cites GlobalData and Innova signals showing Protein RTD as a small but fast-growing China category. Treated as supplier-owned category research: secondary, but confidence-capped at medium because Glanbia is also a nutrition-ingredient supplier."
+    },
+    {
+      "id": "ev-timing-1",
+      "dimension": "timingSaturation",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.glanbianutritionals.com/en-au/node/2346",
+      "note": "The same Glanbia outlook frames Chinese sports nutrition as moving beyond professional athletes toward active lifestyle consumers, while Protein RTD remains relatively small. Confidence is capped at medium because the source is supplier-owned category research."
+    },
+    {
+      "id": "ev-safety-1",
+      "dimension": "brandSafety",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.health.harvard.edu/staying-healthy/the-hidden-dangers-of-protein-powders",
+      "note": "Harvard Health warns that protein supplements can carry hidden risks and that some users should be cautious, confirming a moderate brand-safety score: avoid miracle weight-loss, meal-replacement, or medicalized claims."
+    }
+  ],
+  "expectedAdjustedScores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 75,
+    "creativeFeasibility": 75,
+    "commercialIntent": 100,
+    "brandSafety": 50,
+    "timingSaturation": 75
+  },
+  "expectedAdjustedTotal": 85,
+  "expectedAdjustedBand": "Strong Go",
+  "profileUsed": "default",
+  "expectedEvidenceGate": "pass",
+  "expectedGatedBand": "Strong Go",
+  "expectedGateMissing": [],
+  "expectedDimensionCaps": [],
+  "expectedStability": "fragile",
+  "expectedDecisionType": "organic push",
+  "expectedDimensionConfidence": {
+    "audienceOverlap": "evidence-revised (high)",
+    "useCaseRelevance": "evidence-confirmed (medium)",
+    "messageBridge": "evidence-confirmed (medium)",
+    "creativeFeasibility": "assumption",
+    "commercialIntent": "evidence-revised (medium)",
+    "brandSafety": "evidence-confirmed (high)",
+    "timingSaturation": "evidence-confirmed (medium)"
+  }
+}

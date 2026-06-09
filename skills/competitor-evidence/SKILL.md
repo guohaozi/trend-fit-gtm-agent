@@ -28,6 +28,11 @@ product-swipefile/`), a deep evidence-first product-research engine ("先证据�
 This skill is the *adapter*: it shapes competitor research specifically for the
 trend-fit decision, rather than a general product report.
 
+For new evidence-backed cases, run [`evidence-collector`](../evidence-collector/SKILL.md)
+after this skill: competitor research produces candidate sources, and evidence-collector
+turns only verified, conservatively tiered candidates into score-ready `EvidenceItem`
+records.
+
 ---
 
 ## The discipline (non-negotiable)
@@ -62,6 +67,11 @@ Every finding you intend to use as a score input must be emitted as a typed evid
 (per [`evidence_model.md`](../trend-product-fit/evidence_model.md) §2/§3a) carrying:
 `dimension`, `direction`, `magnitude`, `confidence`, **`sourceTier`** (primary/secondary/
 proxy), `sourceUrl`. A finding with no `sourceTier` is not usable for scoring.
+
+Preferred implementation path: first emit an `EvidenceCandidate`, then run it through
+[`lib/evidence-collector.ts`](../../lib/evidence-collector.ts) and
+[`lib/source-tier-classifier.ts`](../../lib/source-tier-classifier.ts). Do not hand-grade
+`sourceTier` in prose when the code path is available.
 
 **Hard rule — do not launder source strength.** Do not assign `sourceTier` by feel; run
 every source through the literal checklist in

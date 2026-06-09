@@ -2,6 +2,140 @@
 
 This changelog records project-level changes and the reasoning behind them. It is intended for handoff between Codex / Claude conversations, not just release notes.
 
+## 2026-06-09 — Tooling Handoff: GooseWorks, OpenCLI, And Local Skill Substitutes
+
+Status:
+
+- Captured the evidence-collection tooling state for a fresh conversation.
+
+What was verified:
+
+- User terminal verified GooseWorks:
+  - `npx gooseworks login` reports already logged in as `gh1225835497@gmail.com`.
+  - `npx gooseworks credits` reports `200` credits available.
+- OpenCLI is installed at `/Users/guo/.npm-global/bin/opencli`.
+- OpenCLI works when `/Users/guo/.npm-global/bin` is added to `PATH`.
+- Product-swipefile's `opencli-check` reports OpenCLI available when run with:
+
+```bash
+PATH=/Users/guo/.npm-global/bin:$PATH \
+  python3 /Users/guo/gtm/.claude/skills/product-swipefile/scripts/research_helper.py opencli-check
+```
+
+What did not work:
+
+- Remote `find-skills` registry search did not complete inside Codex:
+  - `npx skills find "reddit google trends web research"` failed with
+    `getaddrinfo ENOTFOUND registry.npmjs.org`.
+  - An escalated retry was rejected because `npx skills find` would download and execute
+    public npm code, which the sandbox reviewer flagged as supply-chain risk.
+- Local skill discovery did work. Use user-terminal `npx skills find ...` plus pasted
+  results if remote skill discovery is needed in the next conversation.
+
+Local substitutes identified:
+
+- `product-swipefile` for product/competitor inventory.
+- `opencli` for raw platform/community search across Reddit, X/Twitter, TikTok, Douyin,
+  Xiaohongshu, Bilibili, YouTube, Zhihu, Weibo, Product Hunt, Hacker News, and more.
+- `reddit-icp-monitor` for raw Reddit user language and buyer pain.
+- `seo-keyword-research` for Google Trends/related-query timing signals if `SERPAPI_KEY`
+  is configured.
+- `map-your-market`, `where-your-customer-lives`, and `competitor-pr-finder` as optional
+  specialized providers, depending on script/API-key availability.
+
+Design decision:
+
+- GooseWorks and OpenCLI should be treated as candidate-source providers only. Their
+  output should normalize to `EvidenceCandidate[]`, then pass through
+  `buildEvidenceDraft()` and `source-tier-classifier` before any score adjustment.
+
+Next recommended move:
+
+- Implement a lightweight provider flow that detects GooseWorks/OpenCLI availability,
+  gathers candidate sources, and converts them into `EvidenceCandidate[]`.
+
+## 2026-06-09 — Protein Drink Evidence Case With Collector
+
+Status:
+
+- Added the first new evidence case produced through the new evidence-collector workflow:
+  convenience-store RTD protein drink x everyday protein / lifestyle weight management.
+
+What landed:
+
+- Added `data/demo_protein_drink.json` as the fifth baseline demo.
+- Added `data/demo_protein_drink_evidence.json` as the fourth evidence-backed case.
+- Added `outputs/demo_protein_drink_report.md` and
+  `outputs/demo_protein_drink_evidence_case.md`.
+- Wired the case into `lib/demo-cases.ts`, `lib/display-labels.ts`, README, and tests.
+- Extended scoring, evidence adjustment, and recommendation-rigor tests to cover the new
+  baseline and evidence-backed result.
+
+Key result:
+
+- Baseline: `78 / Go`.
+- Evidence-adjusted: `85 / Strong Go`.
+- Evidence gate: `pass`.
+- Stability: `fragile`.
+- Decision type: `organic push`, not paid push.
+
+Why it matters:
+
+- The case captures the user's actual market insight: Japan has normalized SAVAS-style
+  ready-to-drink protein in convenience retail, while China has rising fitness / healthy
+  lifestyle interest but weaker mainstream convenience-store RTD protein drink behavior.
+- The evidence case shows a useful Strong Go that is still constrained by health-claim
+  risk and threshold fragility.
+
+Collector finding and fix:
+
+- Glanbia's China sports-nutrition article is useful category evidence and cites third-party
+  market signals, but Glanbia is also a nutrition-ingredient supplier. This exposed a
+  classifier gap, so this round added a `supplier_category_report` signal: verified
+  supplier-owned category research can be `secondary`, but max confidence is capped at
+  `medium`.
+
+## 2026-06-09 — Evidence Collector First Step
+
+Status:
+
+- Implemented the first reusable evidence-collector layer so evidence collection is no
+  longer only a manual research/documentation process.
+
+What landed:
+
+- Added `lib/source-tier-classifier.ts`, a reusable TypeScript implementation of the
+  verify-first classifier:
+  - unverified sources are capped at `proxy` / `low`;
+  - contradicted sources are dropped;
+  - vendor docs/copy, listicles, press releases, and anecdotes are forced proxy;
+  - one Reddit/social thread can be `primary` only for raw Audience or Use-case language,
+    with max `medium` confidence;
+  - requested confidence is clamped to the source tier ceiling.
+- Added `lib/evidence-collector.ts`, which converts `EvidenceCandidate` records into an
+  auditable evidence draft with accepted `EvidenceItem[]`, dropped candidates, and
+  per-candidate classifications.
+- Added `tests/evidence-collector.test.ts` and expanded
+  `tests/source-tier-classifier.test.ts` so the classifier is no longer duplicated only
+  inside a guard test.
+- Added `skills/evidence-collector/SKILL.md`, a project-local skill that can borrow
+  `.claude/skills/gooseworks` for candidate-source discovery while keeping source-tiering
+  inside the project-owned classifier.
+- Updated `skills/competitor-evidence/SKILL.md` to make competitor research feed the
+  evidence collector rather than hand-grade `sourceTier`.
+- Updated README skill architecture to include `evidence-collector`.
+
+Key design decision:
+
+- Keep this as a candidate-to-evidence conversion layer, not a crawler. GooseWorks,
+  browser research, or user URLs can supply candidates, but only verified claims can earn
+  non-proxy tiers. This preserves the project's anti-overclaiming boundary.
+
+Next recommended move:
+
+- Use the collector on one fresh evidence case, then build the trend-shortlist demo on top
+  of collector-produced evidence.
+
 ## 2026-06-09 — Public GitHub Portfolio Handoff
 
 Status:
