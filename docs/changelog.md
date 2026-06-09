@@ -2,6 +2,44 @@
 
 This changelog records project-level changes and the reasoning behind them. It is intended for handoff between Codex / Claude conversations, not just release notes.
 
+## 2026-06-10 — Competitor Provider And AI-Tool Competitor Evidence Variant
+
+Status:
+
+- Added the P4 competitor research layer after P0-P3 provider work.
+
+What landed:
+
+- Added `lib/competitor-research-provider.ts`, which converts competitor-profiling /
+  product-swipefile style findings into `EvidenceCandidate[]`.
+- Added `tests/competitor-research-provider.test.ts`, covering direct findings, structured
+  profile extracts, and full draft -> generated evidence case flow.
+- Added `data/demo_ai_tool_competitor_evidence.json` and
+  `outputs/demo_ai_tool_competitor_evidence_case.md`.
+- Extended evidence-adjustment and recommendation-rigor tests so the competitor-layer case
+  is recomputed rather than trusted as static JSON.
+
+Key design decision:
+
+- Competitor research remains a provider layer. It does not hand-grade final evidence,
+  source tiers, or scores.
+- Competitor-owned copy can support audience direction only as proxy. Directly observed
+  competitor campaigns can be primary evidence for competitor activity and trend usage.
+
+Case result:
+
+- AI photo-tool baseline: `89 / Strong Go`.
+- Competitor-adjusted: `85 / Strong Go`.
+- Evidence gate: `pass`.
+- Stability: `fragile`.
+- Main movement: competitor activity reduces Timing & Saturation, while Evoto backlash
+  reduces Brand Safety.
+
+Verification:
+
+- `node --import tsx --test tests/*.test.ts` passed: 53 tests.
+- `npm run build` passed.
+
 ## 2026-06-09 — Tooling Handoff: GooseWorks, OpenCLI, And Local Skill Substitutes
 
 Status:

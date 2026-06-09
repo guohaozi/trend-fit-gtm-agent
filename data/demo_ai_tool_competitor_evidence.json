@@ -1,0 +1,107 @@
+{
+  "id": "demo_ai_tool_competitor_evidence",
+  "case": "demo_ai_tool",
+  "researchDate": "2026-06-10",
+  "tooling": "Competitor layer fixture from competitor-profiling / product-swipefile style extracts. Sources were manually verified through web research, then normalized with lib/competitor-research-provider.ts and classified with the project source-tier rules.",
+  "baselineScores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 100,
+    "creativeFeasibility": 100,
+    "commercialIntent": 75,
+    "brandSafety": 75,
+    "timingSaturation": 75
+  },
+  "evidence": [
+    {
+      "id": "photoroom-same-audience",
+      "dimension": "audienceOverlap",
+      "direction": "confirm",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "proxy",
+      "sourceUrl": "https://www.photoroom.com/ai-product-photography",
+      "note": "Competitor: Photoroom. Origin: competitor-profiling. Competitor positioning targets ecommerce and online sellers creating product photos. This confirms audience direction but stays proxy because it is competitor-owned copy."
+    },
+    {
+      "id": "photoroom-competitor-used-trend",
+      "dimension": "useCaseRelevance",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "primary",
+      "sourceUrl": "https://www.photoroom.com/ai-product-photography",
+      "note": "Competitor: Photoroom. Origin: competitor-profiling. Photoroom directly markets AI product photography from phone/product images, confirming the before-after product-photo use case."
+    },
+    {
+      "id": "photoroom-competitor-content-angle",
+      "dimension": "messageBridge",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "primary",
+      "sourceUrl": "https://www.photoroom.com/tools/instant-backgrounds",
+      "note": "Competitor: Photoroom. Origin: competitor-profiling. The AI backgrounds page bridges from a plain product image to realistic, studio-like product visuals, validating the product-photo transformation message bridge."
+    },
+    {
+      "id": "picsart-competitor-used-trend",
+      "dimension": "useCaseRelevance",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://petapixel.com/2024/04/18/picsart-launches-smart-background-editing-for-product-photography/",
+      "note": "Competitor: Picsart. Origin: product-swipefile. PetaPixel coverage documents Picsart's Smart Background launch for product photography, confirming the category-level use case through reputable journalism."
+    },
+    {
+      "id": "picsart-saturated-competitor-activity",
+      "dimension": "timingSaturation",
+      "direction": "down",
+      "magnitude": "strong",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://petapixel.com/2024/04/18/picsart-launches-smart-background-editing-for-product-photography/",
+      "note": "Competitor: Picsart. Origin: product-swipefile. Reputable coverage frames Smart Background as part of an AI-powered photo-editing arms race, revising Timing & Saturation downward for the AI product-photo trend."
+    },
+    {
+      "id": "evoto-competitor-backlash",
+      "dimension": "brandSafety",
+      "direction": "down",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.digitalcameraworld.com/photography/photo-editing/we-missed-the-mark-and-we-are-sorry-evoto-responds-to-ai-headshot-generator-backlash",
+      "note": "Competitor: Evoto. Origin: product-swipefile. Digital Camera World reports backlash and an apology around Evoto's AI Headshot Generator, revising Brand Safety downward for AI portrait/headshot positioning."
+    }
+  ],
+  "expectedAdjustedScores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 100,
+    "creativeFeasibility": 100,
+    "commercialIntent": 75,
+    "brandSafety": 50,
+    "timingSaturation": 25
+  },
+  "expectedAdjustedTotal": 85,
+  "expectedAdjustedBand": "Strong Go",
+  "profileUsed": "default",
+  "expectedEvidenceGate": "pass",
+  "expectedGatedBand": "Strong Go",
+  "expectedGateMissing": [],
+  "expectedDimensionCaps": [
+    "audienceOverlap",
+    "creativeFeasibility"
+  ],
+  "expectedStability": "fragile",
+  "expectedDecisionType": "organic push",
+  "expectedDimensionConfidence": {
+    "audienceOverlap": "evidence-confirmed (medium)",
+    "useCaseRelevance": "evidence-confirmed (high)",
+    "messageBridge": "evidence-confirmed (high)",
+    "creativeFeasibility": "assumption",
+    "commercialIntent": "assumption",
+    "brandSafety": "evidence-revised (medium)",
+    "timingSaturation": "evidence-revised (high)"
+  }
+}

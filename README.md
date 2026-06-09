@@ -59,6 +59,12 @@ Demo input data → [`data/`](data/)
   health/fitness and sports-nutrition signals moved the read from 78 → 85, but the result
   is fragile because it sits exactly on the Strong Go threshold and health-claim risk
   remains real.
+- AI photo tool competitor layer → [`outputs/demo_ai_tool_competitor_evidence_case.md`](outputs/demo_ai_tool_competitor_evidence_case.md):
+  competitor-profiling / product-swipefile style extracts were normalized into evidence.
+  Photoroom and Picsart confirm the product-photo use case, while Evoto backlash and
+  competitor crowding revise Brand Safety and Timing downward. The read lands at 85 /
+  Strong Go, gate pass, but remains fragile because Audience and Creative stay
+  unsupported-high.
 
 This is the line between a strategy scaffold and an evidence agent — see below.
 

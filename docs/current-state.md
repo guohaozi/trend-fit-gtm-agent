@@ -1,6 +1,6 @@
 # Current State — Trend-Fit GTM Agent
 
-Last updated: 2026-06-09
+Last updated: 2026-06-10
 
 This file is a handoff snapshot for starting a fresh Codex / Claude conversation.
 
@@ -10,7 +10,9 @@ This file is a handoff snapshot for starting a fresh Codex / Claude conversation
 - Git branch: `main`
 - Public GitHub repo: `https://github.com/guohaozi/trend-fit-gtm-agent`
 - Remote: `origin https://github.com/guohaozi/trend-fit-gtm-agent.git`
-- Current state: v1.2 rigor layer is implemented in docs, skills, TypeScript, tests, UI, and four evidence-backed demo cases.
+- Current state: v1.2 rigor layer is implemented in docs, skills, TypeScript, tests, UI, four main evidence-backed demo cases, and one competitor-layer AI-tool evidence variant.
+- Latest provider layer: `lib/competitor-research-provider.ts` maps competitor-profiling / product-swipefile style extracts into `EvidenceCandidate[]`, then the existing collector and generator compute source-tiered evidence cases.
+- Latest competitor case: `data/demo_ai_tool_competitor_evidence.json` and `outputs/demo_ai_tool_competitor_evidence_case.md`. It keeps the AI photo-tool read at `85 / Strong Go`, gate `pass`, but fragile because competitor crowding lowers Timing and Evoto backlash lowers Brand Safety while Audience and Creative remain unsupported-high.
 - Latest product case: convenience-store RTD protein drink x everyday protein / lifestyle weight management. Baseline `78 / Go`; evidence-adjusted `85 / Strong Go`; gate passes, but stability is fragile because it sits exactly on the Strong Go threshold and health-claim risk remains real.
 - Latest round added the first `evidence-collector` implementation: reusable source-tier classification code, an evidence draft builder, tests, and a project skill that can borrow GooseWorks/manual research as candidate-source input without letting the research agent self-grade evidence upward.
 - Previous round implemented the source-tier classifier as an executable test guard and re-audited the fashion, AI-tool, and snack evidence cases against it.
@@ -56,6 +58,32 @@ This was the recommended order from the project-history review:
    Done for `demo_protein_drink`.
 5. **Add a trend-shortlist demo.** After one collector-produced case: one product + three
    candidate trends -> evidence-adjusted gated ranking.
+
+## P4 Competitor Provider Handoff
+
+What landed:
+
+- `lib/competitor-research-provider.ts`
+- `tests/competitor-research-provider.test.ts`
+- `data/demo_ai_tool_competitor_evidence.json`
+- `outputs/demo_ai_tool_competitor_evidence_case.md`
+
+Design boundary:
+
+- `competitor-profiling` and `product-swipefile` are research/front-end skills, not
+  scoring authorities.
+- They should emit structured competitor findings such as `same_audience`,
+  `competitor_used_trend`, `competitor_content_angle`, `competitor_backlash`,
+  `where_to_buy_comments`, and `saturated_competitor_activity`.
+- Those findings normalize to `EvidenceCandidate[]`, then pass through
+  `buildEvidenceDraft()` and `generateEvidenceAdjustmentCaseFromDraft()`.
+- Competitor-owned positioning copy remains proxy when used for audience claims; directly
+  observed competitor campaigns can be primary for what competitors are actually doing.
+
+Verification:
+
+- `node --import tsx --test tests/*.test.ts` -> 53 tests pass.
+- `npm run build` -> production build succeeds.
 
 ## Tooling / Skill Discovery Handoff
 

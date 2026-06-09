@@ -115,6 +115,27 @@ describe("v1.2 recommendation rigor layer", () => {
     assert.equal(rigor.decisionType, evidenceCase.expectedDecisionType);
   });
 
+  it("keeps the AI tool competitor-layer case gated but fragile because unsupported-high dimensions remain", () => {
+    const evidenceCase = readEvidenceCase("demo_ai_tool_competitor_evidence.json");
+    const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
+    const result = calculateTrendFitWithProfile(adjustment.adjusted, "medium", "default");
+    const rigor = applyRecommendationRigor({
+      scores: adjustment.adjusted,
+      result,
+      profile: "default",
+      evidence: evidenceCase.evidence
+    });
+
+    assert.equal(result.total, evidenceCase.expectedAdjustedTotal);
+    assert.equal(result.recommendation.finalBand, evidenceCase.expectedAdjustedBand);
+    assert.equal(rigor.evidenceGate, evidenceCase.expectedEvidenceGate);
+    assert.equal(rigor.gatedBand, evidenceCase.expectedGatedBand);
+    assert.deepEqual(rigor.gateMissing, evidenceCase.expectedGateMissing);
+    assert.deepEqual(rigor.dimensionCaps, evidenceCase.expectedDimensionCaps);
+    assert.equal(rigor.recommendationStability, evidenceCase.expectedStability);
+    assert.equal(rigor.decisionType, evidenceCase.expectedDecisionType);
+  });
+
   it("keeps the snack trend as a guarded Go after saturation evidence", () => {
     const evidenceCase = readEvidenceCase("demo_snack_evidence.json");
     const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
