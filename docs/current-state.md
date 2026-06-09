@@ -10,13 +10,14 @@ This file is a handoff snapshot for starting a fresh Codex / Claude conversation
 - Git branch: `main`
 - Public GitHub repo: `https://github.com/guohaozi/trend-fit-gtm-agent`
 - Remote: `origin https://github.com/guohaozi/trend-fit-gtm-agent.git`
-- Current state: v1.2 rigor layer is implemented in docs, skills, TypeScript, tests, UI, four main evidence-backed demo cases, and one competitor-layer AI-tool evidence variant.
+- Current state: v1.2 rigor layer is implemented in docs, skills, TypeScript, tests, UI, four main evidence-backed demo cases, one competitor-layer AI-tool evidence variant, and P0-P4 evidence automation provider layers.
+- Automation status: P0 product-marketing context, P1 evidence case generator, P2 customer-research provider, P3 SEO/timing provider, and P4 competitor provider are done. P5 orchestration, which merges P2/P3/P4 findings and hands them to P1 automatically, has not been implemented yet.
 - Latest provider layer: `lib/competitor-research-provider.ts` maps competitor-profiling / product-swipefile style extracts into `EvidenceCandidate[]`, then the existing collector and generator compute source-tiered evidence cases.
 - Latest competitor case: `data/demo_ai_tool_competitor_evidence.json` and `outputs/demo_ai_tool_competitor_evidence_case.md`. It keeps the AI photo-tool read at `85 / Strong Go`, gate `pass`, but fragile because competitor crowding lowers Timing and Evoto backlash lowers Brand Safety while Audience and Creative remain unsupported-high.
 - Latest product case: convenience-store RTD protein drink x everyday protein / lifestyle weight management. Baseline `78 / Go`; evidence-adjusted `85 / Strong Go`; gate passes, but stability is fragile because it sits exactly on the Strong Go threshold and health-claim risk remains real.
 - Latest round added the first `evidence-collector` implementation: reusable source-tier classification code, an evidence draft builder, tests, and a project skill that can borrow GooseWorks/manual research as candidate-source input without letting the research agent self-grade evidence upward.
 - Previous round implemented the source-tier classifier as an executable test guard and re-audited the fashion, AI-tool, and snack evidence cases against it.
-- The project is now published to GitHub. Latest pushed code commit before this handoff-doc update: `92b3f21 Add source-tier guard and re-audit evidence cases`.
+- The project is now published to GitHub. Latest pushed code commit before this handoff-doc update: `4c286c6 Add competitor evidence provider`.
 - Previous review round was a Claude **review + fix** pass on the evidence cases Codex produced: it verified the cited sources are real, found a source-tier inflation bug in the AI-tool case, fixed it, and added a deterministic source-tier classifier to prevent recurrence.
 - Previous round added the AI photo-tool evidence case and the snack / Dubai-style chocolate evidence case.
 - The exact latest commit hash should be checked with `git log -1 --oneline`.
@@ -47,6 +48,15 @@ be screenshots / a short demo GIF and a compact case-study section.
 
 This was the recommended order from the project-history review:
 
+1. **P0: Product-marketing context.** Done in `.agents/product-marketing.md` and committed as `4fdc08f`.
+2. **P1: Evidence case generator.** Done in `lib/evidence-case-generator.ts`; it can generate frozen `EvidenceAdjustmentCase` objects from baseline scores plus accepted evidence, or directly from `EvidenceDraft`.
+3. **P2: Customer-research provider.** Done in `lib/customer-research-provider.ts` and `lib/opencli-customer-research.ts`; customer research and OpenCLI-style records normalize to `EvidenceCandidate[]`.
+4. **P3: Timing / search / SEO provider.** Done in `lib/seo-keyword-provider.ts`; SEO and Google Trends-style findings normalize to Timing / Commercial Intent / Message evidence candidates.
+5. **P4: Competitor provider.** Done in `lib/competitor-research-provider.ts`; competitor-profiling and product-swipefile extracts normalize to `EvidenceCandidate[]`.
+6. **P5: Evidence case orchestration.** Not done. Next implementation should merge P2/P3/P4 provider outputs into one candidate list, call `buildEvidenceDraft()`, then call `generateEvidenceAdjustmentCaseFromDraft()`.
+
+Earlier foundational work:
+
 1. **Make source-tiering enforceable in code.** Done in `tests/source-tier-classifier.test.ts`.
 2. **Re-audit fashion and snack evidence cases against the classifier.** Done; AI-tool was also tightened.
 3. **Build an `evidence-collector` skill/script.** Done at the first reusable layer:
@@ -58,6 +68,49 @@ This was the recommended order from the project-history review:
    Done for `demo_protein_drink`.
 5. **Add a trend-shortlist demo.** After one collector-produced case: one product + three
    candidate trends -> evidence-adjusted gated ranking.
+
+## P5 Evidence Automation Handoff
+
+The user asked whether the project is ready to "搞自动化 evidence case" and whether the
+right design is to merge P2/P3/P4 before handing the result to P1. The answer is yes:
+the provider layers are ready enough for the next step, but the orchestrator itself is
+not written yet.
+
+Recommended next implementation:
+
+- Add `lib/evidence-case-orchestrator.ts`.
+- Export an `orchestrateEvidenceCase()` function that accepts:
+  - baseline metadata: `id`, `caseId`, `researchDate`, `baselineScores`,
+    `riskTolerance`, optional `profileUsed`, optional `tooling`;
+  - optional `customerResearchFindings`;
+  - optional `seoKeywordFindings`;
+  - optional `competitorResearchFindings`.
+- Convert each provider finding list through the existing mapper:
+  - `customerResearchFindingsToCandidates()`;
+  - `seoKeywordFindingsToCandidates()`;
+  - `competitorResearchFindingsToCandidates()`.
+- Concatenate candidates in a deterministic order: customer -> SEO/timing -> competitor.
+- Call `buildEvidenceDraft()` once on the merged candidates.
+- Call `generateEvidenceAdjustmentCaseFromDraft()` on the draft.
+- Return `{ candidates, draft, evidenceCase }`.
+
+Suggested first test:
+
+- Add `tests/evidence-case-orchestrator.test.ts`.
+- Use fixture-only provider findings, not network calls.
+- Assert the merged candidate IDs preserve provider order.
+- Assert the generated draft applies source tiers conservatively.
+- Assert the generated `EvidenceAdjustmentCase` has the expected adjusted scores, gate,
+  and missing-gate list.
+
+Design boundary:
+
+- P5 should still be offline and deterministic. It should not browse, call OpenCLI, or
+  write files yet.
+- Network/platform calls belong in provider adapters. The orchestrator should only join
+  normalized findings and hand them through the collector/generator pipeline.
+- After this library layer is tested, add a CLI/script that reads provider JSON fixtures
+  and writes `data/*_evidence.json` plus `outputs/*_evidence_case.md`.
 
 ## P4 Competitor Provider Handoff
 

@@ -2,6 +2,49 @@
 
 This changelog records project-level changes and the reasoning behind them. It is intended for handoff between Codex / Claude conversations, not just release notes.
 
+## 2026-06-10 — Handoff Docs For P0-P4 Evidence Automation
+
+Status:
+
+- Updated handoff docs so a fresh conversation can continue from the current evidence
+  automation state without re-reading the whole thread.
+
+What landed:
+
+- `docs/current-state.md` now explicitly records that P0-P4 are complete:
+  - P0 product-marketing context;
+  - P1 evidence case generator;
+  - P2 customer-research / OpenCLI provider;
+  - P3 SEO keyword / timing provider;
+  - P4 competitor-profiling / product-swipefile provider.
+- It also records that P5 orchestration has not been implemented yet.
+- Added the recommended P5 design: merge provider findings from P2/P3/P4 into
+  `EvidenceCandidate[]`, call `buildEvidenceDraft()`, then call
+  `generateEvidenceAdjustmentCaseFromDraft()`.
+
+Key design decision:
+
+- The next automation step should be an offline, deterministic library layer first. It
+  should not browse, call OpenCLI, or write files. Provider adapters own data collection;
+  the orchestrator owns merging normalized findings into the existing collector and P1
+  generator pipeline.
+
+Known issues / not done:
+
+- No `lib/evidence-case-orchestrator.ts` exists yet.
+- No `tests/evidence-case-orchestrator.test.ts` exists yet.
+- No CLI/script exists yet to read provider JSON and write `data/*_evidence.json` plus
+  `outputs/*_evidence_case.md`.
+
+Next recommended move:
+
+- Implement P5a/b first: add the orchestrator library API and fixture-based test. After
+  that passes, add a CLI/file-writer layer as a separate P5c step.
+
+Verification:
+
+- Documentation-only update. No app/test behavior changed.
+
 ## 2026-06-10 — Competitor Provider And AI-Tool Competitor Evidence Variant
 
 Status:
