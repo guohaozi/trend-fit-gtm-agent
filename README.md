@@ -56,6 +56,11 @@ Demo input data → [`data/`](data/)
 
 This is the line between a strategy scaffold and an evidence agent — see below.
 
+The current rigor layer also includes a Strong Go evidence gate, goal-based weight
+profiles, no-evidence caps, recommendation stability labels, and a deterministic
+source-tier classifier so vendor copy, listicles, and unverified sources cannot quietly
+inflate the recommendation.
+
 ---
 
 ## How the scoring works
@@ -96,11 +101,12 @@ A confident "No-go" is as valuable as a "Strong Go."
 
 ---
 
-## Architecture: four skills
+## Architecture: five skills
 
 ```
 trend-product-fit/          ← core scoring + GTM brief generation
 competitor-evidence/        ← evidence layer (upgrades Assumption → Evidence)
+trend-shortlist/            ← rank several candidate trends for one product
 campaign-generator/         ← angles, content ideas, sample copy
 outreach-copy/              ← creator DMs and email outreach
 ```
@@ -128,7 +134,7 @@ npm run dev
 | `/fit-score` | See the seven-dimension score breakdown and the recommendation |
 | `/report` | Full GTM brief: angle, risk, voice, words, KOL type, copy, outreach DM |
 
-For demo mode, load any of the three cases from [`data/`](data/) directly from the homepage.
+For demo mode, load any of the four baseline cases from [`data/`](data/) directly from the homepage.
 
 ### Tests
 
@@ -136,7 +142,8 @@ For demo mode, load any of the three cases from [`data/`](data/) directly from t
 npm test
 ```
 
-Covers: scoring math for all three demo cases, anchor validation, all three override rules.
+Covers: scoring math, evidence adjustment, recommendation rigor, source-gated demo cases,
+anchor validation, and report Markdown parsing.
 
 ---
 
@@ -145,8 +152,12 @@ Covers: scoring math for all three demo cases, anchor validation, all three over
 **This version does:**
 - Deterministic scoring from manual product + trend input
 - Full GTM brief output with 12 structured sections
-- Three fully worked demo cases with defensible, evidence-grounded reasoning
-- Skill architecture for extending with real data sources
+- Four fully worked baseline demo cases with defensible reasoning
+- Three evidence-backed case studies that show how real sources revise or validate the
+  baseline score
+- Evidence gates, source-tier discipline, recommendation stability, and goal-based weight
+  profiles
+- Skill architecture for extending with real data sources and shortlist workflows
 
 **This version intentionally does not:**
 - Auto-crawl TikTok, X, or Instagram for trends
@@ -156,7 +167,12 @@ Covers: scoring math for all three demo cases, anchor validation, all three over
 
 The scoring layer and GTM brief are the core value. The data input is manual for v1 — which also means every claim in the output is either grounded in what you provided or explicitly labelled as `Assumption:`. No fabricated metrics.
 
-The path to a full evidence agent is documented in [`skills/competitor-evidence/SKILL.md`](skills/competitor-evidence/SKILL.md): once gooseworks (Reddit/X scraping) and the seo-keyword-research skill (Google Trends) are connected, the two weakest assumed dimensions — Timing & Saturation and Commercial Intent — become data-backed.
+The path to a full evidence agent is documented in [`skills/competitor-evidence/SKILL.md`](skills/competitor-evidence/SKILL.md),
+[`skills/trend-product-fit/evidence_model.md`](skills/trend-product-fit/evidence_model.md),
+and [`skills/trend-product-fit/source_tier_classifier.md`](skills/trend-product-fit/source_tier_classifier.md):
+once GooseWorks (Reddit/X scraping) and the seo-keyword-research skill (Google Trends)
+are connected, the weakest assumed dimensions — especially Timing & Saturation,
+Commercial Intent, and raw user-language Audience evidence — become data-backed.
 
 ---
 
@@ -165,36 +181,57 @@ The path to a full evidence agent is documented in [`skills/competitor-evidence/
 ```
 trend-fit-gtm-agent/
 ├── app/                          # Next.js pages
+│   ├── page.tsx
 │   ├── product-profile/page.tsx
 │   ├── trend-input/page.tsx
 │   ├── fit-score/page.tsx
-│   └── report/page.tsx
+│   ├── report/page.tsx
+│   └── api/report/[id]/route.ts
 ├── components/                   # UI components
 ├── lib/
 │   ├── types.ts                  # Product, Trend, Scores, Recommendation types
 │   ├── scoring.ts                # calculateTrendFit(), validateScores(), overrides
-│   ├── demo-cases.ts             # Three loaded demo cases
+│   ├── recommendation-rigor.ts    # evidence gate, profiles, caps, stability
+│   ├── evidence-adjustment.ts     # typed evidence -> anchor-step score adjustment
+│   ├── demo-cases.ts             # demo and evidence case loading
 │   ├── report-sections.ts        # GTM brief section generators
 │   └── report-markdown.ts        # Markdown export
 ├── tests/
 │   ├── scoring.test.ts
+│   ├── evidence-adjustment.test.ts
+│   ├── recommendation-rigor.test.ts
 │   └── report-markdown.test.ts
-├── data/                         # Demo input JSON (product + trend + scores)
+├── data/                         # Demo input JSON and structured evidence cases
 │   ├── demo_fashion.json
+│   ├── demo_fashion_evidence.json
 │   ├── demo_robotics.json
-│   └── demo_ai_tool.json
+│   ├── demo_ai_tool.json
+│   ├── demo_ai_tool_evidence.json
+│   ├── demo_snack.json
+│   └── demo_snack_evidence.json
 ├── outputs/                      # Pre-generated GTM brief reports (Markdown)
 │   ├── demo_fashion_report.md
+│   ├── demo_fashion_evidence_case.md
 │   ├── demo_robotics_report.md
-│   └── demo_ai_tool_report.md
+│   ├── demo_ai_tool_report.md
+│   ├── demo_ai_tool_evidence_case.md
+│   ├── demo_snack_report.md
+│   └── demo_snack_evidence_case.md
+├── docs/
+│   ├── current-state.md          # handoff state for fresh agent sessions
+│   └── changelog.md              # project-level iteration log
 └── skills/                       # Skill definitions (Claude-readable strategy layer)
     ├── trend-product-fit/
     │   ├── SKILL.md              ← the core asset: scoring rubric, voice rules, examples
     │   ├── scoring_rubric.md
     │   ├── risk_taxonomy.md
     │   ├── brand_voice_rules.md
+    │   ├── evidence_model.md
+    │   ├── weight_profiles.md
+    │   ├── source_tier_classifier.md
     │   └── examples.md
     ├── competitor-evidence/SKILL.md
+    ├── trend-shortlist/SKILL.md
     ├── campaign-generator/SKILL.md
     └── outreach-copy/SKILL.md
 ```
