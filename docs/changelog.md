@@ -2,6 +2,28 @@
 
 This changelog records project-level changes and the reasoning behind them. It is intended for handoff between Codex / Claude conversations, not just release notes.
 
+## 2026-06-09 — Public GitHub Portfolio Handoff
+
+Status:
+
+- Published the project as a public GitHub portfolio repo and updated handoff docs for a fresh conversation.
+
+What landed:
+
+- GitHub repo is public: `https://github.com/guohaozi/trend-fit-gtm-agent`.
+- Local remote is configured: `origin https://github.com/guohaozi/trend-fit-gtm-agent.git`.
+- README was polished in commit `4f04b76` so the GitHub homepage reflects the current product state: four baseline demos, three evidence-backed cases, five skills, evidence gates, source-tier discipline, and current project structure.
+- Source-tier guard / evidence re-audit work was committed and pushed in `92b3f21`.
+- `docs/current-state.md` now records the portfolio positioning, GitHub state, and strategic priority track for the next conversation.
+
+Key design / narrative decision:
+
+- Do not present the repo as "many commits" or fake calibration. Present it as an AI-assisted engineering project where the AI's evidence judgment was audited, a source-tier bug was found, and the bug class was converted into deterministic tests.
+
+Next recommended move:
+
+- Build the `evidence-collector` skill/script before adding more case studies. The source-tier guard is now in place; the bottleneck is still manual evidence collection.
+
 ## 2026-06-09 — Enforce Source-Tier Guard + Re-audit Evidence Cases
 
 Status:

@@ -8,11 +8,45 @@ This file is a handoff snapshot for starting a fresh Codex / Claude conversation
 
 - Project path: `/Users/guo/gtm/trend-fit-gtm-agent`
 - Git branch: `main`
+- Public GitHub repo: `https://github.com/guohaozi/trend-fit-gtm-agent`
+- Remote: `origin https://github.com/guohaozi/trend-fit-gtm-agent.git`
 - Current state: v1.2 rigor layer is implemented in docs, skills, TypeScript, tests, UI, and three evidence-backed demo cases.
 - Latest round implemented the source-tier classifier as an executable test guard and re-audited the fashion, AI-tool, and snack evidence cases against it.
-- This handoff round was a Claude **review + fix** pass on the evidence cases Codex produced: it verified the cited sources are real, found a source-tier inflation bug in the AI-tool case, fixed it, and added a deterministic source-tier classifier to prevent recurrence.
+- The project is now published to GitHub. Latest pushed code commit before this handoff-doc update: `92b3f21 Add source-tier guard and re-audit evidence cases`.
+- Previous review round was a Claude **review + fix** pass on the evidence cases Codex produced: it verified the cited sources are real, found a source-tier inflation bug in the AI-tool case, fixed it, and added a deterministic source-tier classifier to prevent recurrence.
 - Previous round added the AI photo-tool evidence case and the snack / Dubai-style chocolate evidence case.
 - The exact latest commit hash should be checked with `git log -1 --oneline`.
+
+## Portfolio / Interview Positioning
+
+The repo is now safe to use as a public portfolio artifact. The strongest story is not
+"many commits" for its own sake; it is the visible engineering arc:
+
+1. MVP scoring scaffold.
+2. Evidence-adjusted scoring workflow.
+3. v1.2 rigor layer with evidence gates, profile weights, caps, and stability.
+4. Evidence-backed cases.
+5. AI-produced evidence reviewed, a source-tier inflation bug found, then fixed.
+6. The bug class turned into an executable test guard and the existing evidence cases re-audited.
+
+When describing it in an interview, frame it as:
+
+> I used AI to build faster, but I also audited the AI's judgment. When I found it had
+> over-graded vendor evidence, I converted the review lesson into a deterministic
+> source-tier classifier and regression tests so the same class of error cannot silently
+> pass again.
+
+The README has been polished for GitHub, but the next portfolio-facing improvement should
+be screenshots / a short demo GIF and a compact case-study section.
+
+## Strategic Priority Track
+
+This was the recommended order from the project-history review:
+
+1. **Make source-tiering enforceable in code.** Done in `tests/source-tier-classifier.test.ts`.
+2. **Re-audit fashion and snack evidence cases against the classifier.** Done; AI-tool was also tightened.
+3. **Build an `evidence-collector` skill/script.** Next high-leverage product step: trend + product -> source candidates -> verify-first tiering -> structured `data/*_evidence.json`.
+4. **Add a trend-shortlist demo.** After evidence collection is less manual: one product + three candidate trends -> evidence-adjusted gated ranking.
 
 ## This Round (Codex source-tier guard + evidence-case re-audit)
 
@@ -32,6 +66,7 @@ Verification:
 
 - Targeted verification passed: `npx tsx --test tests/source-tier-classifier.test.ts tests/evidence-adjustment.test.ts tests/recommendation-rigor.test.ts` → 16 tests, 3 suites.
 - Full verification passed: `npm test` → 29 tests, 5 suites; `npm run build` → production build succeeds.
+- GitHub push verified: `main` on `origin` contains `92b3f21`.
 
 ## Previous Round (Claude review + fix of Codex evidence cases)
 
@@ -327,7 +362,7 @@ Core skill:
   - `examples.md`
   - `evidence_model.md`
   - `weight_profiles.md`
-  - `source_tier_classifier.md` (NEW this round — deterministic, checklist-driven source-tier assignment with a verify-first gate and a forced-proxy list; mandatory before any `sourceTier` is written)
+  - `source_tier_classifier.md` (deterministic, checklist-driven source-tier assignment with a verify-first gate and a forced-proxy list; mandatory before any `sourceTier` is written; backed by `tests/source-tier-classifier.test.ts`)
 
 Sibling skills:
 
@@ -358,6 +393,12 @@ Important design decisions:
 
 The handoff DOCX files are intentionally ignored.
 
+Remote / publish state:
+
+- `origin` is configured as `https://github.com/guohaozi/trend-fit-gtm-agent.git`.
+- GitHub repo visibility is public.
+- `main` and `origin/main` were aligned after pushing `92b3f21`.
+
 If this state is ever found uncommitted, use:
 
 ```bash
@@ -365,7 +406,8 @@ git status
 npm test
 npm run build
 git add <current-round-files>
-git commit -m "Add evidence-backed AI and snack cases"
+git commit -m "<accurate current-round summary>"
+git push
 ```
 
 ## Known Issues / Caveats
