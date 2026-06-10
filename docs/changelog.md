@@ -2,6 +2,149 @@
 
 This changelog records project-level changes and the reasoning behind them. It is intended for handoff between Codex / Claude conversations, not just release notes.
 
+## 2026-06-10 — Editable Workspace UI
+
+Status:
+
+- Added the first usable frontend workflow so the project is no longer demo-page only.
+- The workspace can run single-trend scoring and 3-trend shortlist ranking from editable
+  browser state.
+- Added Markdown export and provider-oriented evidence-gap guidance to the workspace
+  result panel.
+- This was intentionally done before adding more live providers: the editable workflow
+  makes missing provider needs visible from real user input instead of guessing adapter
+  requirements in the abstract.
+
+What landed:
+
+- Added `app/workspace/page.tsx`.
+- Added `components/WorkspaceClient.tsx`.
+- Added `lib/workspace-evaluator.ts`.
+- Added `tests/workspace-evaluator.test.ts`.
+- Updated the top navigation to include "开始评估".
+- Extended `app/globals.css` with responsive workspace form, score matrix, and result
+  panel styles.
+- Added copy-to-clipboard Markdown export for both single-trend and shortlist modes.
+- Added evidence-gap cards that translate missing gate slots and dimension caps into
+  provider-oriented next steps.
+
+Key design decisions:
+
+- `/workspace` is the real workflow entry point; `/product-profile` and `/trend-input`
+  remain demo/review screens for now.
+- The first workflow pass uses client state, deterministic scoring, fixture/curated
+  evidence, and Markdown export. It does not introduce a database, auth, background jobs,
+  or browser-triggered live CLI execution.
+- Live providers should fill evidence gaps, not override scoring. Provider output must
+  still pass through source-tier classification, evidence gates, profile weighting, and
+  stability checks.
+- Evidence-gap copy is provider-oriented on purpose: it names the missing hard evidence
+  class, such as Google Trends / SEO timing, raw social language, marketplace/review
+  proof, brand-safety checks, or commercial intent.
+
+Current behavior:
+
+- Users can edit product fields, risk tolerance, weight profile, three candidate trends,
+  and seven anchored score dimensions.
+- The right-side result panel switches between single-trend rigor output and shortlist
+  ranking.
+- The result panel can copy a Markdown memo/report for the current mode.
+- Evidence gaps identify what is missing, such as raw social language, brand-safety
+  checks, commercial intent, or Google Trends / SEO timing evidence.
+- The default state loads the LEGO World Cup / F1 / graduation-season shortlist.
+
+Current boundary:
+
+- The UI does not yet execute OpenCLI, GooseWorks, Google Trends, or other live providers.
+- Evidence editing is not exposed yet; the default LEGO rows include curated evidence
+  from `data/lego_trend_shortlist.json`.
+- Provider-backed collection should be added as a controlled second step, ideally with
+  dry-run / fixture mode before live local CLI execution.
+
+Known issues:
+
+- Evidence items are not editable in the browser yet; only the score inputs and trend
+  descriptions are editable.
+- The shortlist can rank three manually supplied candidate trends, but it does not
+  discover trends from product + market by itself.
+- The current UI verification was manual through a local browser session; add route-level
+  smoke tests or screenshots before broadening the UI surface.
+
+Recommended next step:
+
+- Add evidence-item editing and a fixture-backed provider panel to `/workspace`, then
+  wire the panel to real Google Trends / SEO timing and raw social-language providers.
+
+## 2026-06-10 — Trend Shortlist Ranking Contract and LEGO Demo
+
+Status:
+
+- Added the first reusable trend-shortlist ranking layer.
+- Added a LEGO shortlist demo comparing World Cup fan culture, F1 race weekend, and
+  graduation season gifting.
+
+What landed:
+
+- Added `lib/trend-shortlist.ts` with deterministic ranking by gated band, adjusted
+  total, stability, and Timing & Saturation.
+- Added `tests/trend-shortlist.test.ts` covering the ranking contract and LEGO demo.
+- Added `data/lego_trend_shortlist.json`.
+- Added `outputs/lego_trend_shortlist.md`.
+
+Key interpretation:
+
+- F1 race weekend ranks first for LEGO because the product-trend bridge is direct, the
+  creative format is already native to LEGO, and the audience overlap is stronger than a
+  generic cultural event activation.
+- World Cup fan culture is high-timing and broad-audience, but it needs a sharper
+  licensed or fan-ritual angle before it should beat F1.
+- Graduation season gifting is safe and commercially useful, but less distinctive.
+
+Current boundary:
+
+- This is not yet a live trend discovery runner. The first version ranks manually entered
+  candidates with supplied baseline scores and optional evidence.
+- The LEGO demo uses curated evidence items and should be treated as a shortlist
+  workflow demo, not a complete market-research case.
+
+Recommended next step:
+
+- Reuse the shortlist ranking contract from `/workspace` after provider execution exists:
+  product + market -> candidate trends -> provider evidence -> gated shortlist ranking.
+
+## 2026-06-10 — Credibility Cleanup and CI
+
+Status:
+
+- Refreshed public-facing project claims so the README, product-marketing context, and
+  handoff docs match the current repository state.
+- Added a minimal GitHub Actions CI workflow for repeatable verification.
+
+What landed:
+
+- Added `.github/workflows/ci.yml` with `npm ci`, `npm test`, and `npm run build`.
+- Updated README evidence claims from the old four-case wording to 13 structured
+  evidence cases.
+- Updated README and product-marketing proof points to the current passing local
+  tests and successful production build.
+- Clarified that `/product-profile` and `/trend-input` are currently demo review screens,
+  not editable production forms.
+- Updated the README project tree so it reflects provider / orchestration tests,
+  evidence automation docs, and CI without pretending to list every case file.
+
+Why this matters:
+
+- The repo is now less likely to overstate product readiness or understate the current
+  evidence/test coverage.
+- CI makes the public portfolio artifact more credible because tests and build are not
+  only local claims.
+
+Known issue:
+
+- `gh auth status` reported an invalid GitHub CLI token during the handoff session. Git
+  push may still work via local Git credentials, but future GitHub CLI workflows should
+  refresh auth with `gh auth login -h github.com`.
+
 ## 2026-06-10 — OpenCLI Live Evidence Research Hardening
 
 Status:

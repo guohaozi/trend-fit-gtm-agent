@@ -149,10 +149,13 @@
 
 **Metrics:**
 - Five baseline demo cases.
-- Four evidence-backed demo cases.
+- 13 structured evidence cases across demo, competitor-layer, market-expansion, and live OpenCLI-backed research paths.
+- One trend-shortlist demo comparing LEGO against World Cup, F1, and graduation-season trends.
+- One editable workspace route for live single-trend scoring, shortlist ranking, evidence-gap guidance, and Markdown export without editing JSON.
 - Seven scoring dimensions.
 - Fixed score anchors: 0, 25, 50, 75, 100.
-- Current local verification: 38 tests pass via `node --import tsx --test tests/*.test.ts`; production build passes via `npm run build`.
+- Current local verification: 93 tests pass via `npm test`; production build passes via `npm run build`.
+- GitHub Actions CI runs `npm ci`, `npm test`, and `npm run build` on pushes to `main` and pull requests.
 
 **Customers:** No external customer logos. This is currently a portfolio/demo project.
 
@@ -165,7 +168,7 @@
 |-------|-------|
 | Evidence discipline | AI-tool source-tier inflation was found, fixed, and converted into deterministic source-tier tests |
 | Repeatable scoring | Frozen scoring tests cover baseline demo totals, recommendation bands, and override behavior |
-| Evidence case-study path | Fashion, AI tool, snack, and protein drink cases show how evidence revises baseline scores |
+| Evidence case-study path | Demo, competitor-layer, market-expansion, and live OpenCLI-backed cases show how evidence revises baseline scores |
 | Extensible research workflow | `evidence-collector` converts candidate sources into typed evidence while preserving conservative tiering |
 
 ## Goals

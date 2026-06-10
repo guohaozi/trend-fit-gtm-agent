@@ -21,6 +21,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </span>
             </Link>
             <div className="topbar-actions">
+              <Link className="secondary-action" href="/workspace">
+                开始评估
+              </Link>
               <Link className="secondary-action" href="/fit-score">
                 查看评分
               </Link>

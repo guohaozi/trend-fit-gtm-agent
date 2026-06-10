@@ -40,7 +40,10 @@ Five fully worked demo cases, each with real scoring rationale (no fabricated me
 Demo briefs → [`outputs/`](outputs/)  
 Demo input data → [`data/`](data/)
 
-**Evidence agent in action:** four demo cases now include real evidence layers:
+**Evidence agent in action:** 13 structured evidence cases now live in `data/` and
+`outputs/`, including demo cases, a competitor-layer variant, seven market-expansion
+cases, and one live OpenCLI-backed DJI research proof. The core demo evidence set shows
+how real sources revise or validate the baseline score:
 
 - Fashion / quiet luxury → [`outputs/demo_fashion_evidence_case.md`](outputs/demo_fashion_evidence_case.md):
   real sources **revised Timing & Saturation from 75 → 50** and hardened the classism risk.
@@ -65,6 +68,14 @@ Demo input data → [`data/`](data/)
   competitor crowding revise Brand Safety and Timing downward. The read lands at 85 /
   Strong Go, gate pass, but remains fragile because Audience and Creative stay
   unsupported-high.
+
+Additional evidence cases include SAVAS China, OBgE China, Anker Europe, Japan service
+robots, POP MART Middle East, Thailand EV, LatAm gaming peripherals, and DJI drones in
+the UAE / Saudi / Middle East.
+
+**Trend shortlist demo:** LEGO now has the first ranked shortlist workflow:
+World Cup fan culture vs. F1 race weekend vs. graduation season gifting. F1 ranks first
+after gated evidence discipline. See [`outputs/lego_trend_shortlist.md`](outputs/lego_trend_shortlist.md).
 
 This is the line between a strategy scaffold and an evidence agent — see below.
 
@@ -142,8 +153,9 @@ npm run dev
 
 | Route | What it does |
 |-------|-------------|
-| `/product-profile` | Enter product name, category, audience, positioning, brand tone, risk tolerance |
-| `/trend-input` | Enter trend name, platform, region, description, format, controversy |
+| `/workspace` | Editable product + trend workflow for single-trend scoring, 3-trend shortlist ranking, evidence gaps, and Markdown export |
+| `/product-profile` | Review the selected demo product name, category, audience, positioning, brand tone, risk tolerance |
+| `/trend-input` | Review the selected demo trend name, platform, region, description, format, controversy |
 | `/fit-score` | See the seven-dimension score breakdown and the recommendation |
 | `/report` | Full GTM brief: angle, risk, voice, words, KOL type, copy, outreach DM |
 
@@ -155,8 +167,12 @@ For demo mode, load any of the five baseline cases from [`data/`](data/) directl
 npm test
 ```
 
-Covers: scoring math, evidence adjustment, recommendation rigor, source-gated demo cases,
-anchor validation, and report Markdown parsing.
+Current local verification: 93 Node tests pass via `npm test`; `npm run build` produces
+a successful Next.js production build. CI now runs both commands on GitHub Actions.
+
+Covers: scoring math, evidence adjustment, recommendation rigor, source-tier
+classification, provider adapters, evidence-case orchestration / file writing, OpenCLI
+research mapping, anchor validation, and report Markdown parsing.
 
 ---
 
@@ -164,12 +180,17 @@ anchor validation, and report Markdown parsing.
 
 **This version does:**
 - Deterministic scoring from manual product + trend input
+- Editable `/workspace` flow for single-trend scoring, 3-trend shortlist ranking,
+  evidence-gap guidance, and Markdown export
 - Full GTM brief output with 12 structured sections
 - Five fully worked baseline demo cases with defensible reasoning
-- Four evidence-backed case studies that show how real sources revise or validate the
+- 13 structured evidence cases that show how real sources revise or validate the
   baseline score
 - Evidence gates, source-tier discipline, recommendation stability, and goal-based weight
   profiles
+- Evidence-case CLI automation, provider normalization, and the first live
+  OpenCLI-backed research path
+- A first trend-shortlist ranking contract and LEGO shortlist demo
 - Skill architecture for extending with real data sources and shortlist workflows
 
 **This version intentionally does not:**
@@ -211,36 +232,35 @@ trend-fit-gtm-agent/
 │   ├── demo-cases.ts             # demo and evidence case loading
 │   ├── report-sections.ts        # GTM brief section generators
 │   └── report-markdown.ts        # Markdown export
-├── tests/
+├── tests/                        # Scoring, rigor, provider, CLI, and parsing tests
 │   ├── scoring.test.ts
 │   ├── evidence-adjustment.test.ts
 │   ├── recommendation-rigor.test.ts
 │   ├── source-tier-classifier.test.ts
 │   ├── evidence-collector.test.ts
+│   ├── evidence-case-orchestrator.test.ts
+│   ├── evidence-case-research-runner.test.ts
+│   ├── opencli-research-source.test.ts
 │   └── report-markdown.test.ts
 ├── data/                         # Demo input JSON and structured evidence cases
 │   ├── demo_fashion.json
 │   ├── demo_fashion_evidence.json
-│   ├── demo_robotics.json
 │   ├── demo_ai_tool.json
-│   ├── demo_ai_tool_evidence.json
-│   ├── demo_snack.json
-│   ├── demo_snack_evidence.json
-│   ├── demo_protein_drink.json
-│   └── demo_protein_drink_evidence.json
-├── outputs/                      # Pre-generated GTM brief reports (Markdown)
+│   ├── demo_ai_tool_competitor_evidence.json
+│   ├── latam_gaming_peripherals_evidence.json
+│   └── dji_drones_..._evidence.json
+├── outputs/                      # Pre-generated GTM brief and evidence reports
 │   ├── demo_fashion_report.md
 │   ├── demo_fashion_evidence_case.md
-│   ├── demo_robotics_report.md
-│   ├── demo_ai_tool_report.md
-│   ├── demo_ai_tool_evidence_case.md
-│   ├── demo_snack_report.md
-│   ├── demo_snack_evidence_case.md
-│   ├── demo_protein_drink_report.md
-│   └── demo_protein_drink_evidence_case.md
+│   ├── demo_ai_tool_competitor_evidence_case.md
+│   ├── latam_gaming_peripherals_evidence_case.md
+│   └── dji_drones_..._evidence_case.md
 ├── docs/
 │   ├── current-state.md          # handoff state for fresh agent sessions
-│   └── changelog.md              # project-level iteration log
+│   ├── changelog.md              # project-level iteration log
+│   └── evidence-case-research-cli.md
+├── .github/workflows/
+│   └── ci.yml                    # npm ci + npm test + npm run build
 └── skills/                       # Skill definitions (Claude-readable strategy layer)
     ├── trend-product-fit/
     │   ├── SKILL.md              ← the core asset: scoring rubric, voice rules, examples

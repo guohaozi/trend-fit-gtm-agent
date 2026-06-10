@@ -1,0 +1,154 @@
+{
+  "id": "lego_trend_shortlist",
+  "productName": "LEGO",
+  "profileUsed": "brand_awareness",
+  "riskTolerance": "medium",
+  "generatedAt": "2026-06-10",
+  "expectedWinnerId": "lego_f1_race_trend",
+  "candidates": [
+    {
+      "id": "lego_world_cup_trend",
+      "trendName": "World Cup fan culture",
+      "trendDescription": "Football fandom, match-day watch parties, national-team identity, and collectible moments around the 2026 World Cup.",
+      "baselineScores": {
+        "audienceOverlap": 100,
+        "useCaseRelevance": 75,
+        "messageBridge": 75,
+        "creativeFeasibility": 75,
+        "commercialIntent": 50,
+        "brandSafety": 75,
+        "timingSaturation": 100
+      },
+      "evidence": [
+        {
+          "id": "world-cup-official-timing",
+          "dimension": "timingSaturation",
+          "direction": "confirm",
+          "magnitude": "strong",
+          "confidence": "high",
+          "sourceTier": "secondary",
+          "sourceUrl": "https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026",
+          "note": "Official FIFA tournament page confirms the 2026 World Cup timing and event scale."
+        },
+        {
+          "id": "world-cup-lego-sports-fit",
+          "dimension": "useCaseRelevance",
+          "direction": "confirm",
+          "magnitude": "moderate",
+          "confidence": "medium",
+          "sourceTier": "proxy",
+          "sourceUrl": "https://www.lego.com/en-us/categories/sports",
+          "note": "LEGO sports catalog fit is directionally useful, but not specific proof of a current World Cup campaign."
+        }
+      ],
+      "oneLineVerdict": "Huge cultural surface, but LEGO needs a sharper licensed or fan-ritual angle to avoid generic football posting.",
+      "recommendedCampaign": "Build match-day rituals around modular stadium scenes, country-color micro-builds, and family watch-party content before committing to paid media."
+    },
+    {
+      "id": "lego_f1_race_trend",
+      "trendName": "F1 race weekend",
+      "trendDescription": "Race-weekend fandom, team identity, car design, engineering storytelling, and adult collector culture around Formula 1.",
+      "baselineScores": {
+        "audienceOverlap": 75,
+        "useCaseRelevance": 100,
+        "messageBridge": 100,
+        "creativeFeasibility": 100,
+        "commercialIntent": 75,
+        "brandSafety": 75,
+        "timingSaturation": 75
+      },
+      "evidence": [
+        {
+          "id": "f1-lego-category-fit",
+          "dimension": "useCaseRelevance",
+          "direction": "confirm",
+          "magnitude": "strong",
+          "confidence": "high",
+          "sourceTier": "primary",
+          "sourceUrl": "https://www.lego.com/en-us/categories/formula-1",
+          "note": "LEGO has a Formula 1 category surface, making the product-trend bridge direct rather than forced."
+        },
+        {
+          "id": "f1-lego-speed-champions-creative",
+          "dimension": "creativeFeasibility",
+          "direction": "confirm",
+          "magnitude": "strong",
+          "confidence": "high",
+          "sourceTier": "primary",
+          "sourceUrl": "https://www.lego.com/en-us/themes/speed-champions",
+          "note": "LEGO Speed Champions provides an existing creative format for car builds, race-weekend content, and collector display."
+        },
+        {
+          "id": "f1-official-partnership-timing",
+          "dimension": "timingSaturation",
+          "direction": "confirm",
+          "magnitude": "moderate",
+          "confidence": "medium",
+          "sourceTier": "secondary",
+          "sourceUrl": "https://www.formula1.com/en/latest/article/formula-1-and-lego-group-announce-new-partnership.4WPDbkJQJ9K71DEzHGIPMl",
+          "note": "Formula 1 coverage of the LEGO partnership supports current relevance for race-weekend activation."
+        },
+        {
+          "id": "f1-family-safe-brand-fit",
+          "dimension": "brandSafety",
+          "direction": "confirm",
+          "magnitude": "moderate",
+          "confidence": "medium",
+          "sourceTier": "secondary",
+          "sourceUrl": "https://www.formula1.com/en/latest/article/formula-1-and-lego-group-announce-new-partnership.4WPDbkJQJ9K71DEzHGIPMl",
+          "note": "The partnership context keeps the activation inside a mainstream entertainment and family-friendly collecting lane."
+        },
+        {
+          "id": "f1-adult-collector-audience",
+          "dimension": "audienceOverlap",
+          "direction": "confirm",
+          "magnitude": "moderate",
+          "confidence": "medium",
+          "sourceTier": "primary",
+          "sourceUrl": "https://www.lego.com/en-us/categories/formula-1",
+          "note": "The Formula 1 category supports overlap between LEGO buyers, adult collectors, motorsport fans, and gift shoppers."
+        }
+      ],
+      "oneLineVerdict": "Best fit: LEGO already has a direct F1 product bridge, strong creative formats, and a natural adult-collector angle.",
+      "recommendedCampaign": "Run a race-weekend builder series: pit-wall desk builds, team-color display shots, parent-child qualifying challenges, and creator videos that connect engineering detail to collectible pride."
+    },
+    {
+      "id": "lego_graduation_season_trend",
+      "trendName": "Graduation season gifting",
+      "trendDescription": "Graduation gifts, school-year milestones, keepsakes, desk decor, and family celebration posts.",
+      "baselineScores": {
+        "audienceOverlap": 75,
+        "useCaseRelevance": 75,
+        "messageBridge": 75,
+        "creativeFeasibility": 75,
+        "commercialIntent": 75,
+        "brandSafety": 100,
+        "timingSaturation": 75
+      },
+      "evidence": [
+        {
+          "id": "graduation-gift-commercial-fit",
+          "dimension": "commercialIntent",
+          "direction": "confirm",
+          "magnitude": "moderate",
+          "confidence": "medium",
+          "sourceTier": "proxy",
+          "sourceUrl": "https://www.lego.com/en-us/gifts",
+          "note": "LEGO gift navigation supports giftability, but this is broad gift evidence rather than graduation-specific conversion proof."
+        },
+        {
+          "id": "graduation-brand-safety",
+          "dimension": "brandSafety",
+          "direction": "confirm",
+          "magnitude": "moderate",
+          "confidence": "medium",
+          "sourceTier": "secondary",
+          "sourceUrl": "https://www.lego.com/en-us/gifts",
+          "note": "Graduation gifting is low-risk and family-safe, but it is more seasonal retail than a distinctive brand trend."
+        }
+      ],
+      "oneLineVerdict": "Safe and giftable, but less distinctive than F1 because many brands can participate in graduation gifting.",
+      "recommendedCampaign": "Use graduation as a seasonal retail lane: desk-friendly display builds, flower sets, and keepsake messaging for parents and friends."
+    }
+  ]
+}

@@ -10,8 +10,11 @@ This file is a handoff snapshot for starting a fresh Codex / Claude conversation
 - Git branch: `main`
 - Public GitHub repo: `https://github.com/guohaozi/trend-fit-gtm-agent`
 - Remote: `origin https://github.com/guohaozi/trend-fit-gtm-agent.git`
-- Current state: v1.2 rigor layer is implemented in docs, skills, TypeScript, tests, UI, seven new 15-case-list evidence-backed cases, one competitor-layer AI-tool evidence variant, P0-P4 evidence automation provider layers, P5a/b offline evidence-case orchestration, P5c CLI/file writer, and the first live OpenCLI-backed research CLI.
-- Automation status: P0 product-marketing context, P1 evidence case generator, P2 customer-research provider, P3 SEO/timing provider, P4 competitor provider, P5a/b offline orchestration, P5c CLI/file writer, and product+market+trend research runner are done. Trend discovery / shortlist orchestration has not been implemented yet.
+- Current state: v1.2 rigor layer is implemented in docs, skills, TypeScript, tests, UI, seven new 15-case-list evidence-backed cases, one competitor-layer AI-tool evidence variant, P0-P4 evidence automation provider layers, P5a/b offline evidence-case orchestration, P5c CLI/file writer, the first live OpenCLI-backed research CLI, and a GitHub Actions CI workflow.
+- Verification status: `npm test` currently runs 93 passing Node tests; `npm run build` completes a successful Next.js production build. `.github/workflows/ci.yml` now runs `npm ci`, `npm test`, and `npm run build` on pushes to `main` and pull requests.
+- Automation status: P0 product-marketing context, P1 evidence case generator, P2 customer-research provider, P3 SEO/timing provider, P4 competitor provider, P5a/b offline orchestration, P5c CLI/file writer, product+market+trend research runner, and the first deterministic trend-shortlist ranking layer are done. Live trend discovery has not been implemented yet.
+- Latest UI layer: `/workspace` is now an editable workflow page backed by `lib/workspace-evaluator.ts`. It lets users edit product fields, risk/profile, three candidate trends, and seven anchored score dimensions, then switch between single-trend scoring and shortlist ranking. It also surfaces evidence gaps with provider-oriented next steps and can copy a Markdown export. It uses existing deterministic scoring, rigor gate, and `lib/trend-shortlist.ts`; it does not yet run live providers from the browser.
+- Latest shortlist layer: `lib/trend-shortlist.ts` ranks manually supplied candidate trends by gated band, evidence-adjusted total, stability, and Timing & Saturation. The first demo is LEGO comparing World Cup fan culture, F1 race weekend, and graduation season gifting in `data/lego_trend_shortlist.json` and `outputs/lego_trend_shortlist.md`; F1 ranks first.
 - Latest automation layer: `lib/evidence-case-research-runner.ts`, `lib/opencli-research-source.ts`, and `scripts/evidence-case-research.ts` add `npm run evidence:case:research`, which starts from product + market + trend, builds research queries, can use fixture / web / OpenCLI providers, converts results into evidence inputs, then writes `data/*_evidence.json` and `outputs/*_evidence_case.md`. The OpenCLI provider maps Reddit and YouTube search rows into `customerResearchFindings`, and maps Twitter/X plus Google Search rows into conservative `additionalCandidates`. It now tolerates individual OpenCLI command failures and applies relevance guards before rows become evidence. Xiaohongshu, TikTok, Google Trends, GooseWorks, and marketplace-specific mappers are the next provider adapters.
 - Latest live research proof: DJI drones entering UAE / Saudi / Middle East for video creation, security inspection, and tourism enablement can be generated with OpenCLI via `npm run evidence:case:research`. The current generated report is `outputs/dji_drones_uae_saudi_middle_east_video_creation_security_inspection_tourism_enablement_evidence_case.md`; latest run produced 16 accepted evidence items, `76 / Cautious test`, evidence gate `partial`, stability `fragile`.
 - File-writing layer: `lib/evidence-case-file-writer.ts` and `scripts/evidence-case.ts` provide a real file-writing CLI. Run `npm run evidence:case -- --input examples/evidence-case-input.example.json` to merge provider findings, apply source-tier classification, generate `data/*_evidence.json`, and generate `outputs/*_evidence_case.md`.
@@ -23,10 +26,75 @@ This file is a handoff snapshot for starting a fresh Codex / Claude conversation
 - Latest round added the first `evidence-collector` implementation: reusable source-tier classification code, an evidence draft builder, tests, and a project skill that can borrow GooseWorks/manual research as candidate-source input without letting the research agent self-grade evidence upward.
 - Latest classifier fix: `desktop-charger` URL paths no longer accidentally trigger the `top-` listicle pattern. This was found while building the Anker Europe case.
 - Previous round implemented the source-tier classifier as an executable test guard and re-audited the fashion, AI-tool, and snack evidence cases against it.
-- The project is now published to GitHub. Latest pushed code commit before this handoff-doc update: `4c286c6 Add competitor evidence provider`.
+- The project is published to GitHub. The exact latest pushed commit hash should be checked with `git log -1 --oneline` in the next conversation.
 - Previous review round was a Claude **review + fix** pass on the evidence cases Codex produced: it verified the cited sources are real, found a source-tier inflation bug in the AI-tool case, fixed it, and added a deterministic source-tier classifier to prevent recurrence.
 - Previous round added the AI photo-tool evidence case and the snack / Dubai-style chocolate evidence case.
-- The exact latest commit hash should be checked with `git log -1 --oneline`.
+- This handoff corresponds to the latest workspace / shortlist / credibility batch.
+  If the next conversation starts after push, expect the latest commit to include the
+  files listed below in "Latest Conversation Handoff".
+
+## Latest Conversation Handoff
+
+This is the compact handoff for the next Codex / Claude conversation.
+
+### What was completed
+
+- **Credibility cleanup:** README, product-marketing context, current-state, and
+  changelog were updated to stop overstating demo readiness and to reflect the current
+  evidence-case, test, build, and CI status.
+- **CI:** `.github/workflows/ci.yml` now runs `npm ci`, `npm test`, and `npm run build`
+  on pushes to `main` and pull requests.
+- **Trend shortlist:** `lib/trend-shortlist.ts` adds deterministic 3-trend ranking.
+  The LEGO demo compares World Cup fan culture, F1 race weekend, and graduation season
+  gifting; F1 ranks first.
+- **Workspace UI:** `/workspace` is now the first usable workflow screen. It supports
+  editable product inputs, editable trend score inputs, single-trend scoring,
+  3-trend shortlist ranking, evidence-gap guidance, and copy-to-clipboard Markdown
+  export.
+- **Workspace evaluator:** `lib/workspace-evaluator.ts` bridges frontend state into the
+  existing scoring, recommendation-rigor, and shortlist modules.
+- **Tests:** Added focused tests for shortlist ranking and workspace evaluation/export.
+
+### Key design decisions
+
+- Build the frontend workflow before adding more live providers, because an editable UI
+  exposes exactly which evidence slots and provider gaps matter.
+- Keep `/workspace` deterministic for now: no browser-triggered OpenCLI, GooseWorks, or
+  Google Trends calls yet.
+- Treat live providers as candidate-source collectors, not scoring authorities. Scores
+  still pass through source-tier classification, evidence gates, profile weighting, and
+  stability checks.
+- Use client state instead of database/auth/background jobs in the first workflow pass,
+  so the workflow is usable without creating infrastructure surface area.
+- Keep demo/review pages (`/product-profile`, `/trend-input`) separate from the real
+  workflow entry point (`/workspace`).
+
+### Known issues / limitations
+
+- `/workspace` can edit score inputs but not individual evidence items yet; evidence
+  count is currently read from the fixture data.
+- The UI does not execute live providers. Evidence gaps are advisory and provider-
+  oriented, not clickable automation.
+- LEGO shortlist evidence is curated fixture evidence, not a full live market-research
+  run.
+- Google Search is still not Google Trends. Hard Timing / SEO evidence needs a real
+  Google Trends or SEO timeseries provider.
+- Xiaohongshu, TikTok, marketplace/review providers, and provider health checks are not
+  wired into the UI.
+- `gh auth status` showed the GitHub CLI token as invalid during this handoff; plain
+  `git push` may still work through local Git credentials.
+
+### Recommended next steps
+
+1. Add evidence-item editing in `/workspace`: source URL, source tier, supported
+   dimension, direction, confidence, and notes.
+2. Add a fixture-backed provider panel in `/workspace` before live execution:
+   provider health, dry-run commands, and "fill evidence gaps" output.
+3. Add a real Google Trends / SEO timeseries provider to fill Timing, Search Demand,
+   and Commercial Intent with hard evidence.
+4. Add Xiaohongshu / TikTok social-language mappers and marketplace/review providers.
+5. Add route-level smoke coverage or browser screenshots for `/workspace` so future UI
+   regressions are easier to catch.
 
 ## Portfolio / Interview Positioning
 
@@ -47,8 +115,9 @@ When describing it in an interview, frame it as:
 > source-tier classifier and regression tests so the same class of error cannot silently
 > pass again.
 
-The README has been polished for GitHub, but the next portfolio-facing improvement should
-be screenshots / a short demo GIF and a compact case-study section.
+The README and product-marketing context have been refreshed to match the current
+evidence-case count, test count, UI boundary, and CI status. The next portfolio-facing
+improvement should be screenshots / a short demo GIF and a compact case-study section.
 
 ## Strategic Priority Track
 
@@ -73,8 +142,9 @@ Earlier foundational work:
    product/trend pair, gather candidate sources with GooseWorks or browser research,
    build an evidence draft, then promote accepted evidence into `data/*_evidence.json`.
    Done for `demo_protein_drink`.
-5. **Add a trend-shortlist demo.** After one collector-produced case: one product + three
-   candidate trends -> evidence-adjusted gated ranking.
+5. **Add a trend-shortlist demo.** Done for LEGO: one product + three candidate trends
+   -> evidence-adjusted gated ranking. Current boundary: candidates and baseline scores
+   are still supplied manually; live discovery is not implemented.
 
 ## P5 Evidence Automation Handoff
 
@@ -767,8 +837,10 @@ git push
 - Fashion, AI-tool, and snack evidence cases have been re-audited against the classifier. Remaining limitation: this is a deterministic pattern guard, not a live URL content verifier.
 - The evidence-backed cases are not model-training labels. They are analyst-reviewed examples used to pressure-test and improve the scoring logic, evidence gate, and case-study story.
 - Timing & Saturation should eventually use raw Google Trends / SEO timeseries instead of secondary trend-analysis pages.
-- The app does not yet auto-discover trends; trends are still manual/demo inputs.
+- The app does not yet auto-discover trends; trends are still manual/demo inputs. The
+  new shortlist module ranks supplied candidates but does not discover candidates.
 - The app does not yet run automatic multi-source evidence collection; the new collector is a library/skill workflow, not a UI crawler.
+- `/workspace` is editable. The older `/product-profile` and `/trend-input` pages remain demo review screens.
 - If running `npm test` inside Codex sandbox fails with `tsx` pipe `EPERM`, rerun with elevated permissions.
 - Do not run `npm run build` concurrently with `npm run dev`; stale `.next` chunks previously caused a runtime error.
 
@@ -781,9 +853,9 @@ git push
    - gather candidate sources with GooseWorks/OpenCLI/specialized skills first;
    - normalize them into `EvidenceCandidate[]`;
    - pass candidates into `buildEvidenceDraft()`.
-3. Add a small trend shortlist demo: 1 product + 3 candidate trends -> GooseWorks/OpenCLI/local-skill-assisted evidence -> evidence-adjusted gated ranking.
-4. Add route smoke tests for `/`, `/fit-score`, and `/report`, including `demo_ai_tool` and `demo_snack`.
-5. Add portfolio screenshots and a short case-study page/doc showing the four evidence-backed examples.
+3. Add route smoke tests for `/`, `/fit-score`, and `/report`, including `demo_ai_tool` and `demo_snack`.
+4. Add provider-backed evidence collection controls to `/workspace`, starting with dry-run / fixture mode before live OpenCLI execution.
+5. Add portfolio screenshots and a short case-study page/doc showing the evidence-backed examples, the LEGO shortlist, and the editable workspace.
 6. Later, integrate a real evidence toolchain:
    - GooseWorks for Reddit/X comments, competitor activity, and creator discovery
    - Google Trends / SEO timeseries for Timing & Saturation
@@ -792,4 +864,4 @@ git push
 
 ## Best One-Sentence Framing
 
-This is not just a prompt bundle: it is a deterministic GTM scoring scaffold with tests, goal-based lenses, evidence gates, source-tier discipline, and four evidence-backed cases showing the path toward an evidence-aware trend-fit agent.
+This is not just a prompt bundle: it is a deterministic GTM scoring scaffold with tests, goal-based lenses, evidence gates, source-tier discipline, and structured evidence cases showing the path toward an evidence-aware trend-fit agent.
