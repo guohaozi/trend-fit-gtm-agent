@@ -333,4 +333,42 @@ describe("OpenCLI research source", () => {
     assert.match(result.stdout, /\/custom\/opencli google search/);
     assert.match(result.stdout, /commercial_intent/);
   });
+
+  it("uses portable opencli commands by default in dry-run output", () => {
+    const result = spawnSync(
+      process.execPath,
+      [
+        "--import",
+        "tsx",
+        "scripts/evidence-case-research.ts",
+        "--product",
+        "DJI drones",
+        "--market",
+        "Middle East",
+        "--trend",
+        "video creation tourism",
+        "--risk",
+        "high",
+        "--profile",
+        "b2b_pipeline",
+        "--provider",
+        "opencli",
+        "--platforms",
+        "reddit",
+        "--dry-run-provider-commands"
+      ],
+      {
+        cwd: process.cwd(),
+        encoding: "utf8",
+        env: {
+          ...process.env,
+          OPENCLI_BIN: ""
+        }
+      }
+    );
+
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /^audience_language: opencli reddit search/m);
+    assert.doesNotMatch(result.stdout, /\/Users\/guo\/\.npm-global\/bin\/opencli/);
+  });
 });

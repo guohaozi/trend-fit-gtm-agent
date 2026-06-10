@@ -1,4 +1,3 @@
-import fs from "node:fs";
 import { spawn } from "node:child_process";
 import type { CustomerResearchFinding, CustomerResearchTheme } from "./customer-research-provider";
 import type { EvidenceCandidate } from "./evidence-collector";
@@ -34,21 +33,19 @@ const DEFAULT_THEMES: CustomerResearchTheme[] = [
 ];
 
 const DEFAULT_PLATFORMS: OpenCliResearchPlatform[] = ["reddit", "youtube"];
-const LOCAL_OPENCLI_BIN = "/Users/guo/.npm-global/bin/opencli";
 const CUSTOMER_PLATFORMS = new Set<OpenCliResearchPlatform>(["reddit", "youtube"]);
 const RAW_SOCIAL_PLATFORMS = new Set<OpenCliResearchPlatform>(["twitter"]);
 const TOKEN_STOPWORDS = new Set(["and", "for", "from", "into", "market", "with", "the", "use"]);
 
 function defaultOpenCliBin(): string {
-  return process.env.OPENCLI_BIN || (fs.existsSync(LOCAL_OPENCLI_BIN) ? LOCAL_OPENCLI_BIN : "opencli");
+  return process.env.OPENCLI_BIN?.trim() || "opencli";
 }
 
 function defaultRunner(command: string[]): Promise<OpenCliCommandResult> {
   return new Promise((resolve) => {
     const child = spawn(command[0], command.slice(1), {
       env: {
-        ...process.env,
-        PATH: `/Users/guo/.npm-global/bin:${process.env.PATH ?? ""}`
+        ...process.env
       }
     });
     let stdout = "";

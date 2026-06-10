@@ -5,6 +5,7 @@ import { describe, it } from "node:test";
 import type { TrendShortlistInput } from "../lib/trend-shortlist";
 import {
   buildWorkspaceEvidenceGaps,
+  buildWorkspaceProviderPreview,
   evaluateSingleWorkspaceTrend,
   evaluateWorkspaceShortlist,
   renderSingleWorkspaceMarkdown,
@@ -159,5 +160,31 @@ describe("workspace evaluator", () => {
     assert.match(shortlistMarkdown, /# Trend Shortlist Workspace Report/);
     assert.match(shortlistMarkdown, /F1 race weekend/);
     assert.match(shortlistMarkdown, /World Cup fan culture/);
+  });
+
+  it("builds a fixture-backed provider preview without exposing editable source tiers", () => {
+    const candidate: WorkspaceCandidate = {
+      ...f1Candidate,
+      scores: {
+        ...f1Candidate.scores,
+        brandSafety: 100
+      },
+      evidence: f1Candidate.evidence.filter((item) => item.dimension !== "brandSafety")
+    };
+    const result = evaluateSingleWorkspaceTrend(product, candidate);
+    const gaps = buildWorkspaceEvidenceGaps(result.rigor);
+    const preview = buildWorkspaceProviderPreview({
+      product,
+      candidate,
+      gaps,
+      mode: "single"
+    });
+
+    assert.equal(preview.targetedSlots.some((slot) => slot.slot === "brandSafety"), true);
+    assert.match(preview.dryRunCommand.command, /--dry-run-provider-commands/);
+    assert.match(preview.dryRunCommand.command, /--provider opencli/);
+    assert.match(preview.fixtureCommand.command, /--fixture-results examples\/dji-middle-east-search-results\.fixture\.json/);
+    assert.equal(preview.commandsText.includes("sourceTier"), false);
+    assert.equal(preview.targetedSlots.some((slot) => slot.plannedSources.some((source) => /policy|backlash/i.test(source))), true);
   });
 });

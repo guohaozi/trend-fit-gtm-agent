@@ -45,6 +45,25 @@ export type WorkspaceEvidenceGap = {
   providerHint: string;
 };
 
+export type WorkspaceProviderSlot = WorkspaceEvidenceGap & {
+  plannedSources: string[];
+};
+
+export type WorkspaceProviderCommand = {
+  label: string;
+  command: string;
+  description: string;
+};
+
+export type WorkspaceProviderPreview = {
+  targetTrend: string;
+  targetedSlots: WorkspaceProviderSlot[];
+  dryRunCommand: WorkspaceProviderCommand;
+  fixtureCommand: WorkspaceProviderCommand;
+  commandsText: string;
+  notes: string[];
+};
+
 const DIMENSION_LABELS: Record<string, string> = {
   audienceOverlap: "Audience overlap",
   useCaseRelevance: "Use-case relevance",
@@ -67,6 +86,30 @@ const PROVIDER_HINTS: Record<string, string> = {
   timingSaturation: "Use Google Trends / SEO timeseries, platform volume, creator saturation, and competitor activity recency."
 };
 
+const PROVIDER_SOURCES: Record<string, string[]> = {
+  audienceOverlap: ["Reddit / YouTube / X raw language", "Customer reviews or marketplace Q&A"],
+  useCaseRelevance: ["Creator examples and customer comments", "Competitor campaign or product-use examples"],
+  audienceOrUseCase: ["Reddit / YouTube / X raw language", "Customer reviews, marketplace Q&A, or competitor usage examples"],
+  messageBridge: ["Competitor campaign pages", "Creator scripts, landing pages, or review language"],
+  creativeFeasibility: ["Creator content examples", "Existing brand assets or directly observed competitor creative"],
+  commercialIntent: ["Where-to-buy and price queries", "Marketplace reviews, distributor pages, or SEO demand data"],
+  brandSafety: ["Policy, news, and backlash scan via Google", "Reddit / X sentiment and community safety checks"],
+  timingSaturation: ["Google Trends / SEO timeseries", "Recent platform volume, creator saturation, and competitor recency"],
+  stability: ["One high-signal source for the most sensitive unsupported dimension", "Small controlled test result"]
+};
+
+const SLOT_PLATFORMS: Record<string, string[]> = {
+  audienceOverlap: ["reddit", "youtube", "twitter"],
+  useCaseRelevance: ["reddit", "youtube", "twitter"],
+  audienceOrUseCase: ["reddit", "youtube", "twitter"],
+  messageBridge: ["google", "youtube"],
+  creativeFeasibility: ["youtube", "google"],
+  commercialIntent: ["google", "reddit"],
+  brandSafety: ["google", "reddit", "twitter"],
+  timingSaturation: ["google", "youtube"],
+  stability: ["google", "reddit"]
+};
+
 function formatScoreBlock(scores: Scores): string {
   return Object.entries(scores)
     .map(([key, value]) => `- ${DIMENSION_LABELS[key] ?? key}: ${value}`)
@@ -75,6 +118,72 @@ function formatScoreBlock(scores: Scores): string {
 
 function providerHintFor(slot: string): string {
   return PROVIDER_HINTS[slot] ?? "Add non-proxy evidence from a provider before upgrading this recommendation.";
+}
+
+function shellQuote(value: string): string {
+  return `"${value.replace(/["\\$`]/g, "\\$&")}"`;
+}
+
+function unique(values: string[]): string[] {
+  return [...new Set(values)];
+}
+
+function platformsForGaps(gaps: WorkspaceEvidenceGap[]): string[] {
+  const platforms = gaps.flatMap((gap) => SLOT_PLATFORMS[gap.slot] ?? ["google"]);
+  return unique(platforms.length > 0 ? platforms : ["reddit", "youtube", "twitter", "google"]);
+}
+
+function activeResearchCommand({
+  product,
+  candidate,
+  platforms,
+  dryRun
+}: {
+  product: WorkspaceProduct;
+  candidate: WorkspaceCandidate;
+  platforms: string[];
+  dryRun: boolean;
+}): string {
+  return [
+    "npm run evidence:case:research --",
+    "--product",
+    shellQuote(product.name),
+    "--market",
+    shellQuote(product.market),
+    "--trend",
+    shellQuote(candidate.trendName),
+    "--risk",
+    product.riskTolerance,
+    "--profile",
+    product.profileUsed,
+    "--provider",
+    "opencli",
+    "--platforms",
+    platforms.join(","),
+    "--limit",
+    "3",
+    dryRun ? "--dry-run-provider-commands" : ""
+  ].filter(Boolean).join(" ");
+}
+
+function fixtureSmokeCommand(): string {
+  return [
+    "npm run evidence:case:research --",
+    "--product",
+    shellQuote("DJI drones"),
+    "--market",
+    shellQuote("UAE Saudi Middle East"),
+    "--trend",
+    shellQuote("video creation security inspection tourism enablement"),
+    "--risk",
+    "high",
+    "--profile",
+    "b2b_pipeline",
+    "--fixture-results",
+    "examples/dji-middle-east-search-results.fixture.json",
+    "--limit",
+    "3"
+  ].join(" ");
 }
 
 export function buildWorkspaceEvidenceGaps(rigor: GatedRecommendation): WorkspaceEvidenceGap[] {
@@ -106,6 +215,50 @@ export function buildWorkspaceEvidenceGaps(rigor: GatedRecommendation): Workspac
   }
 
   return [...missing, ...caps];
+}
+
+export function buildWorkspaceProviderPreview({
+  product,
+  candidate,
+  gaps,
+  mode
+}: {
+  product: WorkspaceProduct;
+  candidate: WorkspaceCandidate;
+  gaps: WorkspaceEvidenceGap[];
+  mode: "single" | "shortlist";
+}): WorkspaceProviderPreview {
+  const targetedSlots = gaps.map((gap) => ({
+    ...gap,
+    plannedSources: PROVIDER_SOURCES[gap.slot] ?? ["Provider result normalized into EvidenceCandidate[]"]
+  }));
+  const platforms = platformsForGaps(gaps);
+  const dryRunCommand: WorkspaceProviderCommand = {
+    label: "Dry-run current trend",
+    command: activeResearchCommand({ product, candidate, platforms, dryRun: true }),
+    description: "Prints the OpenCLI commands for this product, market, trend, and evidence-gap set without executing live collection."
+  };
+  const fixtureCommand: WorkspaceProviderCommand = {
+    label: "Portable fixture smoke",
+    command: fixtureSmokeCommand(),
+    description: "Runs the committed fixture through the evidence-case pipeline so the provider contract can be demonstrated on any machine."
+  };
+  const commandsText = [dryRunCommand.command, fixtureCommand.command].join("\n\n");
+
+  return {
+    targetTrend: candidate.trendName,
+    targetedSlots,
+    dryRunCommand,
+    fixtureCommand,
+    commandsText,
+    notes: [
+      mode === "shortlist"
+        ? "Shortlist mode previews the provider plan for the current winning trend."
+        : "Single-trend mode previews the provider plan for the active trend.",
+      "OpenCLI should be resolved from --opencli-bin, OPENCLI_BIN, or PATH; the runtime no longer depends on a user-specific default path.",
+      "Provider output becomes candidate evidence only. Source tier remains classifier-owned and is not editable in the workspace."
+    ]
+  };
 }
 
 export function evaluateSingleWorkspaceTrend(

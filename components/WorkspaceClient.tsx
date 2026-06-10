@@ -13,12 +13,14 @@ import type { TrendShortlistInput } from "@/lib/trend-shortlist";
 import type { RiskTolerance, ScoreKey, Scores, ScoreValue } from "@/lib/types";
 import {
   buildWorkspaceEvidenceGaps,
+  buildWorkspaceProviderPreview,
   evaluateSingleWorkspaceTrend,
   evaluateWorkspaceShortlist,
   renderShortlistWorkspaceMarkdown,
   renderSingleWorkspaceMarkdown,
   type WorkspaceCandidate,
   type WorkspaceEvidenceGap,
+  type WorkspaceProviderPreview,
   type WorkspaceProduct
 } from "@/lib/workspace-evaluator";
 import { useMemo, useState } from "react";
@@ -105,6 +107,7 @@ export function WorkspaceClient() {
   const [candidates, setCandidates] = useState<WorkspaceCandidate[]>(() => initialCandidates());
   const [activeCandidateIndex, setActiveCandidateIndex] = useState(0);
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
+  const [providerCopyStatus, setProviderCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
 
   const singleResult = useMemo(
     () => evaluateSingleWorkspaceTrend(product, candidates[activeCandidateIndex]),
@@ -115,12 +118,29 @@ export function WorkspaceClient() {
     [product, candidates]
   );
   const activeCandidate = candidates[activeCandidateIndex];
+  const providerCandidate = useMemo(
+    () =>
+      mode === "single"
+        ? activeCandidate
+        : candidates.find((candidate) => candidate.id === shortlistResult.winner.id) ?? activeCandidate,
+    [mode, activeCandidate, candidates, shortlistResult.winner.id]
+  );
   const activeGaps = useMemo(
     () =>
       mode === "single"
         ? buildWorkspaceEvidenceGaps(singleResult.rigor)
         : buildWorkspaceEvidenceGaps(shortlistResult.winner.rigor),
     [mode, singleResult.rigor, shortlistResult.winner.rigor]
+  );
+  const providerPreview = useMemo(
+    () =>
+      buildWorkspaceProviderPreview({
+        product,
+        candidate: providerCandidate,
+        gaps: activeGaps,
+        mode
+      }),
+    [product, providerCandidate, activeGaps, mode]
   );
   const markdownExport = useMemo(
     () =>
@@ -144,6 +164,16 @@ export function WorkspaceClient() {
       window.setTimeout(() => setCopyStatus("idle"), 1800);
     } catch {
       setCopyStatus("failed");
+    }
+  }
+
+  async function copyProviderCommands() {
+    try {
+      await navigator.clipboard.writeText(providerPreview.commandsText);
+      setProviderCopyStatus("copied");
+      window.setTimeout(() => setProviderCopyStatus("idle"), 1800);
+    } catch {
+      setProviderCopyStatus("failed");
     }
   }
 
@@ -350,6 +380,11 @@ export function WorkspaceClient() {
                 <p>{singleResult.rigor.nextValidationAction}</p>
               </div>
               <EvidenceGapList gaps={activeGaps} />
+              <ProviderPreviewPanel
+                preview={providerPreview}
+                copyStatus={providerCopyStatus}
+                onCopy={copyProviderCommands}
+              />
             </>
           ) : (
             <>
@@ -401,11 +436,72 @@ export function WorkspaceClient() {
                 </p>
               </div>
               <EvidenceGapList gaps={activeGaps} />
+              <ProviderPreviewPanel
+                preview={providerPreview}
+                copyStatus={providerCopyStatus}
+                onCopy={copyProviderCommands}
+              />
             </>
           )}
         </aside>
       </div>
     </div>
+  );
+}
+
+function ProviderPreviewPanel({
+  preview,
+  copyStatus,
+  onCopy
+}: {
+  preview: WorkspaceProviderPreview;
+  copyStatus: "idle" | "copied" | "failed";
+  onCopy: () => void;
+}) {
+  return (
+    <section className="provider-preview-panel" aria-label="Provider dry-run preview">
+      <div className="provider-preview-head">
+        <div className="section-heading compact">
+          <p className="eyebrow">Provider preview</p>
+          <h2>Dry-run / fixture</h2>
+        </div>
+        <button className="secondary-action" type="button" onClick={onCopy}>
+          复制命令
+        </button>
+      </div>
+      <p className="provider-target">Target: {preview.targetTrend}</p>
+      <div className="provider-command-list">
+        {[preview.dryRunCommand, preview.fixtureCommand].map((command) => (
+          <article key={command.label}>
+            <div>
+              <strong>{command.label}</strong>
+              <span>{command.description}</span>
+            </div>
+            <code>{command.command}</code>
+          </article>
+        ))}
+      </div>
+      {preview.targetedSlots.length > 0 ? (
+        <ul className="provider-slot-list">
+          {preview.targetedSlots.map((slot) => (
+            <li key={`${slot.slot}-${slot.reason}`}>
+              <strong>{slot.label}</strong>
+              <span>{slot.plannedSources.join(" · ")}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="provider-empty">No blocking provider gaps for this result. Use the fixture smoke command to verify the pipeline contract.</p>
+      )}
+      <div className="provider-notes">
+        {preview.notes.map((note) => (
+          <p key={note}>{note}</p>
+        ))}
+      </div>
+      <span className="provider-copy-status" aria-live="polite">
+        {copyStatus === "copied" ? "命令已复制" : copyStatus === "failed" ? "复制失败，请手动选择" : " "}
+      </span>
+    </section>
   );
 }
 

@@ -971,6 +971,118 @@ th {
   padding-top: 16px;
 }
 
+.provider-preview-panel {
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
+}
+
+.provider-preview-head {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.provider-preview-head .section-heading.compact {
+  margin-bottom: 0;
+}
+
+.provider-preview-head .secondary-action {
+  border: 1px solid rgba(11, 111, 104, 0.28);
+  color: var(--teal);
+  cursor: pointer;
+  min-height: 34px;
+}
+
+.provider-target,
+.provider-empty,
+.provider-notes p,
+.provider-copy-status {
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.provider-target {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.provider-command-list {
+  display: grid;
+  gap: 10px;
+}
+
+.provider-command-list article {
+  background: #fbfcfd;
+  border: 1px solid #e7ebf0;
+  border-radius: 8px;
+  display: grid;
+  gap: 9px;
+  padding: 12px;
+}
+
+.provider-command-list article div {
+  display: grid;
+  gap: 4px;
+}
+
+.provider-command-list strong,
+.provider-slot-list strong {
+  font-size: 13px;
+}
+
+.provider-command-list span,
+.provider-slot-list span {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.provider-command-list code {
+  background: #17202a;
+  border-radius: 6px;
+  color: #edf8f7;
+  display: block;
+  font-size: 11px;
+  line-height: 1.55;
+  overflow-x: auto;
+  padding: 10px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.provider-slot-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+
+.provider-slot-list li {
+  background: #f8fafb;
+  border: 1px solid #e7ebf0;
+  border-radius: 8px;
+  display: grid;
+  gap: 4px;
+  list-style: none;
+  padding: 10px;
+}
+
+.provider-notes {
+  display: grid;
+  gap: 5px;
+}
+
+.provider-copy-status {
+  font-size: 12px;
+  font-weight: 800;
+  min-height: 18px;
+}
+
 .evidence-gap-panel ul {
   display: grid;
   gap: 10px;
@@ -1075,7 +1187,8 @@ th {
   .page-header,
   .recommendation-band,
   .workspace-hero,
-  .trend-editor-header {
+  .trend-editor-header,
+  .provider-preview-head {
     align-items: stretch;
     flex-direction: column;
   }

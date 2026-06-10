@@ -2,6 +2,71 @@
 
 This changelog records project-level changes and the reasoning behind them. It is intended for handoff between Codex / Claude conversations, not just release notes.
 
+## 2026-06-10 — Workspace Provider Preview and Portable OpenCLI Default
+
+Status:
+
+- Pushed the previous workspace / shortlist commit (`e1f82d5`) to `origin/main`.
+- Added the first fixture/dry-run provider panel to `/workspace`.
+- Removed the user-specific OpenCLI default path from runtime command generation.
+
+What landed:
+
+- Added `buildWorkspaceProviderPreview()` in `lib/workspace-evaluator.ts`.
+- Extended `components/WorkspaceClient.tsx` with a Provider preview panel in the result
+  pane for both single-trend and shortlist modes.
+- Added provider preview styles to `app/globals.css`.
+- Changed `lib/opencli-research-source.ts` so default OpenCLI resolution is portable:
+  explicit `--opencli-bin`, then `OPENCLI_BIN`, then `opencli` from `PATH`.
+- Added tests for provider-preview command generation and portable OpenCLI dry-run
+  output.
+- Updated README, product-marketing context, and current-state test counts to 95.
+
+Current behavior:
+
+- `/workspace` now shows:
+  - a dry-run OpenCLI command for the active single trend or current shortlist winner;
+  - a portable fixture smoke command using
+    `examples/dji-middle-east-search-results.fixture.json`;
+  - targeted evidence slots and planned provider source classes;
+  - notes that provider output is only candidate evidence and `sourceTier` remains
+    classifier-owned.
+- The panel can copy both provider commands.
+- The browser still does not execute live OpenCLI / GooseWorks / Google Trends calls.
+
+Key design decisions:
+
+- Make the provider panel a reproducible contract/demo layer before adding live browser
+  execution.
+- Keep live providers as candidate-source collectors, never scoring authorities.
+- Do not expose editable `sourceTier` in the workspace; future evidence editing should
+  allow source URL, source signals, direction, verification status, and notes, while the
+  classifier computes tier.
+- Remove hardcoded `/Users/guo/.npm-global/bin/opencli` from runtime defaults so
+  portfolio reviewers and CI are not tied to one machine.
+
+Verification:
+
+- `npm test` passes with 95 tests.
+- `npm run build` passes.
+- HTTP verification against local `/workspace` returned 200 and confirmed provider panel
+  content, dry-run command, and fixture command in SSR output.
+- Browser screenshot verification was attempted but blocked because the bundled
+  Playwright package had no installed browser binary in this environment.
+
+Known issues:
+
+- Provider panel is still preview/copy-only. It does not run fixture or live provider
+  collection from the browser.
+- Provider health checks are not implemented yet.
+- Google Trends / SEO execution is still a missing live provider; the current SEO layer
+  is still a mapper for supplied findings.
+
+Recommended next step:
+
+- Add a server/API boundary for fixture provider runs and provider health checks, then
+  build the evidence editor with read-only classifier-owned `sourceTier`.
+
 ## 2026-06-10 — Editable Workspace UI
 
 Status:

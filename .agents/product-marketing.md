@@ -154,7 +154,7 @@
 - One editable workspace route for live single-trend scoring, shortlist ranking, evidence-gap guidance, and Markdown export without editing JSON.
 - Seven scoring dimensions.
 - Fixed score anchors: 0, 25, 50, 75, 100.
-- Current local verification: 93 tests pass via `npm test`; production build passes via `npm run build`.
+- Current local verification: 95 tests pass via `npm test`; production build passes via `npm run build`.
 - GitHub Actions CI runs `npm ci`, `npm test`, and `npm run build` on pushes to `main` and pull requests.
 
 **Customers:** No external customer logos. This is currently a portfolio/demo project.
