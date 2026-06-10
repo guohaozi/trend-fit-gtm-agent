@@ -1,0 +1,44 @@
+[
+  {
+    "lane": "audience",
+    "query": "DJI drones Middle East video creation security inspection tourism audience",
+    "title": "Dubai creators discuss drone shots for tourism videos",
+    "url": "https://www.reddit.com/r/dubai/comments/abc123/drone_video/",
+    "snippet": "Creators ask whether DJI drones are worth it for desert, hotel, and tourism video shoots."
+  },
+  {
+    "lane": "useCase",
+    "query": "DJI drones Middle East video creation security inspection tourism use case",
+    "title": "Drone operators support tourism, mapping, public safety, and infrastructure inspection",
+    "url": "https://apnews.com/article/example-drone-middle-east-use-cases",
+    "snippet": "Drone deployments are used for tourism content, mapping, emergency response, security, and inspection workflows."
+  },
+  {
+    "lane": "commercial",
+    "query": "DJI drones Middle East where to buy distributor procurement",
+    "title": "Middle East buyers adopt drones for inspection and public safety",
+    "url": "https://apnews.com/article/example-dji-enterprise-middle-east",
+    "snippet": "Enterprise drones are sold for public safety, inspection, and mapping workflows."
+  },
+  {
+    "lane": "timingSaturation",
+    "query": "Middle East drone tourism smart city inspection market growth report 2025",
+    "title": "Middle East smart city and drone inspection programs expand",
+    "url": "https://apnews.com/article/example-drone-middle-east-growth",
+    "snippet": "Tourism, smart city, and energy inspection programs are increasing drone use across the region."
+  },
+  {
+    "lane": "brandSafety",
+    "query": "DJI drones UAE Saudi regulation safety risk ban policy",
+    "title": "UAE drone regulations and aviation safety",
+    "url": "https://www.gcaa.gov.ae/",
+    "snippet": "Drone users need aviation approval and must follow local safety rules."
+  },
+  {
+    "lane": "competitor",
+    "query": "Autel OR Skydio Middle East drone security inspection tourism campaign",
+    "title": "Autel and Skydio compete for enterprise drone inspection workflows",
+    "url": "https://www.wired.com/story/example-enterprise-drone-competition/",
+    "snippet": "Enterprise drone vendors compete on safety, autonomy, inspection, and public-sector workflows."
+  }
+]

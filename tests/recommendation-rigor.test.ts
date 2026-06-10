@@ -177,4 +177,151 @@ describe("v1.2 recommendation rigor layer", () => {
     assert.equal(rigor.recommendationStability, evidenceCase.expectedStability);
     assert.equal(rigor.decisionType, evidenceCase.expectedDecisionType);
   });
+
+  it("keeps the SAVAS China case as a fragile small test after evidence collection", () => {
+    const evidenceCase = readEvidenceCase("savas_china_evidence.json");
+    const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
+    const result = calculateTrendFitWithProfile(adjustment.adjusted, "medium", "default");
+    const rigor = applyRecommendationRigor({
+      scores: adjustment.adjusted,
+      result,
+      profile: "default",
+      evidence: evidenceCase.evidence
+    });
+
+    assert.equal(result.total, evidenceCase.expectedAdjustedTotal);
+    assert.equal(result.recommendation.finalBand, evidenceCase.expectedAdjustedBand);
+    assert.equal(rigor.evidenceGate, evidenceCase.expectedEvidenceGate);
+    assert.equal(rigor.gatedBand, evidenceCase.expectedGatedBand);
+    assert.deepEqual(rigor.gateMissing, evidenceCase.expectedGateMissing);
+    assert.deepEqual(rigor.dimensionCaps, evidenceCase.expectedDimensionCaps);
+    assert.equal(rigor.recommendationStability, evidenceCase.expectedStability);
+    assert.equal(rigor.decisionType, evidenceCase.expectedDecisionType);
+  });
+
+  it("keeps the OBgE China case as a fragile small test after evidence collection", () => {
+    const evidenceCase = readEvidenceCase("obge_china_evidence.json");
+    const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
+    const result = calculateTrendFitWithProfile(adjustment.adjusted, "high", "default");
+    const rigor = applyRecommendationRigor({
+      scores: adjustment.adjusted,
+      result,
+      profile: "default",
+      evidence: evidenceCase.evidence
+    });
+
+    assert.equal(result.total, evidenceCase.expectedAdjustedTotal);
+    assert.equal(result.recommendation.finalBand, evidenceCase.expectedAdjustedBand);
+    assert.equal(rigor.evidenceGate, evidenceCase.expectedEvidenceGate);
+    assert.equal(rigor.gatedBand, evidenceCase.expectedGatedBand);
+    assert.deepEqual(rigor.gateMissing, evidenceCase.expectedGateMissing);
+    assert.deepEqual(rigor.dimensionCaps, evidenceCase.expectedDimensionCaps);
+    assert.equal(rigor.recommendationStability, evidenceCase.expectedStability);
+    assert.equal(rigor.decisionType, evidenceCase.expectedDecisionType);
+  });
+
+  it("lets the Anker Europe case pass Strong Go but keeps it fragile from saturation", () => {
+    const evidenceCase = readEvidenceCase("anker_europe_evidence.json");
+    const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
+    const result = calculateTrendFitWithProfile(adjustment.adjusted, "medium", "default");
+    const rigor = applyRecommendationRigor({
+      scores: adjustment.adjusted,
+      result,
+      profile: "default",
+      evidence: evidenceCase.evidence
+    });
+
+    assert.equal(result.total, evidenceCase.expectedAdjustedTotal);
+    assert.equal(result.recommendation.finalBand, evidenceCase.expectedAdjustedBand);
+    assert.equal(rigor.evidenceGate, evidenceCase.expectedEvidenceGate);
+    assert.equal(rigor.gatedBand, evidenceCase.expectedGatedBand);
+    assert.deepEqual(rigor.gateMissing, evidenceCase.expectedGateMissing);
+    assert.deepEqual(rigor.dimensionCaps, evidenceCase.expectedDimensionCaps);
+    assert.equal(rigor.recommendationStability, evidenceCase.expectedStability);
+    assert.equal(rigor.decisionType, evidenceCase.expectedDecisionType);
+  });
+
+  it("lets the Japan service robot case pass the B2B pipeline evidence gate", () => {
+    const evidenceCase = readEvidenceCase("service_robot_japan_evidence.json");
+    const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
+    const result = calculateTrendFitWithProfile(adjustment.adjusted, "high", "b2b_pipeline");
+    const rigor = applyRecommendationRigor({
+      scores: adjustment.adjusted,
+      result,
+      profile: "b2b_pipeline",
+      evidence: evidenceCase.evidence
+    });
+
+    assert.equal(result.total, evidenceCase.expectedAdjustedTotal);
+    assert.equal(result.recommendation.finalBand, evidenceCase.expectedAdjustedBand);
+    assert.equal(rigor.evidenceGate, evidenceCase.expectedEvidenceGate);
+    assert.equal(rigor.gatedBand, evidenceCase.expectedGatedBand);
+    assert.deepEqual(rigor.gateMissing, evidenceCase.expectedGateMissing);
+    assert.deepEqual(rigor.dimensionCaps, evidenceCase.expectedDimensionCaps);
+    assert.equal(rigor.recommendationStability, evidenceCase.expectedStability);
+    assert.equal(rigor.decisionType, evidenceCase.expectedDecisionType);
+  });
+
+  it("keeps the POP MART Middle East case as creator seeding under brand-awareness rigor", () => {
+    const evidenceCase = readEvidenceCase("popmart_middle_east_evidence.json");
+    const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
+    const result = calculateTrendFitWithProfile(adjustment.adjusted, "high", "brand_awareness");
+    const rigor = applyRecommendationRigor({
+      scores: adjustment.adjusted,
+      result,
+      profile: "brand_awareness",
+      evidence: evidenceCase.evidence
+    });
+
+    assert.equal(result.total, evidenceCase.expectedAdjustedTotal);
+    assert.equal(result.recommendation.finalBand, evidenceCase.expectedAdjustedBand);
+    assert.equal(rigor.evidenceGate, evidenceCase.expectedEvidenceGate);
+    assert.equal(rigor.gatedBand, evidenceCase.expectedGatedBand);
+    assert.deepEqual(rigor.gateMissing, evidenceCase.expectedGateMissing);
+    assert.deepEqual(rigor.dimensionCaps, evidenceCase.expectedDimensionCaps);
+    assert.equal(rigor.recommendationStability, evidenceCase.expectedStability);
+    assert.equal(rigor.decisionType, evidenceCase.expectedDecisionType);
+  });
+
+  it("lets the Thailand EV case pass the ecommerce evidence gate", () => {
+    const evidenceCase = readEvidenceCase("thailand_ev_evidence.json");
+    const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
+    const result = calculateTrendFitWithProfile(adjustment.adjusted, "high", "ecommerce_conversion");
+    const rigor = applyRecommendationRigor({
+      scores: adjustment.adjusted,
+      result,
+      profile: "ecommerce_conversion",
+      evidence: evidenceCase.evidence
+    });
+
+    assert.equal(result.total, evidenceCase.expectedAdjustedTotal);
+    assert.equal(result.recommendation.finalBand, evidenceCase.expectedAdjustedBand);
+    assert.equal(rigor.evidenceGate, evidenceCase.expectedEvidenceGate);
+    assert.equal(rigor.gatedBand, evidenceCase.expectedGatedBand);
+    assert.deepEqual(rigor.gateMissing, evidenceCase.expectedGateMissing);
+    assert.deepEqual(rigor.dimensionCaps, evidenceCase.expectedDimensionCaps);
+    assert.equal(rigor.recommendationStability, evidenceCase.expectedStability);
+    assert.equal(rigor.decisionType, evidenceCase.expectedDecisionType);
+  });
+
+  it("lets the LatAm gaming peripherals case pass the ecommerce evidence gate", () => {
+    const evidenceCase = readEvidenceCase("latam_gaming_peripherals_evidence.json");
+    const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
+    const result = calculateTrendFitWithProfile(adjustment.adjusted, "high", "ecommerce_conversion");
+    const rigor = applyRecommendationRigor({
+      scores: adjustment.adjusted,
+      result,
+      profile: "ecommerce_conversion",
+      evidence: evidenceCase.evidence
+    });
+
+    assert.equal(result.total, evidenceCase.expectedAdjustedTotal);
+    assert.equal(result.recommendation.finalBand, evidenceCase.expectedAdjustedBand);
+    assert.equal(rigor.evidenceGate, evidenceCase.expectedEvidenceGate);
+    assert.equal(rigor.gatedBand, evidenceCase.expectedGatedBand);
+    assert.deepEqual(rigor.gateMissing, evidenceCase.expectedGateMissing);
+    assert.deepEqual(rigor.dimensionCaps, evidenceCase.expectedDimensionCaps);
+    assert.equal(rigor.recommendationStability, evidenceCase.expectedStability);
+    assert.equal(rigor.decisionType, evidenceCase.expectedDecisionType);
+  });
 });

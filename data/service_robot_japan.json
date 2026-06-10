@@ -1,0 +1,53 @@
+{
+  "id": "service_robot_japan",
+  "product": {
+    "name": "Chinese service robot for restaurants and eldercare",
+    "category": "service robotics / B2B automation",
+    "targetMarket": ["Japan restaurants", "Japan eldercare", "hotels and malls"],
+    "audience": "Restaurant chains, izakaya operators, family restaurants, eldercare facilities, hotels, and shopping-center operators facing labor shortages and repetitive service workloads",
+    "priceRange": "B2B hardware + service contract; expected high-ticket purchase or lease depending on deployment scale",
+    "positioning": "A practical service-assistance robot that reduces repetitive walking, serving, greeting, and recommendation tasks without pretending to replace human care or hospitality",
+    "sellingPoints": [
+      "Reduces repetitive service workload during peak hours",
+      "Creates a visible automation trial for labor-shortage operators",
+      "Can support delivery, greeting, recommendation, and facility-assistance workflows",
+      "Chinese manufacturing scale and deployment experience"
+    ],
+    "brandTone": "Operational, respectful, assistive, evidence-led",
+    "competitors": ["Pudu Robotics", "Keenon Robotics", "Bear Robotics", "SoftBank Robotics", "TechMagic", "local automation integrators"],
+    "campaignGoal": "B2B pipeline generation + pilot deployments",
+    "riskTolerance": "high"
+  },
+  "trend": {
+    "name": "Japan labor shortage / restaurant automation / eldercare robotics",
+    "platform": "B2B sales, industry media, trade shows, operator demos",
+    "region": "Japan",
+    "description": "Japan's restaurant, hospitality, and eldercare sectors face labor pressure, making operators more open to robot-assisted serving, delivery, greeting, recommendation, and workload-reduction pilots.",
+    "drivenBy": "Labor shortage, aging society, service-sector workload, foreign-worker constraints, automation pilots, and visible robot deployments in food service and transport",
+    "format": "Restaurant pilot demo, peak-hour workload reduction case, eldercare task-assistance briefing, before/after labor flow, trade-show robot workflow",
+    "whyPopular": "Operators need practical ways to maintain service levels with limited staff, while robotics pilots are becoming more visible and socially legible in Japan.",
+    "exampleContent": "A restaurant manager shows how a robot handles table delivery and recommendations during lunch rush while staff focus on ordering and hospitality.",
+    "controversy": "Robots can create safety, maintenance, workflow, dignity, and trust risks if sold as human replacement rather than task relief."
+  },
+  "scores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 100,
+    "creativeFeasibility": 50,
+    "commercialIntent": 75,
+    "brandSafety": 50,
+    "timingSaturation": 75
+  },
+  "expectedTotal": 88,
+  "expectedBand": "Strong Go",
+  "expectedQualifier": null,
+  "expectedFinalBand": "Strong Go",
+  "overrideReason": null,
+  "profileUsed": "b2b_pipeline",
+  "expectedEvidenceGate": "fail",
+  "expectedGatedBand": "Go",
+  "expectedGateMissing": ["timingSaturation", "brandSafety", "audienceOrUseCase", "commercialIntent"],
+  "expectedDimensionCaps": ["audienceOverlap"],
+  "expectedStability": "fragile",
+  "expectedDecisionType": "small test"
+}

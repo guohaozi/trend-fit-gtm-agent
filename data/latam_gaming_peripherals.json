@@ -1,0 +1,54 @@
+{
+  "id": "latam_gaming_peripherals",
+  "product": {
+    "name": "Chinese gaming peripherals for Latin America esports and ecommerce",
+    "category": "gaming peripherals / ecommerce hardware",
+    "targetMarket": ["Brazil", "Mexico", "Chile", "Latin America ecommerce"],
+    "audience": "PC and console gamers, university students, entry-level esports players, streamers, LAN/game-cafe users, and budget-conscious buyers upgrading keyboards, mice, headsets, controllers, and mousepads",
+    "priceRange": "Low-to-mid-ticket ecommerce purchase; value-performance peripherals under premium Logitech/Razer/Corsair tiers",
+    "positioning": "High-performance-looking gaming gear at an accessible price, giving new esports and streaming users a credible setup without premium-brand spend",
+    "sellingPoints": [
+      "Affordable mechanical keyboards and lightweight mice",
+      "RGB and gamer aesthetics",
+      "Low latency and adjustable DPI",
+      "Bundles for first gaming setup",
+      "Good enough performance for casual competitive play"
+    ],
+    "brandTone": "Energetic, performance-led, value-smart, community-native",
+    "competitors": ["Logitech G", "Razer", "HyperX", "Corsair", "Redragon", "local ecommerce brands"],
+    "campaignGoal": "Ecommerce conversion + creator/community seeding",
+    "riskTolerance": "high"
+  },
+  "trend": {
+    "name": "Latin America esports, streaming, and low-cost gaming setup upgrades",
+    "platform": "TikTok, YouTube, Twitch, ecommerce marketplaces, Discord, esports communities",
+    "region": "Brazil, Mexico, Chile",
+    "description": "Latin America has large gaming audiences and visible esports culture, creating demand for affordable peripherals that look competitive and improve everyday play without premium pricing.",
+    "drivenBy": "Large Brazil/Mexico gamer populations, esports events, Free Fire and PC competitive culture, streaming aspirations, ecommerce access, and budget pressure",
+    "format": "Setup upgrade video, keyboard sound test, mouse DPI challenge, budget vs premium comparison, streamer desk tour, first esports kit bundle",
+    "whyPopular": "Gamers want visible performance upgrades and creator-worthy setups, but many buyers remain price-sensitive compared with US/EU premium-peripheral buyers.",
+    "exampleContent": "A Brazilian creator compares a budget mechanical keyboard and mouse bundle against a premium Logitech/Razer setup in a ranked-game challenge and posts marketplace links.",
+    "controversy": "Cheap peripherals can suffer from warranty, software, durability, shipping, and trust issues if the brand lacks local support."
+  },
+  "scores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 75,
+    "creativeFeasibility": 75,
+    "commercialIntent": 75,
+    "brandSafety": 75,
+    "timingSaturation": 75
+  },
+  "expectedTotal": 84,
+  "expectedBand": "Go",
+  "expectedQualifier": null,
+  "expectedFinalBand": "Go",
+  "overrideReason": null,
+  "profileUsed": "ecommerce_conversion",
+  "expectedEvidenceGate": "fail",
+  "expectedGatedBand": "Go",
+  "expectedGateMissing": ["timingSaturation", "brandSafety", "audienceOrUseCase", "commercialIntent"],
+  "expectedDimensionCaps": ["audienceOverlap"],
+  "expectedStability": "fragile",
+  "expectedDecisionType": "small test"
+}

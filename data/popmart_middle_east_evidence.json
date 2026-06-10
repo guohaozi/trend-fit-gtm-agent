@@ -1,0 +1,124 @@
+{
+  "id": "popmart_middle_east_evidence",
+  "case": "popmart_middle_east",
+  "researchDate": "2026-06-10",
+  "tooling": "manual browser research fallback + P5 evidence-case orchestrator; no GooseWorks/OpenCLI provider calls in this run",
+  "baselineScores": {
+    "audienceOverlap": 75,
+    "useCaseRelevance": 75,
+    "messageBridge": 75,
+    "creativeFeasibility": 100,
+    "commercialIntent": 75,
+    "brandSafety": 50,
+    "timingSaturation": 50
+  },
+  "evidence": [
+    {
+      "id": "popmart-audience-gulf-luxury-young-retail",
+      "dimension": "audienceOverlap",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.vogue.com/article/the-future-of-luxury-in-the-gulf",
+      "note": "Vogue covers the Gulf as a young, mall-centered, experience-led luxury and premium retail market. This supports audience fit for visual collectibles, while remaining a category-level signal rather than POP MART-specific demand. (verified secondary source signal)"
+    },
+    {
+      "id": "popmart-usecase-mall-entertainment",
+      "dimension": "useCaseRelevance",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://apnews.com/article/435c527373e27a94d97fb5a98c7754b0",
+      "note": "AP reports Mall of the Emirates renovation and large annual footfall, supporting the idea that immersive mall retail remains a real Gulf consumer venue for discovery, browsing, and entertainment-led purchases. (verified secondary source signal)"
+    },
+    {
+      "id": "popmart-message-saudi-anime-youth",
+      "dimension": "messageBridge",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://theweek.com/business/why-saudi-arabia-is-muscling-in-on-the-world-of-anime",
+      "note": "The Week reports Saudi investment and audience momentum around anime, supporting a bridge from Asian character culture into Gulf youth entertainment without forcing a purely luxury framing. (verified secondary source signal)"
+    },
+    {
+      "id": "popmart-commercial-labubu-global-sales",
+      "dimension": "commercialIntent",
+      "direction": "up",
+      "magnitude": "strong",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://nypost.com/2025/08/19/business/chinas-pop-mart-sees-profit-soar-400-as-labubu-dolls-fly-off-shelves-around-the-world/",
+      "note": "NY Post reports Pop Mart profit growth and global Labubu sell-through momentum. This is not Gulf-specific, but it is direct commercial evidence that the product/trend combination can convert demand, so Commercial Intent moves from 75 to 100. (verified secondary source signal)"
+    },
+    {
+      "id": "popmart-creative-labubu-accessory-culture",
+      "dimension": "creativeFeasibility",
+      "direction": "confirm",
+      "magnitude": "strong",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.vanityfair.com/style/story/inside-the-rise-of-labubu-trend-pop-mart",
+      "note": "Vanity Fair covers Labubu's rise as a visible fashion and accessory object, confirming very high creative feasibility for styling, unboxing, bag-charm, and collector-display content. (verified secondary source signal)"
+    },
+    {
+      "id": "popmart-timing-saturation-ap",
+      "dimension": "timingSaturation",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://apnews.com/article/8a6925e216dc42ac92316fc56a7c49b0",
+      "note": "AP lists Labubu among visible 2025 trend objects, confirming cultural timing while also implying some trend saturation and hype-cycle risk. Timing stays at 50 rather than moving up. (verified secondary source signal)"
+    },
+    {
+      "id": "popmart-safety-counterfeit-risk",
+      "dimension": "brandSafety",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://nypost.com/2025/08/19/business/fake-labubu-dolls-known-as-lafufus-pose-serious-risk-of-choking-feds-warn/",
+      "note": "NY Post reports counterfeit Lafufu choking-risk warnings, confirming a real brand-safety constraint: campaign and retail messaging must emphasize authentic channels, age guidance, and product safety. (verified secondary source signal)"
+    },
+    {
+      "id": "popmart-safety-cultural-consumerism",
+      "dimension": "brandSafety",
+      "direction": "down",
+      "magnitude": "weak",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.thetimes.co.uk/article/are-labubus-demonic-evil-lt3dxf9cb",
+      "note": "The Times covers backlash and cultural/religious interpretation around Labubu. This is a weak negative pressure, but not enough to move Brand Safety below 50 because risk can be managed with careful character selection and non-provocative campaign framing. (verified secondary source signal)"
+    }
+  ],
+  "expectedAdjustedScores": {
+    "audienceOverlap": 75,
+    "useCaseRelevance": 75,
+    "messageBridge": 75,
+    "creativeFeasibility": 100,
+    "commercialIntent": 100,
+    "brandSafety": 50,
+    "timingSaturation": 50
+  },
+  "expectedAdjustedTotal": 75,
+  "expectedAdjustedBand": "Go",
+  "profileUsed": "brand_awareness",
+  "expectedEvidenceGate": "pass",
+  "expectedGatedBand": "Go",
+  "expectedGateMissing": [],
+  "expectedDimensionCaps": [],
+  "expectedStability": "moderate",
+  "expectedDecisionType": "creator seeding",
+  "expectedDimensionConfidence": {
+    "audienceOverlap": "evidence-confirmed (high)",
+    "useCaseRelevance": "evidence-confirmed (high)",
+    "messageBridge": "evidence-confirmed (high)",
+    "creativeFeasibility": "evidence-confirmed (high)",
+    "commercialIntent": "evidence-revised (high)",
+    "brandSafety": "evidence-confirmed (high)",
+    "timingSaturation": "evidence-confirmed (high)"
+  }
+}

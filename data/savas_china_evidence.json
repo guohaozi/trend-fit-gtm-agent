@@ -1,0 +1,104 @@
+{
+  "id": "savas_china_evidence",
+  "case": "savas_china",
+  "researchDate": "2026-06-10",
+  "tooling": "manual browser research fallback + P5 evidence-case orchestrator; no GooseWorks/OpenCLI provider calls in this run",
+  "baselineScores": {
+    "audienceOverlap": 75,
+    "useCaseRelevance": 100,
+    "messageBridge": 75,
+    "creativeFeasibility": 75,
+    "commercialIntent": 75,
+    "brandSafety": 50,
+    "timingSaturation": 75
+  },
+  "evidence": [
+    {
+      "id": "savas-audience-frontiers-china-fitness",
+      "dimension": "audienceOverlap",
+      "direction": "up",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.frontiersin.org/journals/sports-and-active-living/articles/10.3389/fspor.2025.1578817/full",
+      "note": "Frontiers analysis of China national adult physical-fitness monitoring shows a broad 20-59 adult policy and monitoring context, supporting a wider health/fitness audience than only hardcore gym users. (verified secondary source signal)"
+    },
+    {
+      "id": "savas-usecase-meiji-rtd",
+      "dimension": "useCaseRelevance",
+      "direction": "confirm",
+      "magnitude": "strong",
+      "confidence": "medium",
+      "sourceTier": "proxy",
+      "sourceUrl": "https://www.meiji.com/global/food/protein/",
+      "note": "Meiji says SAVAS Milk Protein launched as a ready-to-drink product in 2015 and can be used as snack replacement or post-workout replenishment. Vendor-owned, so proxy only. (vendor copy)"
+    },
+    {
+      "id": "savas-message-meiji-mainstream-protein",
+      "dimension": "messageBridge",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "proxy",
+      "sourceUrl": "https://www.meiji.com/global/wellness-stories/changing-protein-images.html",
+      "note": "Meiji frames protein as moving from athlete-only muscle building toward convenient products for active lifestyles. Vendor-owned storytelling, useful for message direction but not demand proof. (vendor copy)"
+    },
+    {
+      "id": "savas-commercial-global-protein-drinks",
+      "dimension": "commercialIntent",
+      "direction": "confirm",
+      "magnitude": "weak",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.foodandwine.com/protein-coffee-trend-america-2026-11967536",
+      "note": "Food & Wine cites IFIC 2025 survey signals and chain launches showing protein-forward drinks becoming more normal in the US. This supports category direction, but is not China-specific, so it only confirms rather than upgrades commercial intent. (verified secondary source signal)"
+    },
+    {
+      "id": "savas-timing-global-whey-demand",
+      "dimension": "timingSaturation",
+      "direction": "confirm",
+      "magnitude": "weak",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.theguardian.com/business/2026/jun/09/fears-whey-protein-shortage-weight-loss-drugs-global-demand",
+      "note": "Guardian reporting on whey-protein demand and supply pressure indicates the protein trend is still active globally. It is not local China proof, so timing remains confirmed rather than upgraded. (verified secondary source signal)"
+    },
+    {
+      "id": "savas-safety-harvard-protein-supplements",
+      "dimension": "brandSafety",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.health.harvard.edu/diet-and-nutrition/the-hidden-dangers-of-protein-powders",
+      "note": "Harvard Health warns that protein supplements can carry risks and that users should prefer ordinary foods unless supplementation is appropriate. Confirms the need for conservative protein/weight-management claims. (verified secondary source signal)"
+    }
+  ],
+  "expectedAdjustedScores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 75,
+    "creativeFeasibility": 75,
+    "commercialIntent": 75,
+    "brandSafety": 50,
+    "timingSaturation": 75
+  },
+  "expectedAdjustedTotal": 83,
+  "expectedAdjustedBand": "Go",
+  "profileUsed": "default",
+  "expectedEvidenceGate": "pass",
+  "expectedGatedBand": "Go",
+  "expectedGateMissing": [],
+  "expectedDimensionCaps": [],
+  "expectedStability": "fragile",
+  "expectedDecisionType": "small test",
+  "expectedDimensionConfidence": {
+    "audienceOverlap": "evidence-revised (high)",
+    "useCaseRelevance": "evidence-confirmed (medium)",
+    "messageBridge": "evidence-confirmed (medium)",
+    "creativeFeasibility": "assumption",
+    "commercialIntent": "evidence-confirmed (high)",
+    "brandSafety": "evidence-confirmed (high)",
+    "timingSaturation": "evidence-confirmed (high)"
+  }
+}

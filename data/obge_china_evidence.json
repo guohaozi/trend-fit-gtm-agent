@@ -1,0 +1,104 @@
+{
+  "id": "obge_china_evidence",
+  "case": "obge_china",
+  "researchDate": "2026-06-10",
+  "tooling": "manual browser research fallback + P5 evidence-case orchestrator; no GooseWorks/OpenCLI provider calls in this run",
+  "baselineScores": {
+    "audienceOverlap": 75,
+    "useCaseRelevance": 100,
+    "messageBridge": 75,
+    "creativeFeasibility": 75,
+    "commercialIntent": 50,
+    "brandSafety": 50,
+    "timingSaturation": 75
+  },
+  "evidence": [
+    {
+      "id": "obge-audience-vogue-china-men-skincare",
+      "dimension": "audienceOverlap",
+      "direction": "up",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.vogue.com/article/skincare-brands-find-an-eager-new-customer-in-china-men",
+      "note": "Vogue Business reports China male grooming/skincare is gaining market share, with young male consumers becoming a deliberate target for brands such as EB39 and Sidekick. (verified secondary source signal)"
+    },
+    {
+      "id": "obge-commercial-vogue-china-online-buying",
+      "dimension": "commercialIntent",
+      "direction": "up",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.vogue.com/article/skincare-brands-find-an-eager-new-customer-in-china-men",
+      "note": "The same report cites Qianzhan, Daxue and Ipsos signals: China He Economy expected growth, men skincare/personal-care sales doubled on Tmall/Taobao from Q1 2020, and online/social/live-streaming channels are central to purchase research. (verified secondary source signal)"
+    },
+    {
+      "id": "obge-timing-vogue-china-beauty-2024",
+      "dimension": "timingSaturation",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.vogue.com/article/four-factors-shaping-chinas-beauty-market-in-2024",
+      "note": "Vogue Business 2024 China beauty outlook says male grooming is expected to keep growing and video-channel ecommerce is likely to support online beauty growth, confirming timing without proving the BB-cream subcategory is early. (verified secondary source signal)"
+    },
+    {
+      "id": "obge-usecase-korean-bb-category",
+      "dimension": "useCaseRelevance",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "proxy",
+      "sourceUrl": "https://www.glamour.com/story/best-korean-bb-creams-and-skin-tints",
+      "note": "Glamour describes Korean BB creams/skin tints as light coverage products with skincare benefits and natural finish. Useful category fit signal, but listicle/affiliate format keeps it proxy. (listicle / affiliate / SEO source)"
+    },
+    {
+      "id": "obge-message-genz-guys-efficiency",
+      "dimension": "messageBridge",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.vogue.com/article/the-new-rules-of-selling-beauty-to-gen-z-guys",
+      "note": "Vogue Business reports Gen Z men increasingly want efficient, transparent, science-backed grooming and beauty guidance. This supports a message bridge around quick natural confidence rather than overt makeup. (verified secondary source signal)"
+    },
+    {
+      "id": "obge-safety-vogue-alpha-male-risk",
+      "dimension": "brandSafety",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.vogue.com/article/is-mens-grooming-going-alpha-male-again",
+      "note": "Vogue Business describes tension between inclusive grooming and renewed traditional masculinity narratives. Confirms moderate brand-safety risk for male makeup positioning: avoid mocking masculinity or over-gendered claims. (verified secondary source signal)"
+    }
+  ],
+  "expectedAdjustedScores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 75,
+    "creativeFeasibility": 75,
+    "commercialIntent": 75,
+    "brandSafety": 50,
+    "timingSaturation": 75
+  },
+  "expectedAdjustedTotal": 83,
+  "expectedAdjustedBand": "Go",
+  "profileUsed": "default",
+  "expectedEvidenceGate": "pass",
+  "expectedGatedBand": "Go",
+  "expectedGateMissing": [],
+  "expectedDimensionCaps": [],
+  "expectedStability": "fragile",
+  "expectedDecisionType": "small test",
+  "expectedDimensionConfidence": {
+    "audienceOverlap": "evidence-revised (high)",
+    "useCaseRelevance": "evidence-confirmed (medium)",
+    "messageBridge": "evidence-confirmed (high)",
+    "creativeFeasibility": "assumption",
+    "commercialIntent": "evidence-revised (high)",
+    "brandSafety": "evidence-confirmed (high)",
+    "timingSaturation": "evidence-confirmed (high)"
+  }
+}

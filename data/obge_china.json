@@ -1,0 +1,59 @@
+{
+  "id": "obge_china",
+  "product": {
+    "name": "OBgE Men's All-in-One Tone-Up / BB Cream",
+    "category": "men's grooming / complexion product",
+    "targetMarket": ["China tier-1 and tier-2 cities"],
+    "audience": "18-30 year-old men, college students, job-interview candidates, dating users, skincare beginners, and short-video creators who want natural complexion correction without an obvious makeup look",
+    "priceRange": "Premium Korean men's grooming import; expected RMB 100-250 depending on SKU and channel",
+    "positioning": "A fast, natural-looking men's complexion product that combines skincare, sunscreen, and tone correction for everyday image management",
+    "sellingPoints": [
+      "Men-specific natural cover without an obvious makeup look",
+      "Quick out-the-door routine for interviews, dates, content creation, and daily grooming",
+      "Korean men's grooming credibility with skincare + coverage framing"
+    ],
+    "brandTone": "Confident, clean, practical, non-mocking, low-drama",
+    "competitors": [
+      "UNO men's BB",
+      "Biotherm Homme",
+      "L'Oreal Men Expert",
+      "DearBoyFriend",
+      "Make Essense",
+      "Korean men's grooming brands"
+    ],
+    "campaignGoal": "Category education + online trial",
+    "riskTolerance": "high"
+  },
+  "trend": {
+    "name": "Men's appearance economy / male makeup destigmatization / Korean men's grooming",
+    "platform": "Douyin / Xiaohongshu / Tmall / Bilibili",
+    "region": "China",
+    "description": "Young men are treating grooming as practical image management: better skin on camera, more confidence in interviews and dates, and a low-effort daily routine that does not feel like heavy makeup.",
+    "drivenBy": "Gen Z grooming content, Korean beauty influence, short-video self-presentation, job/date image management, and ecommerce education",
+    "format": "No-makeup makeup before/after, one-minute interview grooming routine, date prep, camera-ready skin, men trying BB cream for the first time",
+    "whyPopular": "The social cost of male grooming is lower than before, but many users still need language that frames the product as natural, efficient, and confidence-oriented rather than theatrical makeup.",
+    "exampleContent": "Creator shows half-face before/after under daylight: redness and uneven tone reduced, but the finish still looks like skin.",
+    "controversy": "Male makeup can trigger stigma, over-gendered messaging, shade mismatch complaints, or backlash if the brand mocks masculinity or implies insecurity."
+  },
+  "scores": {
+    "audienceOverlap": 75,
+    "useCaseRelevance": 100,
+    "messageBridge": 75,
+    "creativeFeasibility": 75,
+    "commercialIntent": 50,
+    "brandSafety": 50,
+    "timingSaturation": 75
+  },
+  "expectedTotal": 75,
+  "expectedBand": "Go",
+  "expectedQualifier": null,
+  "expectedFinalBand": "Go",
+  "overrideReason": null,
+  "profileUsed": "default",
+  "expectedEvidenceGate": "fail",
+  "expectedGatedBand": "Go",
+  "expectedGateMissing": ["timingSaturation", "brandSafety", "audienceOrUseCase"],
+  "expectedDimensionCaps": [],
+  "expectedStability": "fragile",
+  "expectedDecisionType": "small test"
+}

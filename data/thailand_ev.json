@@ -1,0 +1,54 @@
+{
+  "id": "thailand_ev",
+  "product": {
+    "name": "Chinese EV brands for Thailand urban families",
+    "category": "electric vehicles / smart mobility",
+    "targetMarket": ["Thailand", "Bangkok", "Chiang Mai", "urban family buyers", "ride-hailing drivers"],
+    "audience": "Urban middle-class families, young professionals, first-time car buyers, ride-hailing drivers, and fuel-cost-sensitive commuters considering BYD, MG, Neta, or other Chinese EV brands",
+    "priceRange": "High-ticket vehicle purchase; mass-market EVs competing with Japanese ICE and hybrid vehicles",
+    "positioning": "A practical, lower-running-cost EV with enough range for Thai city life, smart cabin features, and stronger value than comparable Japanese fuel vehicles",
+    "sellingPoints": [
+      "Lower daily energy and maintenance cost",
+      "Smart cabin and modern EV features",
+      "Urban commuting range is enough for most family use",
+      "Chinese EV price-performance advantage",
+      "Local assembly and dealer expansion can improve trust"
+    ],
+    "brandTone": "Practical, family-safe, cost-saving, modern, confidence-building",
+    "competitors": ["Toyota", "Honda", "MG", "BYD", "Neta", "Tesla", "Hyundai", "local fuel and hybrid cars"],
+    "campaignGoal": "Demand validation + dealer/test-drive conversion",
+    "riskTolerance": "high"
+  },
+  "trend": {
+    "name": "Thailand EV adoption and Chinese EV brand expansion",
+    "platform": "dealer campaigns, auto shows, search, YouTube reviews, comparison content",
+    "region": "Thailand",
+    "description": "Thailand is becoming one of Southeast Asia's most important EV markets as government incentives, Chinese EV price-performance, local production, and fuel-cost pressure push urban buyers toward electric cars.",
+    "drivenBy": "Government EV incentives, local production commitments, Chinese EV price advantage, fuel-cost pressure, Bangkok commuter use, auto-show visibility, and dealership expansion",
+    "format": "Dealer test-drive funnel, cost-of-ownership calculator, charging routine explainer, family commute comparison, Japanese ICE vs Chinese EV comparison",
+    "whyPopular": "EVs promise lower running costs and modern features while Chinese brands are pricing aggressively enough to compete with mainstream family cars.",
+    "exampleContent": "A Bangkok family compares monthly fuel, charging, maintenance, and loan cost between a Japanese compact car and a Chinese EV, then books a weekend test drive.",
+    "controversy": "Price wars, resale value, charging access, battery confidence, dealer trust, and post-purchase discount complaints can damage buyer confidence."
+  },
+  "scores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 100,
+    "creativeFeasibility": 50,
+    "commercialIntent": 75,
+    "brandSafety": 50,
+    "timingSaturation": 75
+  },
+  "expectedTotal": 83,
+  "expectedBand": "Go",
+  "expectedQualifier": null,
+  "expectedFinalBand": "Go",
+  "overrideReason": null,
+  "profileUsed": "ecommerce_conversion",
+  "expectedEvidenceGate": "fail",
+  "expectedGatedBand": "Go",
+  "expectedGateMissing": ["timingSaturation", "brandSafety", "audienceOrUseCase", "commercialIntent"],
+  "expectedDimensionCaps": ["audienceOverlap", "messageBridge"],
+  "expectedStability": "fragile",
+  "expectedDecisionType": "small test"
+}

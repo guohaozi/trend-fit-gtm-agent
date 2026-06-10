@@ -1,0 +1,59 @@
+{
+  "id": "savas_china",
+  "product": {
+    "name": "Meiji SAVAS Milk Protein",
+    "category": "RTD protein beverage",
+    "targetMarket": ["China tier-1 and tier-2 cities"],
+    "audience": "Gym users, office workers managing weight, convenience-store breakfast buyers, light-fitness women, and college students who want easy daily protein intake",
+    "priceRange": "Premium imported RTD protein drink; expected RMB 12-20 per bottle depending on channel",
+    "positioning": "A Japanese ready-to-drink protein beverage for daily protein convenience, not a bodybuilding-only supplement or aggressive meal-replacement product",
+    "sellingPoints": [
+      "Ready-to-drink protein without mixing powder",
+      "Japanese sports-nutrition credibility",
+      "Fits breakfast, office snack, post-workout, and convenience-store routines"
+    ],
+    "brandTone": "Practical, disciplined, health-literate, non-anxious",
+    "competitors": [
+      "Keep protein drinks",
+      "ffit8",
+      "Boohee Health",
+      "high-protein yogurt",
+      "protein bars",
+      "sports drinks"
+    ],
+    "campaignGoal": "Category education + retail trial",
+    "riskTolerance": "medium"
+  },
+  "trend": {
+    "name": "High-protein snacking / light fitness / convenience-store healthy breakfast",
+    "platform": "Douyin / Xiaohongshu / convenience-store discovery",
+    "region": "China, with Japan as product-format benchmark",
+    "description": "Protein is moving from gym supplement behavior into lighter daily routines: breakfast backup, office snack, post-workout drink, and weight-management swap for sugary drinks or heavy snacks.",
+    "drivenBy": "Light-fitness creators, weight-management content, convenience-store product discovery, and Japanese RTD protein benchmarks",
+    "format": "Convenience-store protein find, what I drink after a light workout, high-protein breakfast in a rush, office snack swap, daily protein without powder",
+    "whyPopular": "Consumers want convenient health routines without mixing powder, cooking, or adopting an intense bodybuilding identity.",
+    "exampleContent": "A creator compares a normal sweet bottled drink, a protein powder shaker, and a SAVAS-style chilled protein drink for a workday breakfast or post-gym convenience-store stop.",
+    "controversy": "Protein and weight-management messaging can drift into diet anxiety, meal-replacement overclaiming, or pseudo-scientific health claims."
+  },
+  "scores": {
+    "audienceOverlap": 75,
+    "useCaseRelevance": 100,
+    "messageBridge": 75,
+    "creativeFeasibility": 75,
+    "commercialIntent": 75,
+    "brandSafety": 50,
+    "timingSaturation": 75
+  },
+  "expectedTotal": 78,
+  "expectedBand": "Go",
+  "expectedQualifier": null,
+  "expectedFinalBand": "Go",
+  "overrideReason": null,
+  "profileUsed": "default",
+  "expectedEvidenceGate": "fail",
+  "expectedGatedBand": "Go",
+  "expectedGateMissing": ["timingSaturation", "brandSafety", "audienceOrUseCase"],
+  "expectedDimensionCaps": [],
+  "expectedStability": "fragile",
+  "expectedDecisionType": "small test"
+}

@@ -64,13 +64,20 @@ function isKnownVendorMarketingPage(url: URL): boolean {
 }
 
 function isListicleOrAffiliate(url: URL): boolean {
-  const pathName = url.pathname.toLowerCase();
-  return (
-    pathName.includes("affordable") ||
-    pathName.includes("dupe") ||
-    pathName.includes("best-") ||
-    pathName.includes("top-")
-  );
+  const segments = url.pathname
+    .toLowerCase()
+    .split("/")
+    .filter(Boolean);
+
+  return segments.some((segment) => {
+    const tokens = segment.split("-");
+    return (
+      tokens.includes("affordable") ||
+      tokens.includes("dupe") ||
+      segment.startsWith("best-") ||
+      segment.startsWith("top-")
+    );
+  });
 }
 
 function isSingleRedditThread(url: URL): boolean {

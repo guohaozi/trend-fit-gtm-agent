@@ -118,6 +118,18 @@ describe("source-tier classifier guard", () => {
     assert.match(classification.reasons.join(" "), /supplier/i);
   });
 
+  it("does not treat normal words like desktop as top-listicle URL patterns", () => {
+    const classification = classifySourceTier({
+      sourceUrl: "https://www.theverge.com/2025/1/5/24328396/ugreen-nexode-500w-desktop-charger-usb-c-240w-power-delivery",
+      dimension: "timingSaturation",
+      verificationStatus: "verified",
+      sourceSignals: ["direct_competitor_campaign"]
+    });
+
+    assert.equal(classification.sourceTier, "primary");
+    assert.equal(classification.maxConfidence, "high");
+  });
+
   it("clamps requested evidence confidence to the source-tier ceiling", () => {
     assert.equal(clampEvidenceConfidence("high", "medium"), "medium");
     assert.equal(clampEvidenceConfidence("medium", "low"), "low");

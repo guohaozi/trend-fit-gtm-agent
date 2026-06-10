@@ -1,0 +1,210 @@
+{
+  "id": "dji_drones_uae_saudi_middle_east_video_creation_security_inspection_tourism_enablement_evidence",
+  "case": "dji_drones_uae_saudi_middle_east_video_creation_security_inspection_tourism_enablement",
+  "researchDate": "2026-06-10",
+  "tooling": "evidence:case:research + OpenCLI customer research provider",
+  "baselineScores": {
+    "audienceOverlap": 75,
+    "useCaseRelevance": 100,
+    "messageBridge": 75,
+    "creativeFeasibility": 75,
+    "commercialIntent": 75,
+    "brandSafety": 50,
+    "timingSaturation": 75
+  },
+  "evidence": [
+    {
+      "id": "opencli-youtube-audience-language-1",
+      "dimension": "audienceOverlap",
+      "direction": "confirm",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "proxy",
+      "sourceUrl": "https://www.youtube.com/watch?v=otxMp0Irm-I",
+      "note": "OpenCLI YouTube search hit. Quote: \"How To Do Automated Facade Inspections With Your DJI Drone\" Context: YouTube by Jays Tech Vault (unknown source type; tie-breaker goes to proxy)"
+    },
+    {
+      "id": "opencli-youtube-audience-language-2",
+      "dimension": "audienceOverlap",
+      "direction": "confirm",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "proxy",
+      "sourceUrl": "https://www.youtube.com/watch?v=s7bHiy0X1WU",
+      "note": "OpenCLI YouTube search hit. Quote: \"Transforming Energy Operations & Safety Using Drones In Saudi Arabia\" Context: YouTube by DJI Enterprise (unknown source type; tie-breaker goes to proxy)"
+    },
+    {
+      "id": "opencli-youtube-use-case-language-1",
+      "dimension": "useCaseRelevance",
+      "direction": "confirm",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "proxy",
+      "sourceUrl": "https://www.youtube.com/watch?v=otxMp0Irm-I",
+      "note": "OpenCLI YouTube search hit. Quote: \"How To Do Automated Facade Inspections With Your DJI Drone\" Context: YouTube by Jays Tech Vault (unknown source type; tie-breaker goes to proxy)"
+    },
+    {
+      "id": "opencli-youtube-use-case-language-2",
+      "dimension": "useCaseRelevance",
+      "direction": "confirm",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "proxy",
+      "sourceUrl": "https://www.youtube.com/watch?v=s7bHiy0X1WU",
+      "note": "OpenCLI YouTube search hit. Quote: \"Transforming Energy Operations & Safety Using Drones In Saudi Arabia\" Context: YouTube by DJI Enterprise (unknown source type; tie-breaker goes to proxy)"
+    },
+    {
+      "id": "opencli-youtube-brand-safety-concern-1",
+      "dimension": "brandSafety",
+      "direction": "down",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "proxy",
+      "sourceUrl": "https://www.youtube.com/watch?v=otxMp0Irm-I",
+      "note": "OpenCLI YouTube search hit. Quote: \"How To Do Automated Facade Inspections With Your DJI Drone\" Context: YouTube by Jays Tech Vault (unknown source type; tie-breaker goes to proxy)"
+    },
+    {
+      "id": "opencli-google-audience-language-1",
+      "dimension": "audienceOverlap",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "proxy",
+      "sourceUrl": "https://www.dji.com/",
+      "note": "OpenCLI Google search result. Type: result. DJI - Official Website. DJI technology empowers us to see the future of possible. Learn about our consumer drones like DJI Mavic 3 Pro, DJI Mini 4 Pro, DJI Air 3S, DJI Flip; ... (unknown source type; tie-breaker goes to proxy)"
+    },
+    {
+      "id": "opencli-google-audience-language-2",
+      "dimension": "audienceOverlap",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "proxy",
+      "sourceUrl": "https://en.yenisafak.com/world/saudi-deploys-drones-ai-to-boost-security-during-2026-hajj-3718593",
+      "note": "OpenCLI Google search result. Type: result. Saudi deploys drones, AI to boost security during 2026 Hajj. Drones are being used to track and apprehend violators of Hajj regulations, alongside fixed-wing aircraft tasked with monitoring illegal entry ... (unknown source type; tie-breaker goes to proxy)"
+    },
+    {
+      "id": "opencli-google-audience-language-3",
+      "dimension": "audienceOverlap",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "proxy",
+      "sourceUrl": "https://www.facebook.com/GulfNews.UAE/posts/drone-attack-footage-on-social-media-may-expose-defence-locations-expert-says/1375866884571687/",
+      "note": "OpenCLI Google search result. Type: result. Drone attack footage on social media may expose defence .... Facebook · Gulf News260+ reactions  ·  3 months ago (unknown source type; tie-breaker goes to proxy)"
+    },
+    {
+      "id": "opencli-google-use-case-language-1",
+      "dimension": "useCaseRelevance",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "proxy",
+      "sourceUrl": "https://en.yenisafak.com/world/saudi-deploys-drones-ai-to-boost-security-during-2026-hajj-3718593",
+      "note": "OpenCLI Google search result. Type: result. Saudi deploys drones, AI to boost security during 2026 Hajj. Drones are being used to track and apprehend violators of Hajj regulations, alongside fixed-wing aircraft tasked with monitoring illegal entry ... (unknown source type; tie-breaker goes to proxy)"
+    },
+    {
+      "id": "opencli-google-use-case-language-2",
+      "dimension": "useCaseRelevance",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "proxy",
+      "sourceUrl": "https://www.ddpmod.gov.in/sites/default/files/2023-11/ai.pdf",
+      "note": "OpenCLI Google search result. Type: result. AI. Swarm Drones can be effectively employed to detect enemy ground activities and target enemy ground forces to include troops, vehicles and command and control ... (unknown source type; tie-breaker goes to proxy)"
+    },
+    {
+      "id": "opencli-google-use-case-language-3",
+      "dimension": "useCaseRelevance",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "proxy",
+      "sourceUrl": "https://www.mdpi.com/2504-446X/9/9/603",
+      "note": "OpenCLI Google search result. Type: result. Integration of Drones in Landscape Research. This scoping review systematically explores and synthesises the technological applications of drones within the context of landscape studies, addressing a ... (unknown source type; tie-breaker goes to proxy)"
+    },
+    {
+      "id": "opencli-google-commercial-intent-1",
+      "dimension": "commercialIntent",
+      "direction": "up",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "proxy",
+      "sourceUrl": "https://www.dji.com/",
+      "note": "OpenCLI Google search result. Type: result. DJI - Official Website. DJI technology empowers us to see the future of possible. Learn about our consumer drones like DJI Mavic 3 Pro, DJI Mini 4 Pro, DJI Air 3S, DJI Flip; ... (unknown source type; tie-breaker goes to proxy)"
+    },
+    {
+      "id": "opencli-google-commercial-intent-2",
+      "dimension": "commercialIntent",
+      "direction": "up",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "proxy",
+      "sourceUrl": "https://smtmachineline.com/top-10-drone-companies-2026-strengthen-your-drone-pcb-with-proven-smt/",
+      "note": "OpenCLI Google search result. Type: result. Top 10 Drone Companies 2026 | Market Leaders & Technology. Who's really leading the drone market? Explore the Top 10 Drone Companies and see how SMT technology shapes next-gen UAV innovation and production. (listicle / affiliate / SEO source)"
+    },
+    {
+      "id": "opencli-google-brand-safety-concern-1",
+      "dimension": "brandSafety",
+      "direction": "down",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://asia.nikkei.com/business/china-tech/china-drone-maker-dji-turns-to-independent-audit-in-fight-against-us-ban",
+      "note": "OpenCLI Google search result. Type: result. China drone maker DJI turns to independent audit in fight .... The drone maker has been trying to prove its products do not have any security vulnerabilities since Washington began to crack down on its ... (verified secondary source signal)"
+    },
+    {
+      "id": "opencli-google-brand-safety-concern-2",
+      "dimension": "brandSafety",
+      "direction": "down",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.youtube.com/watch?v=nYUruJhC89c",
+      "note": "OpenCLI Google search result. Type: result. DJI Just Got Audited. Here's What They Actually Found.. YouTube · Coastal Drone11.2K+ views  ·  1 week ago (verified secondary source signal)"
+    },
+    {
+      "id": "opencli-google-brand-safety-concern-3",
+      "dimension": "brandSafety",
+      "direction": "down",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.facebook.com/GulfNews.UAE/posts/drone-attack-footage-on-social-media-may-expose-defence-locations-expert-says/1375866884571687/",
+      "note": "OpenCLI Google search result. Type: result. Drone attack footage on social media may expose defence .... Facebook · Gulf News260+ reactions  ·  3 months ago (verified secondary source signal)"
+    }
+  ],
+  "expectedAdjustedScores": {
+    "audienceOverlap": 75,
+    "useCaseRelevance": 100,
+    "messageBridge": 75,
+    "creativeFeasibility": 75,
+    "commercialIntent": 100,
+    "brandSafety": 0,
+    "timingSaturation": 75
+  },
+  "expectedAdjustedTotal": 76,
+  "expectedAdjustedBand": "Cautious test",
+  "profileUsed": "b2b_pipeline",
+  "expectedEvidenceGate": "partial",
+  "expectedGatedBand": "Cautious test",
+  "expectedGateMissing": [
+    "timingSaturation",
+    "audienceOrUseCase",
+    "commercialIntent"
+  ],
+  "expectedDimensionCaps": [
+    "commercialIntent"
+  ],
+  "expectedStability": "fragile",
+  "expectedDecisionType": "small test",
+  "expectedDimensionConfidence": {
+    "audienceOverlap": "evidence-confirmed (medium)",
+    "useCaseRelevance": "evidence-confirmed (medium)",
+    "messageBridge": "assumption",
+    "creativeFeasibility": "assumption",
+    "commercialIntent": "evidence-revised (medium)",
+    "brandSafety": "evidence-revised (medium)",
+    "timingSaturation": "assumption"
+  }
+}

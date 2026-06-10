@@ -1,0 +1,53 @@
+{
+  "id": "popmart_middle_east",
+  "product": {
+    "name": "POP MART collectible figures for Middle East retail and creator seeding",
+    "category": "designer toys / collectibles / character IP retail",
+    "targetMarket": ["UAE", "Saudi Arabia", "Qatar", "GCC mall retail", "young female collectors"],
+    "audience": "Young women, Gen Z and millennial shoppers, mall visitors, anime and Asian pop-culture fans, gift buyers, and creator-led collectible communities in the Gulf",
+    "priceRange": "Affordable premium impulse purchase; blind boxes and limited collectible drops",
+    "positioning": "An Asian pop-culture collectible and social-display product that turns mall browsing, gifting, bag charms, and creator content into a repeatable character-IP ritual",
+    "sellingPoints": [
+      "Strong character-IP collectibility",
+      "Blind-box repeat-purchase mechanics",
+      "Highly visual creator and social-display format",
+      "Works naturally in high-footfall mall and gifting environments"
+    ],
+    "brandTone": "Playful, collectible, premium-cute, social, culturally careful",
+    "competitors": ["Miniso", "Sanrio", "Funko", "Tokidoki", "anime merchandise retailers", "mall gift and toy stores"],
+    "campaignGoal": "Brand awareness + creator seeding + mall retail demand validation",
+    "riskTolerance": "high"
+  },
+  "trend": {
+    "name": "Asian pop-culture collectibles and mall-based social display in the Gulf",
+    "platform": "TikTok, Instagram, malls, creator seeding, retail drops",
+    "region": "Middle East / GCC",
+    "description": "Gulf youth culture is increasingly open to Asian pop-culture formats, anime, immersive mall retail, and visible collectible accessories, creating room for POP MART-style character drops and creator-led social display.",
+    "drivenBy": "Young affluent shoppers, luxury mall traffic, anime and Asian entertainment investment, creator-led accessory culture, blind-box scarcity, and gifting behavior",
+    "format": "Mall pop-up, creator unboxing, Labubu or Molly bag-charm styling, limited drop queue, gifting edit, collector shelf tour",
+    "whyPopular": "The product is visual, giftable, status-adjacent, and easy to turn into creator content while fitting Gulf mall and social shopping rituals.",
+    "exampleContent": "A Riyadh or Dubai creator styles a Labubu charm on a designer bag, opens a limited blind box in a mall, and invites followers to vote on the next character drop.",
+    "controversy": "Counterfeits, choking-risk coverage, backlash against overconsumption, and cultural/religious interpretation risks can make the campaign feel unsafe if it leans into hype without guardrails."
+  },
+  "scores": {
+    "audienceOverlap": 75,
+    "useCaseRelevance": 75,
+    "messageBridge": 75,
+    "creativeFeasibility": 100,
+    "commercialIntent": 75,
+    "brandSafety": 50,
+    "timingSaturation": 50
+  },
+  "expectedTotal": 74,
+  "expectedBand": "Go",
+  "expectedQualifier": null,
+  "expectedFinalBand": "Go",
+  "overrideReason": null,
+  "profileUsed": "brand_awareness",
+  "expectedEvidenceGate": "fail",
+  "expectedGatedBand": "Go",
+  "expectedGateMissing": ["timingSaturation", "brandSafety", "audienceOrUseCase"],
+  "expectedDimensionCaps": ["creativeFeasibility"],
+  "expectedStability": "fragile",
+  "expectedDecisionType": "small test"
+}

@@ -1,0 +1,114 @@
+{
+  "id": "latam_gaming_peripherals_evidence",
+  "case": "latam_gaming_peripherals",
+  "researchDate": "2026-06-10",
+  "tooling": "manual browser research fallback + P5 evidence-case orchestrator; no GooseWorks/OpenCLI provider calls in this run",
+  "baselineScores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 75,
+    "creativeFeasibility": 75,
+    "commercialIntent": 75,
+    "brandSafety": 75,
+    "timingSaturation": 75
+  },
+  "evidence": [
+    {
+      "id": "latam-gaming-audience-newzoo-market-size",
+      "dimension": "audienceOverlap",
+      "direction": "confirm",
+      "magnitude": "strong",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Video_game_industry",
+      "note": "The video-game industry market table cites Newzoo data placing Brazil and Mexico among the world's largest game markets by revenue and player count. This confirms strong audience overlap for gaming hardware. (verified secondary source signal)"
+    },
+    {
+      "id": "latam-gaming-usecase-free-fire-rio",
+      "dimension": "useCaseRelevance",
+      "direction": "confirm",
+      "magnitude": "strong",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Free_Fire_World_Series_%E2%80%93_Global_Finals_2024",
+      "note": "The 2024 Free Fire World Series Global Finals were held in Rio de Janeiro and broadcast on YouTube, TikTok, and Facebook, confirming a visible esports/content use case in Brazil. (verified secondary source signal)"
+    },
+    {
+      "id": "latam-gaming-message-budget-performance",
+      "dimension": "messageBridge",
+      "direction": "up",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.tomsguide.com/computing/mice/logitech-g-pro-x2-superstrike-review",
+      "note": "Tom's Guide's Logitech G Pro X2 Superstrike review explicitly frames premium gaming mice as expensive and names lower-cost alternatives including Redragon M916. This supports the message bridge from Chinese value hardware to credible performance. (verified secondary source signal)"
+    },
+    {
+      "id": "latam-gaming-commercial-redragon-brazil",
+      "dimension": "commercialIntent",
+      "direction": "up",
+      "magnitude": "strong",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.redragon.com.br/",
+      "note": "Redragon Brasil has localized product categories for keyboards, mice, headsets, gamepads, and official store/support links, showing value gaming peripherals are already commercialized locally. This moves Commercial Intent from 75 to 100. (verified secondary source signal)"
+    },
+    {
+      "id": "latam-gaming-creative-setup-content",
+      "dimension": "creativeFeasibility",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.pcgamer.com/cyber-monday-pc-gaming-deals/",
+      "note": "PC Gamer's deal coverage shows gaming accessories like Redragon keyboards can be explained through concrete specs, price comparisons, and setup-upgrade content. Creative Feasibility stays at 75. (verified secondary source signal)"
+    },
+    {
+      "id": "latam-gaming-timing-free-fire-broadcast",
+      "dimension": "timingSaturation",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Free_Fire_World_Series_%E2%80%93_Global_Finals_2024",
+      "note": "The Rio-hosted Free Fire finals and social-platform broadcasts confirm esports/content timing, while the established competitor set keeps Timing & Saturation at 75 rather than 100. (verified secondary source signal)"
+    },
+    {
+      "id": "latam-gaming-safety-local-support",
+      "dimension": "brandSafety",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.redragon.com.br/",
+      "note": "Redragon Brasil exposes support, software/download, reseller, and importer/distributor links. This confirms the category's trust bar: local support and warranty matter, but Brand Safety can remain at 75 if handled explicitly. (verified secondary source signal)"
+    }
+  ],
+  "expectedAdjustedScores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 100,
+    "creativeFeasibility": 75,
+    "commercialIntent": 100,
+    "brandSafety": 75,
+    "timingSaturation": 75
+  },
+  "expectedAdjustedTotal": 93,
+  "expectedAdjustedBand": "Strong Go",
+  "profileUsed": "ecommerce_conversion",
+  "expectedEvidenceGate": "pass",
+  "expectedGatedBand": "Strong Go",
+  "expectedGateMissing": [],
+  "expectedDimensionCaps": [],
+  "expectedStability": "moderate",
+  "expectedDecisionType": "organic push",
+  "expectedDimensionConfidence": {
+    "audienceOverlap": "evidence-confirmed (high)",
+    "useCaseRelevance": "evidence-confirmed (high)",
+    "messageBridge": "evidence-revised (high)",
+    "creativeFeasibility": "evidence-confirmed (high)",
+    "commercialIntent": "evidence-revised (high)",
+    "brandSafety": "evidence-confirmed (high)",
+    "timingSaturation": "evidence-confirmed (high)"
+  }
+}

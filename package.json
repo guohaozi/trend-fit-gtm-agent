@@ -7,7 +7,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "tsx --test tests/*.test.ts"
+    "test": "node --import tsx --test tests/*.test.ts",
+    "evidence:case": "node --import tsx scripts/evidence-case.ts",
+    "evidence:case:research": "node --import tsx scripts/evidence-case-research.ts"
   },
   "dependencies": {
     "next": "^15.3.4",

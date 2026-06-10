@@ -9,6 +9,7 @@ import {
   getBand,
   isAllowedScore
 } from "../lib/scoring";
+import { calculateTrendFitWithProfile } from "../lib/recommendation-rigor";
 import type { DemoCase, Scores } from "../lib/types";
 
 const dataDir = path.join(process.cwd(), "data");
@@ -23,7 +24,10 @@ describe("Trend-Fit scoring contract", () => {
     ["demo_robotics.json", 74, "Go", "trust-building angle"],
     ["demo_ai_tool.json", 89, "Strong Go", null],
     ["demo_snack.json", 81, "Go", null],
-    ["demo_protein_drink.json", 78, "Go", null]
+    ["demo_protein_drink.json", 78, "Go", null],
+    ["savas_china.json", 78, "Go", null],
+    ["obge_china.json", 75, "Go", null],
+    ["anker_europe.json", 85, "Strong Go", null]
   ] as const;
 
   for (const [fileName, total, band, qualifier] of demos) {
@@ -41,6 +45,62 @@ describe("Trend-Fit scoring contract", () => {
       assert.equal(result.recommendation.overrideReason, demo.overrideReason);
     });
   }
+
+  it("service_robot_japan.json computes the frozen B2B pipeline total and recommendation", () => {
+    const demo = readDemo("service_robot_japan.json");
+    const result = calculateTrendFitWithProfile(demo.scores, demo.product.riskTolerance, "b2b_pipeline", {
+      qualifier: demo.expectedQualifier
+    });
+
+    assert.equal(result.total, 88);
+    assert.equal(result.total, demo.expectedTotal);
+    assert.equal(result.recommendation.rawBand, "Strong Go");
+    assert.equal(result.recommendation.finalBand, demo.expectedFinalBand);
+    assert.equal(result.recommendation.qualifier, null);
+    assert.equal(result.recommendation.overrideReason, demo.overrideReason);
+  });
+
+  it("popmart_middle_east.json computes the frozen brand-awareness total and recommendation", () => {
+    const demo = readDemo("popmart_middle_east.json");
+    const result = calculateTrendFitWithProfile(demo.scores, demo.product.riskTolerance, "brand_awareness", {
+      qualifier: demo.expectedQualifier
+    });
+
+    assert.equal(result.total, 74);
+    assert.equal(result.total, demo.expectedTotal);
+    assert.equal(result.recommendation.rawBand, "Go");
+    assert.equal(result.recommendation.finalBand, demo.expectedFinalBand);
+    assert.equal(result.recommendation.qualifier, null);
+    assert.equal(result.recommendation.overrideReason, demo.overrideReason);
+  });
+
+  it("thailand_ev.json computes the frozen ecommerce-conversion total and recommendation", () => {
+    const demo = readDemo("thailand_ev.json");
+    const result = calculateTrendFitWithProfile(demo.scores, demo.product.riskTolerance, "ecommerce_conversion", {
+      qualifier: demo.expectedQualifier
+    });
+
+    assert.equal(result.total, 83);
+    assert.equal(result.total, demo.expectedTotal);
+    assert.equal(result.recommendation.rawBand, "Go");
+    assert.equal(result.recommendation.finalBand, demo.expectedFinalBand);
+    assert.equal(result.recommendation.qualifier, null);
+    assert.equal(result.recommendation.overrideReason, demo.overrideReason);
+  });
+
+  it("latam_gaming_peripherals.json computes the frozen ecommerce-conversion total and recommendation", () => {
+    const demo = readDemo("latam_gaming_peripherals.json");
+    const result = calculateTrendFitWithProfile(demo.scores, demo.product.riskTolerance, "ecommerce_conversion", {
+      qualifier: demo.expectedQualifier
+    });
+
+    assert.equal(result.total, 84);
+    assert.equal(result.total, demo.expectedTotal);
+    assert.equal(result.recommendation.rawBand, "Go");
+    assert.equal(result.recommendation.finalBand, demo.expectedFinalBand);
+    assert.equal(result.recommendation.qualifier, null);
+    assert.equal(result.recommendation.overrideReason, demo.overrideReason);
+  });
 
   it("rejects off-anchor score values", () => {
     assert.deepEqual(ALLOWED_SCORE_VALUES, [0, 25, 50, 75, 100]);

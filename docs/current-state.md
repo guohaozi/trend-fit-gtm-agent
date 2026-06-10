@@ -10,12 +10,18 @@ This file is a handoff snapshot for starting a fresh Codex / Claude conversation
 - Git branch: `main`
 - Public GitHub repo: `https://github.com/guohaozi/trend-fit-gtm-agent`
 - Remote: `origin https://github.com/guohaozi/trend-fit-gtm-agent.git`
-- Current state: v1.2 rigor layer is implemented in docs, skills, TypeScript, tests, UI, four main evidence-backed demo cases, one competitor-layer AI-tool evidence variant, and P0-P4 evidence automation provider layers.
-- Automation status: P0 product-marketing context, P1 evidence case generator, P2 customer-research provider, P3 SEO/timing provider, and P4 competitor provider are done. P5 orchestration, which merges P2/P3/P4 findings and hands them to P1 automatically, has not been implemented yet.
+- Current state: v1.2 rigor layer is implemented in docs, skills, TypeScript, tests, UI, seven new 15-case-list evidence-backed cases, one competitor-layer AI-tool evidence variant, P0-P4 evidence automation provider layers, P5a/b offline evidence-case orchestration, P5c CLI/file writer, and the first live OpenCLI-backed research CLI.
+- Automation status: P0 product-marketing context, P1 evidence case generator, P2 customer-research provider, P3 SEO/timing provider, P4 competitor provider, P5a/b offline orchestration, P5c CLI/file writer, and product+market+trend research runner are done. Trend discovery / shortlist orchestration has not been implemented yet.
+- Latest automation layer: `lib/evidence-case-research-runner.ts`, `lib/opencli-research-source.ts`, and `scripts/evidence-case-research.ts` add `npm run evidence:case:research`, which starts from product + market + trend, builds research queries, can use fixture / web / OpenCLI providers, converts results into evidence inputs, then writes `data/*_evidence.json` and `outputs/*_evidence_case.md`. The OpenCLI provider maps Reddit and YouTube search rows into `customerResearchFindings`, and maps Twitter/X plus Google Search rows into conservative `additionalCandidates`. It now tolerates individual OpenCLI command failures and applies relevance guards before rows become evidence. Xiaohongshu, TikTok, Google Trends, GooseWorks, and marketplace-specific mappers are the next provider adapters.
+- Latest live research proof: DJI drones entering UAE / Saudi / Middle East for video creation, security inspection, and tourism enablement can be generated with OpenCLI via `npm run evidence:case:research`. The current generated report is `outputs/dji_drones_uae_saudi_middle_east_video_creation_security_inspection_tourism_enablement_evidence_case.md`; latest run produced 16 accepted evidence items, `76 / Cautious test`, evidence gate `partial`, stability `fragile`.
+- File-writing layer: `lib/evidence-case-file-writer.ts` and `scripts/evidence-case.ts` provide a real file-writing CLI. Run `npm run evidence:case -- --input examples/evidence-case-input.example.json` to merge provider findings, apply source-tier classification, generate `data/*_evidence.json`, and generate `outputs/*_evidence_case.md`.
 - Latest provider layer: `lib/competitor-research-provider.ts` maps competitor-profiling / product-swipefile style extracts into `EvidenceCandidate[]`, then the existing collector and generator compute source-tiered evidence cases.
 - Latest competitor case: `data/demo_ai_tool_competitor_evidence.json` and `outputs/demo_ai_tool_competitor_evidence_case.md`. It keeps the AI photo-tool read at `85 / Strong Go`, gate `pass`, but fragile because competitor crowding lowers Timing and Evoto backlash lowers Brand Safety while Audience and Creative remain unsupported-high.
+- Latest new 15-case-list evidence cases: `data/thailand_ev.json`, `data/thailand_ev_evidence.json`, `outputs/thailand_ev_evidence_case.md`, plus `data/latam_gaming_peripherals.json`, `data/latam_gaming_peripherals_evidence.json`, and `outputs/latam_gaming_peripherals_evidence_case.md`. Both use the `ecommerce_conversion` profile; Thailand EV lands at `90 / Strong Go`, gate `pass`, stability `moderate`, decision type `organic push`; LatAm gaming peripherals lands at `93 / Strong Go`, gate `pass`, stability `moderate`, decision type `organic push`.
+- First seven 15-case-list evidence cases are done: SAVAS China, OBgE China, Anker Europe, Japan service robots, POP MART Middle East, Thailand EV, and LatAm gaming peripherals. Recommended next step: compare the seven cases as a shortlist, or implement product-only trend discovery so the system can move from "product + market + trend" to "product -> 3-5 candidate trends -> ranked shortlist".
 - Latest product case: convenience-store RTD protein drink x everyday protein / lifestyle weight management. Baseline `78 / Go`; evidence-adjusted `85 / Strong Go`; gate passes, but stability is fragile because it sits exactly on the Strong Go threshold and health-claim risk remains real.
 - Latest round added the first `evidence-collector` implementation: reusable source-tier classification code, an evidence draft builder, tests, and a project skill that can borrow GooseWorks/manual research as candidate-source input without letting the research agent self-grade evidence upward.
+- Latest classifier fix: `desktop-charger` URL paths no longer accidentally trigger the `top-` listicle pattern. This was found while building the Anker Europe case.
 - Previous round implemented the source-tier classifier as an executable test guard and re-audited the fashion, AI-tool, and snack evidence cases against it.
 - The project is now published to GitHub. Latest pushed code commit before this handoff-doc update: `4c286c6 Add competitor evidence provider`.
 - Previous review round was a Claude **review + fix** pass on the evidence cases Codex produced: it verified the cited sources are real, found a source-tier inflation bug in the AI-tool case, fixed it, and added a deterministic source-tier classifier to prevent recurrence.
@@ -53,7 +59,8 @@ This was the recommended order from the project-history review:
 3. **P2: Customer-research provider.** Done in `lib/customer-research-provider.ts` and `lib/opencli-customer-research.ts`; customer research and OpenCLI-style records normalize to `EvidenceCandidate[]`.
 4. **P3: Timing / search / SEO provider.** Done in `lib/seo-keyword-provider.ts`; SEO and Google Trends-style findings normalize to Timing / Commercial Intent / Message evidence candidates.
 5. **P4: Competitor provider.** Done in `lib/competitor-research-provider.ts`; competitor-profiling and product-swipefile extracts normalize to `EvidenceCandidate[]`.
-6. **P5: Evidence case orchestration.** Not done. Next implementation should merge P2/P3/P4 provider outputs into one candidate list, call `buildEvidenceDraft()`, then call `generateEvidenceAdjustmentCaseFromDraft()`.
+6. **P5a/b: Evidence case orchestration.** Done in `lib/evidence-case-orchestrator.ts` with `tests/evidence-case-orchestrator.test.ts`. It merges P2/P3/P4 provider outputs plus optional verified manual/browser `additionalCandidates` into one candidate list, calls `buildEvidenceDraft()`, then calls `generateEvidenceAdjustmentCaseFromDraft()`.
+7. **P5c: Evidence case CLI/file writer.** Done in `lib/evidence-case-file-writer.ts`, `scripts/evidence-case.ts`, and `tests/evidence-case-file-writer.test.ts`. It reads provider JSON input, writes `data/*_evidence.json`, and writes `outputs/*_evidence_case.md`.
 
 Earlier foundational work:
 
@@ -73,44 +80,125 @@ Earlier foundational work:
 
 The user asked whether the project is ready to "搞自动化 evidence case" and whether the
 right design is to merge P2/P3/P4 before handing the result to P1. The answer is yes:
-the provider layers are ready enough for the next step, but the orchestrator itself is
-not written yet.
+the provider layers were ready enough for that step, and the offline orchestrator is now
+written.
+
+## Live Evidence Research CLI Handoff
+
+What is now runnable:
+
+```bash
+cd /Users/guo/gtm/trend-fit-gtm-agent
+
+npm run evidence:case:research -- \
+  --product "DJI drones" \
+  --market "UAE Saudi Middle East" \
+  --trend "video creation security inspection tourism enablement" \
+  --risk high \
+  --profile b2b_pipeline \
+  --provider opencli \
+  --platforms reddit,youtube,twitter,google \
+  --opencli-bin /Users/guo/.npm-global/bin/opencli \
+  --limit 3
+```
+
+Expected outputs:
+
+- `data/dji_drones_uae_saudi_middle_east_video_creation_security_inspection_tourism_enablement_evidence.json`
+- `outputs/dji_drones_uae_saudi_middle_east_video_creation_security_inspection_tourism_enablement_evidence_case.md`
+
+Latest DJI run:
+
+- Candidate / accepted evidence count: `16 / 16`.
+- Evidence-adjusted read: `76 / Cautious test`.
+- Evidence gate: `partial`.
+- Stability: `fragile`.
+- Main reason gate remains partial: Timing & Saturation has no hard Google Trends / SEO evidence yet; Message Bridge and Creative Feasibility are still assumptions.
+
+OpenCLI operational notes:
+
+- OpenCLI binary: `/Users/guo/.npm-global/bin/opencli`.
+- If OpenCLI reports `BROWSER_CONNECT`, run:
+
+```bash
+PATH=/Users/guo/.npm-global/bin:$PATH opencli daemon restart
+PATH=/Users/guo/.npm-global/bin:$PATH opencli doctor
+```
+
+- In the last session, `opencli doctor` became healthy only when run outside the sandbox:
+  daemon running, Browser Bridge extension connected.
+- Reddit can sometimes return HTML / adapter parse errors. The CLI now uses
+  `continueOnCommandError: true` for OpenCLI provider runs so one platform failure does
+  not kill the entire case.
+
+Evidence hygiene added this round:
+
+- OpenCLI rows are filtered before becoming findings/candidates.
+- Reddit / YouTube / Twitter rows must hit product/category terms and also market or
+  trend terms.
+- Google Search rows can still pass on broader product or market+trend relevance because
+  they are treated conservatively as proxy / secondary candidates by the classifier.
+- Long social rows only use leading text for relevance checks, so a long unrelated post
+  cannot pass just because it mentions "drones" deep in the body.
+
+Known limitations:
+
+- Google Search is not Google Trends. It should not be treated as hard Timing evidence.
+- Current Google rows still include some broad web/search results and listicles. The
+  source-tier classifier caps them, but next provider work should add real SERPAPI /
+  Google Trends / SEO timing data.
+- Twitter/X and YouTube rows are useful for raw language and weak use-case evidence, but
+  they should not decide final scores without the classifier and gate layer.
+- Xiaohongshu and TikTok adapters exist in OpenCLI but are not mapped yet.
+- Trend discovery / shortlist is still not implemented. The current CLI assumes the user
+  already supplies product + market + trend.
 
 Recommended next implementation:
 
-- Add `lib/evidence-case-orchestrator.ts`.
-- Export an `orchestrateEvidenceCase()` function that accepts:
+1. Add a real Google Trends / SEO execution provider around the existing
+   `seo-keyword-provider.ts` shape.
+2. Add Xiaohongshu / TikTok row mappers as raw social candidate providers.
+3. Add a shortlist runner: product + market -> 3-5 candidate trends -> run
+   `evidence:case:research` for each -> rank by gated evidence score and missing slots.
+
+What landed:
+
+- Added `lib/evidence-case-orchestrator.ts`.
+- Added `tests/evidence-case-orchestrator.test.ts`.
+- Exported an `orchestrateEvidenceCase()` function that accepts:
   - baseline metadata: `id`, `caseId`, `researchDate`, `baselineScores`,
     `riskTolerance`, optional `profileUsed`, optional `tooling`;
   - optional `customerResearchFindings`;
   - optional `seoKeywordFindings`;
   - optional `competitorResearchFindings`.
-- Convert each provider finding list through the existing mapper:
+- It converts each provider finding list through the existing mapper:
   - `customerResearchFindingsToCandidates()`;
   - `seoKeywordFindingsToCandidates()`;
   - `competitorResearchFindingsToCandidates()`.
-- Concatenate candidates in a deterministic order: customer -> SEO/timing -> competitor.
-- Call `buildEvidenceDraft()` once on the merged candidates.
-- Call `generateEvidenceAdjustmentCaseFromDraft()` on the draft.
-- Return `{ candidates, draft, evidenceCase }`.
+- It concatenates candidates in deterministic order: customer -> SEO/timing -> competitor.
+- It also accepts optional `additionalCandidates` for verified manual/browser research,
+  appended after provider-derived candidates.
+- It calls `buildEvidenceDraft()` once on the merged candidates.
+- It calls `generateEvidenceAdjustmentCaseFromDraft()` on the draft.
+- It returns `{ candidates, draft, evidenceCase }`.
 
-Suggested first test:
+Test coverage:
 
-- Add `tests/evidence-case-orchestrator.test.ts`.
-- Use fixture-only provider findings, not network calls.
-- Assert the merged candidate IDs preserve provider order.
-- Assert the generated draft applies source tiers conservatively.
-- Assert the generated `EvidenceAdjustmentCase` has the expected adjusted scores, gate,
+- Uses fixture-only provider findings, not network calls.
+- Asserts the merged candidate IDs preserve provider order.
+- Asserts the generated draft applies source tiers conservatively.
+- Asserts the generated `EvidenceAdjustmentCase` has the expected adjusted scores, gate,
   and missing-gate list.
 
 Design boundary:
 
-- P5 should still be offline and deterministic. It should not browse, call OpenCLI, or
+- P5 remains offline and deterministic. It does not browse, call OpenCLI, or
   write files yet.
 - Network/platform calls belong in provider adapters. The orchestrator should only join
   normalized findings and hand them through the collector/generator pipeline.
-- After this library layer is tested, add a CLI/script that reads provider JSON fixtures
-  and writes `data/*_evidence.json` plus `outputs/*_evidence_case.md`.
+- P5c file writing is now done in `lib/evidence-case-file-writer.ts` and
+  `scripts/evidence-case.ts`; future work should focus on live provider execution and
+  trend-shortlist orchestration, not another offline writer.
 
 ## P4 Competitor Provider Handoff
 

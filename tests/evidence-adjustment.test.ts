@@ -8,6 +8,7 @@ import {
   type EvidenceAdjustmentCase,
   type EvidenceItem
 } from "../lib/evidence-adjustment";
+import { calculateTrendFitWithProfile } from "../lib/recommendation-rigor";
 import { calculateTrendFit } from "../lib/scoring";
 import type { Scores } from "../lib/types";
 
@@ -72,6 +73,83 @@ describe("evidence adjustment model", () => {
     const evidenceCase = readEvidenceCase("demo_protein_drink_evidence.json");
     const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
     const result = calculateTrendFit(adjustment.adjusted, "medium");
+
+    assert.deepEqual(adjustment.adjusted, evidenceCase.expectedAdjustedScores);
+    assert.equal(result.total, evidenceCase.expectedAdjustedTotal);
+    assert.equal(result.recommendation.finalBand, evidenceCase.expectedAdjustedBand);
+    assert.deepEqual(adjustment.confidenceByDimension, evidenceCase.expectedDimensionConfidence);
+  });
+
+  it("recomputes the SAVAS China evidence case as a guarded Go", () => {
+    const evidenceCase = readEvidenceCase("savas_china_evidence.json");
+    const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
+    const result = calculateTrendFit(adjustment.adjusted, "medium");
+
+    assert.deepEqual(adjustment.adjusted, evidenceCase.expectedAdjustedScores);
+    assert.equal(result.total, evidenceCase.expectedAdjustedTotal);
+    assert.equal(result.recommendation.finalBand, evidenceCase.expectedAdjustedBand);
+    assert.deepEqual(adjustment.confidenceByDimension, evidenceCase.expectedDimensionConfidence);
+  });
+
+  it("recomputes the OBgE China evidence case as a guarded Go", () => {
+    const evidenceCase = readEvidenceCase("obge_china_evidence.json");
+    const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
+    const result = calculateTrendFit(adjustment.adjusted, "high");
+
+    assert.deepEqual(adjustment.adjusted, evidenceCase.expectedAdjustedScores);
+    assert.equal(result.total, evidenceCase.expectedAdjustedTotal);
+    assert.equal(result.recommendation.finalBand, evidenceCase.expectedAdjustedBand);
+    assert.deepEqual(adjustment.confidenceByDimension, evidenceCase.expectedDimensionConfidence);
+  });
+
+  it("recomputes the Anker Europe evidence case as a fragile Strong Go", () => {
+    const evidenceCase = readEvidenceCase("anker_europe_evidence.json");
+    const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
+    const result = calculateTrendFit(adjustment.adjusted, "medium");
+
+    assert.deepEqual(adjustment.adjusted, evidenceCase.expectedAdjustedScores);
+    assert.equal(result.total, evidenceCase.expectedAdjustedTotal);
+    assert.equal(result.recommendation.finalBand, evidenceCase.expectedAdjustedBand);
+    assert.deepEqual(adjustment.confidenceByDimension, evidenceCase.expectedDimensionConfidence);
+  });
+
+  it("recomputes the Japan service robot evidence case with the B2B profile", () => {
+    const evidenceCase = readEvidenceCase("service_robot_japan_evidence.json");
+    const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
+    const result = calculateTrendFitWithProfile(adjustment.adjusted, "high", "b2b_pipeline");
+
+    assert.deepEqual(adjustment.adjusted, evidenceCase.expectedAdjustedScores);
+    assert.equal(result.total, evidenceCase.expectedAdjustedTotal);
+    assert.equal(result.recommendation.finalBand, evidenceCase.expectedAdjustedBand);
+    assert.deepEqual(adjustment.confidenceByDimension, evidenceCase.expectedDimensionConfidence);
+  });
+
+  it("recomputes the POP MART Middle East evidence case with the brand-awareness profile", () => {
+    const evidenceCase = readEvidenceCase("popmart_middle_east_evidence.json");
+    const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
+    const result = calculateTrendFitWithProfile(adjustment.adjusted, "high", "brand_awareness");
+
+    assert.deepEqual(adjustment.adjusted, evidenceCase.expectedAdjustedScores);
+    assert.equal(result.total, evidenceCase.expectedAdjustedTotal);
+    assert.equal(result.recommendation.finalBand, evidenceCase.expectedAdjustedBand);
+    assert.deepEqual(adjustment.confidenceByDimension, evidenceCase.expectedDimensionConfidence);
+  });
+
+  it("recomputes the Thailand EV evidence case with the ecommerce-conversion profile", () => {
+    const evidenceCase = readEvidenceCase("thailand_ev_evidence.json");
+    const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
+    const result = calculateTrendFitWithProfile(adjustment.adjusted, "high", "ecommerce_conversion");
+
+    assert.deepEqual(adjustment.adjusted, evidenceCase.expectedAdjustedScores);
+    assert.equal(result.total, evidenceCase.expectedAdjustedTotal);
+    assert.equal(result.recommendation.finalBand, evidenceCase.expectedAdjustedBand);
+    assert.deepEqual(adjustment.confidenceByDimension, evidenceCase.expectedDimensionConfidence);
+  });
+
+  it("recomputes the LatAm gaming peripherals evidence case with the ecommerce-conversion profile", () => {
+    const evidenceCase = readEvidenceCase("latam_gaming_peripherals_evidence.json");
+    const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);
+    const result = calculateTrendFitWithProfile(adjustment.adjusted, "high", "ecommerce_conversion");
 
     assert.deepEqual(adjustment.adjusted, evidenceCase.expectedAdjustedScores);
     assert.equal(result.total, evidenceCase.expectedAdjustedTotal);

@@ -1,0 +1,114 @@
+{
+  "id": "thailand_ev_evidence",
+  "case": "thailand_ev",
+  "researchDate": "2026-06-10",
+  "tooling": "manual browser research fallback + P5 evidence-case orchestrator; no GooseWorks/OpenCLI provider calls in this run",
+  "baselineScores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 100,
+    "creativeFeasibility": 50,
+    "commercialIntent": 75,
+    "brandSafety": 50,
+    "timingSaturation": 75
+  },
+  "evidence": [
+    {
+      "id": "thailand-ev-audience-fast-growing-market",
+      "dimension": "audienceOverlap",
+      "direction": "confirm",
+      "magnitude": "strong",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.businessinsider.com/byd-saic-chinese-ev-makers-plot-world-takeover-2024-6",
+      "note": "Business Insider, citing ABI Research and Counterpoint, reports fast EV growth in Thailand and strong Chinese EV share. This confirms the target audience is already considering Chinese EV brands, not just abstract green mobility. (verified secondary source signal)"
+    },
+    {
+      "id": "thailand-ev-usecase-ap-government-incentives",
+      "dimension": "useCaseRelevance",
+      "direction": "confirm",
+      "magnitude": "strong",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://apnews.com/article/7dd2fafaea96e5eec19fadb06ee84b86",
+      "note": "AP reports Thailand's EV market is growing with government incentives and a national target to shift 30% of annual vehicle output to EVs by 2030, confirming the commuting and family-vehicle use case. (verified secondary source signal)"
+    },
+    {
+      "id": "thailand-ev-message-chinese-cost-advantage",
+      "dimension": "messageBridge",
+      "direction": "confirm",
+      "magnitude": "strong",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.businessinsider.com/byd-saic-chinese-ev-makers-plot-world-takeover-2024-6",
+      "note": "Business Insider explains that Chinese automakers' cost advantage is central to their push in developing markets. This supports the message bridge around lower total ownership cost and price-performance versus legacy ICE/hybrid alternatives. (verified secondary source signal)"
+    },
+    {
+      "id": "thailand-ev-commercial-byd-share",
+      "dimension": "commercialIntent",
+      "direction": "up",
+      "magnitude": "strong",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.businessinsider.com/byd-saic-chinese-ev-makers-plot-world-takeover-2024-6",
+      "note": "The same report says Chinese automakers accounted for a large share of Thailand EV sales in Q1 2024, with BYD alone taking a major share. This moves Commercial Intent from 75 to 100 because there is actual purchase conversion, not only awareness. (verified secondary source signal)"
+    },
+    {
+      "id": "thailand-ev-timing-byd-local-factory",
+      "dimension": "timingSaturation",
+      "direction": "confirm",
+      "magnitude": "strong",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://en.wikipedia.org/wiki/BYD_Auto",
+      "note": "BYD's Thailand section summarizes the Rayong plant opening in July 2024 with annual capacity of 150,000 vehicles. This confirms timing and local-production momentum, while also implying a more crowded EV market. (verified secondary source signal)"
+    },
+    {
+      "id": "thailand-ev-creative-test-drive-funnel",
+      "dimension": "creativeFeasibility",
+      "direction": "up",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://apnews.com/article/7dd2fafaea96e5eec19fadb06ee84b86",
+      "note": "AP notes EV brands displaying models at the Bangkok International Motor Show and using dealer/showroom expansion, supporting concrete creative mechanics around test drives, comparison tools, and showroom conversion content. (verified secondary source signal)"
+    },
+    {
+      "id": "thailand-ev-safety-price-war-trust",
+      "dimension": "brandSafety",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://apnews.com/article/7dd2fafaea96e5eec19fadb06ee84b86",
+      "note": "AP frames Thailand as attractive but highly competitive, with Chinese EVs, Tesla, and VinFast all in the market. This confirms Brand Safety at 50 because trust, discounting, dealer experience, resale value, and charging confidence must be managed carefully. (verified secondary source signal)"
+    }
+  ],
+  "expectedAdjustedScores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 100,
+    "creativeFeasibility": 75,
+    "commercialIntent": 100,
+    "brandSafety": 50,
+    "timingSaturation": 75
+  },
+  "expectedAdjustedTotal": 90,
+  "expectedAdjustedBand": "Strong Go",
+  "profileUsed": "ecommerce_conversion",
+  "expectedEvidenceGate": "pass",
+  "expectedGatedBand": "Strong Go",
+  "expectedGateMissing": [],
+  "expectedDimensionCaps": [],
+  "expectedStability": "moderate",
+  "expectedDecisionType": "organic push",
+  "expectedDimensionConfidence": {
+    "audienceOverlap": "evidence-confirmed (high)",
+    "useCaseRelevance": "evidence-confirmed (high)",
+    "messageBridge": "evidence-confirmed (high)",
+    "creativeFeasibility": "evidence-revised (high)",
+    "commercialIntent": "evidence-revised (high)",
+    "brandSafety": "evidence-confirmed (high)",
+    "timingSaturation": "evidence-confirmed (high)"
+  }
+}

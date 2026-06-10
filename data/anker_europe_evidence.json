@@ -1,0 +1,114 @@
+{
+  "id": "anker_europe_evidence",
+  "case": "anker_europe",
+  "researchDate": "2026-06-10",
+  "tooling": "manual browser research fallback + P5 evidence-case orchestrator; no GooseWorks/OpenCLI provider calls in this run",
+  "baselineScores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 75,
+    "creativeFeasibility": 75,
+    "commercialIntent": 100,
+    "brandSafety": 75,
+    "timingSaturation": 50
+  },
+  "evidence": [
+    {
+      "id": "anker-audience-eu-usbc-laptops",
+      "dimension": "audienceOverlap",
+      "direction": "confirm",
+      "magnitude": "strong",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.theverge.com/24330106/usb-c-common-charger-directive-explained-europe",
+      "note": "The Verge explains EU USB-C common charger rules, including laptops by 2026 and charging-brick unbundling. This confirms a broad European audience needing compatible USB-C charging accessories. (verified secondary source signal)"
+    },
+    {
+      "id": "anker-usecase-macbook-chargers",
+      "dimension": "useCaseRelevance",
+      "direction": "confirm",
+      "magnitude": "strong",
+      "confidence": "medium",
+      "sourceTier": "proxy",
+      "sourceUrl": "https://www.digitalcameraworld.com/buying-guides/best-macbook-chargers",
+      "note": "Digital Camera World ranks Anker Prime 100W GaN Charger as a best all-around MacBook/laptop charger and discusses multi-device charging, confirming the product naturally fits laptop and travel charging use cases. (listicle / affiliate / SEO source)"
+    },
+    {
+      "id": "anker-commercial-verge-product-launch",
+      "dimension": "commercialIntent",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.theverge.com/2024/8/7/24215215/anker-prime-charger-usb-c-gan-power",
+      "note": "The Verge covers Anker Prime 100W charger pricing, ports and use with laptops and multiple devices. This confirms active product-market shopping context without relying only on SEO buying guides. (verified secondary source signal)"
+    },
+    {
+      "id": "anker-message-verge-wall-charger-redesign",
+      "dimension": "messageBridge",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.theverge.com/2024/8/7/24215215/anker-prime-charger-usb-c-gan-power",
+      "note": "The Verge covers Anker Prime 100W wall charger improvements around GaN, multiple USB ports, laptop charging and staying plugged into outlets. This supports a message bridge around one compact charger replacing several adapters. (verified secondary source signal)"
+    },
+    {
+      "id": "anker-safety-eu-eps-labels",
+      "dimension": "brandSafety",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.tomshardware.com/tech-industry/power-bricks-and-wall-warts-must-be-usb-c-by-2028-new-legislation-also-adds-power-rating-labels-for-power-units-and-cables",
+      "note": "Tom's Hardware reports EU external-power-supply rules for USB-C/PD, detachable cables, power ratings and safety/efficiency requirements. This confirms compliance/labeling as the main brand-safety constraint rather than cultural risk. (verified secondary source signal)"
+    },
+    {
+      "id": "anker-timing-ugreen-saturation",
+      "dimension": "timingSaturation",
+      "direction": "confirm",
+      "magnitude": "strong",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.theverge.com/2025/1/5/24328396/ugreen-nexode-500w-desktop-charger-usb-c-240w-power-delivery",
+      "note": "The Verge reports UGREEN high-power multi-port GaN chargers, including 500W desktop output and multiple laptop charging. This confirms the category is active but crowded, so Timing remains 50 rather than being upgraded. (verified secondary source signal)"
+    },
+    {
+      "id": "anker-competitor-price-pressure",
+      "dimension": "timingSaturation",
+      "direction": "down",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.androidcentral.com/accessories/power-charging/anker-who-this-triple-port-voltme-100w-gan-charger-costs-less-than-usd30-with-this-deal",
+      "note": "Android Central highlights lower-priced 100W GaN alternatives from Voltme, UGREEN and Baseus versus Anker. This adds price/saturation pressure, but only weakly because it is deal coverage. (verified secondary source signal)"
+    }
+  ],
+  "expectedAdjustedScores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 75,
+    "creativeFeasibility": 75,
+    "commercialIntent": 100,
+    "brandSafety": 75,
+    "timingSaturation": 50
+  },
+  "expectedAdjustedTotal": 85,
+  "expectedAdjustedBand": "Strong Go",
+  "profileUsed": "default",
+  "expectedEvidenceGate": "pass",
+  "expectedGatedBand": "Strong Go",
+  "expectedGateMissing": [],
+  "expectedDimensionCaps": [],
+  "expectedStability": "fragile",
+  "expectedDecisionType": "organic push",
+  "expectedDimensionConfidence": {
+    "audienceOverlap": "evidence-confirmed (high)",
+    "useCaseRelevance": "evidence-confirmed (medium)",
+    "messageBridge": "evidence-confirmed (high)",
+    "creativeFeasibility": "assumption",
+    "commercialIntent": "evidence-confirmed (high)",
+    "brandSafety": "evidence-confirmed (high)",
+    "timingSaturation": "evidence-confirmed (high)"
+  }
+}

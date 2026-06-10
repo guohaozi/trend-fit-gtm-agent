@@ -1,0 +1,80 @@
+{
+  "id": "example_orchestrated_evidence",
+  "caseId": "example_orchestrated",
+  "researchDate": "2026-06-10",
+  "riskTolerance": "medium",
+  "profileUsed": "default",
+  "baselineScores": {
+    "audienceOverlap": 75,
+    "useCaseRelevance": 75,
+    "messageBridge": 75,
+    "creativeFeasibility": 75,
+    "commercialIntent": 75,
+    "brandSafety": 75,
+    "timingSaturation": 75
+  },
+  "report": {
+    "title": "Example Product x Example Trend",
+    "productName": "Example Product",
+    "trendName": "Example Trend",
+    "recommendation": "Use this generated evidence case as a first pass, then strengthen it with more local and channel-specific evidence.",
+    "nextEvidence": [
+      "Add raw user-language evidence from Reddit, comments, reviews, or interviews.",
+      "Add Google Trends / SEO buying-query exports.",
+      "Add competitor campaign, pricing, review, and backlash evidence."
+    ]
+  },
+  "customerResearchFindings": [
+    {
+      "id": "example-customer-audience",
+      "theme": "audience_language",
+      "sourceType": "reddit_thread",
+      "sourceUrl": "https://www.reddit.com/r/example/comments/abc123/example_thread/",
+      "verificationStatus": "verified",
+      "confidence": "high",
+      "intensity": "weak",
+      "quote": "I want a simpler way to solve this problem.",
+      "note": "Raw customer language confirms audience fit."
+    }
+  ],
+  "seoKeywordFindings": [
+    {
+      "id": "example-seo-buying",
+      "signal": "related_buying_query",
+      "query": "where to buy example product",
+      "sourceUrl": "https://serpapi.com/search?engine=google_trends&q=example",
+      "verificationStatus": "verified",
+      "growthLabel": "+120%",
+      "note": "Related query contains buying language."
+    }
+  ],
+  "competitorResearchFindings": [
+    {
+      "id": "example-competitor-content",
+      "competitorName": "Example Competitor",
+      "competitorUrl": "https://example.com",
+      "origin": "competitor-profiling",
+      "findingType": "competitor_content_angle",
+      "sourceType": "direct_competitor_campaign",
+      "sourceUrl": "https://example.com/campaign",
+      "verificationStatus": "verified",
+      "confidence": "high",
+      "intensity": "moderate",
+      "quote": "A campaign angle that maps to the trend.",
+      "note": "Competitor content confirms message bridge."
+    }
+  ],
+  "additionalCandidates": [
+    {
+      "id": "example-manual-safety",
+      "dimension": "brandSafety",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "desiredConfidence": "high",
+      "sourceUrl": "https://example.com/research/safety",
+      "verificationStatus": "verified",
+      "sourceSignals": ["research_report"],
+      "note": "Manual verified source confirms risk can be managed with guardrails."
+    }
+  ]
+}

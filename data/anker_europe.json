@@ -1,0 +1,53 @@
+{
+  "id": "anker_europe",
+  "product": {
+    "name": "Anker 100W / 140W GaN Multi-Port Charger",
+    "category": "consumer electronics / charging accessory",
+    "targetMarket": ["Germany", "France", "United Kingdom", "European business travel"],
+    "audience": "Business travelers, MacBook users, remote workers, students, and multi-device digital workers who want one compact charger for laptop, phone, tablet, earbuds, and travel",
+    "priceRange": "Premium accessory; expected EUR 60-120 depending on wattage and bundle",
+    "positioning": "A compact high-power USB-C GaN charger that replaces multiple original adapters for work, school, and travel",
+    "sellingPoints": [
+      "100W/140W laptop-capable USB-C charging",
+      "Multiple ports for laptop, phone, and accessories",
+      "Smaller travel footprint than carrying several original chargers",
+      "Anker reliability and safety reputation"
+    ],
+    "brandTone": "Practical, premium, reliable, travel-ready",
+    "competitors": ["Apple original chargers", "Belkin", "UGREEN", "Baseus", "Satechi", "Native Union"],
+    "campaignGoal": "Premium accessory conversion + travel/workflow education",
+    "riskTolerance": "medium"
+  },
+  "trend": {
+    "name": "Multi-device work and travel charging / GaN fast charging",
+    "platform": "Google Search / YouTube / tech reviews / ecommerce",
+    "region": "Europe",
+    "description": "USB-C standardization, laptop USB-C charging, remote work, travel, and multi-device setups are making compact multi-port high-power GaN chargers a practical replacement for carrying several original adapters.",
+    "drivenBy": "USB-C regulation, laptop and phone convergence, business travel, remote work, creator workstations, and tech-review buying guides",
+    "format": "What's in my travel tech bag, one charger for my MacBook and phone, desk setup cleanup, EU USB-C travel kit, replacing three chargers with one",
+    "whyPopular": "People carry more USB-C devices and want fewer power bricks, especially when moving between home, office, airport, hotel, and client meetings.",
+    "exampleContent": "A traveler charges a MacBook, iPhone, and earbuds from one compact Anker GaN charger in an airport lounge and hotel room.",
+    "controversy": "Hardware risk is mostly compliance, heat, plug stability, cable wattage confusion, and premium price pressure from cheaper GaN competitors."
+  },
+  "scores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 75,
+    "creativeFeasibility": 75,
+    "commercialIntent": 100,
+    "brandSafety": 75,
+    "timingSaturation": 50
+  },
+  "expectedTotal": 85,
+  "expectedBand": "Strong Go",
+  "expectedQualifier": null,
+  "expectedFinalBand": "Strong Go",
+  "overrideReason": null,
+  "profileUsed": "default",
+  "expectedEvidenceGate": "fail",
+  "expectedGatedBand": "Go",
+  "expectedGateMissing": ["timingSaturation", "brandSafety", "audienceOrUseCase"],
+  "expectedDimensionCaps": ["audienceOverlap", "commercialIntent"],
+  "expectedStability": "fragile",
+  "expectedDecisionType": "small test"
+}

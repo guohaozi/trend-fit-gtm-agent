@@ -2,6 +2,490 @@
 
 This changelog records project-level changes and the reasoning behind them. It is intended for handoff between Codex / Claude conversations, not just release notes.
 
+## 2026-06-10 — OpenCLI Live Evidence Research Hardening
+
+Status:
+
+- The OpenCLI-backed `evidence:case:research` path has been tested against a real DJI
+  Middle East product/trend case.
+- The pipeline can now generate an evidence JSON and markdown case from product + market
+  + trend using OpenCLI platform adapters.
+- The live DJI case currently lands at `76 / Cautious test`, gate `partial`, stability
+  `fragile`.
+
+What landed:
+
+- Added failure tolerance to `lib/opencli-research-source.ts`.
+- Updated `scripts/evidence-case-research.ts` so OpenCLI provider runs use
+  `continueOnCommandError: true`.
+- Added relevance filtering before OpenCLI rows become evidence.
+- Added tests covering:
+  - continuing when one OpenCLI command/platform fails;
+  - filtering unrelated OpenCLI rows;
+  - avoiding long unrelated social posts that only mention a keyword deep in the body.
+- Generated and committed the live DJI report:
+  - `data/dji_drones_uae_saudi_middle_east_video_creation_security_inspection_tourism_enablement_evidence.json`
+  - `outputs/dji_drones_uae_saudi_middle_east_video_creation_security_inspection_tourism_enablement_evidence_case.md`
+
+Key design decisions:
+
+- OpenCLI adapters are candidate-source providers, not scoring authorities.
+- A single platform failure should not kill the whole research case. The report should
+  still be generated from surviving providers, while tooling notes record skipped
+  commands.
+- Reddit / YouTube / Twitter rows must hit product/category terms and also market or
+  trend terms before they are mapped into evidence.
+- Google Search rows are allowed to be broader because they are still capped by the
+  source-tier classifier as proxy / secondary evidence.
+- Relevance checks use leading social text rather than full long bodies, so unrelated
+  mega-threads cannot pass because of a stray keyword far down the post.
+
+Operational notes:
+
+- If OpenCLI reports `BROWSER_CONNECT`, fix the local bridge first:
+
+```bash
+PATH=/Users/guo/.npm-global/bin:$PATH opencli daemon restart
+PATH=/Users/guo/.npm-global/bin:$PATH opencli doctor
+```
+
+- In this session, daemon/extension health was confirmed outside the sandbox:
+  daemon running on port `19825`, Browser Bridge extension connected.
+- Full DJI command:
+
+```bash
+npm run evidence:case:research -- \
+  --product "DJI drones" \
+  --market "UAE Saudi Middle East" \
+  --trend "video creation security inspection tourism enablement" \
+  --risk high \
+  --profile b2b_pipeline \
+  --provider opencli \
+  --platforms reddit,youtube,twitter,google \
+  --opencli-bin /Users/guo/.npm-global/bin/opencli \
+  --limit 3
+```
+
+Known limitations:
+
+- Google Search is not Google Trends. Timing & Saturation remains weak until a real
+  Google Trends / SEO provider is executed.
+- The current case still has no accepted evidence for Message Bridge, Creative
+  Feasibility, and Timing & Saturation.
+- OpenCLI Xiaohongshu and TikTok adapters are installed but not yet mapped into
+  provider findings.
+- Trend discovery / shortlist is still future work; current runner requires
+  product + market + trend as input.
+
+Recommended next step:
+
+- Add a real Google Trends / SEO execution provider so the runner can fill Timing,
+  Search Demand, and Commercial Intent with hard evidence rather than broad Google
+  Search snippets.
+- Then add Xiaohongshu / TikTok mappers and a trend-shortlist runner.
+
+## 2026-06-10 — OpenCLI Research Provider
+
+Status:
+
+- Added an OpenCLI-backed provider for `evidence:case:research`.
+- This is the first provider that executes a platform CLI and feeds raw platform rows
+  into `customerResearchFindings` instead of treating everything as generic web-search
+  snippets.
+- Extended the same provider to support Twitter/X and Google Search rows as conservative
+  evidence candidates.
+
+What landed:
+
+- Added `lib/opencli-research-source.ts`.
+- Added `tests/opencli-research-source.test.ts`.
+- Extended `lib/evidence-case-research-runner.ts` to accept provider sources that return
+  structured findings, not only search results.
+- Extended `scripts/evidence-case-research.ts` with:
+  - `--provider opencli`
+  - `--opencli-bin`
+  - `--dry-run-provider-commands`
+
+Current support:
+
+- Reddit and YouTube searches are executed through OpenCLI and mapped through the existing
+  OpenCLI customer-research adapter.
+- Twitter/X search is executed through OpenCLI and mapped into raw social
+  `additionalCandidates`.
+- Google Search is executed through OpenCLI and mapped into conservative search-result
+  `additionalCandidates`.
+- Dry-run command output is available before live execution.
+
+Current boundary:
+
+- OpenCLI has Xiaohongshu adapters installed, but this provider does not yet map its row
+  format into evidence findings.
+- Google Trends / SEO, GooseWorks, TikTok, marketplace reviews, and competitor provider
+  execution are still separate next adapters.
+
+## 2026-06-10 — Product + Trend Research Runner
+
+Status:
+
+- Added `evidence:case:research`, a first live-research-oriented CLI that starts from
+  product, market, and trend text instead of a preassembled provider JSON file.
+- The runner builds research queries, collects search results through a pluggable
+  `ResearchSource`, maps those results into conservative evidence candidates, and then
+  reuses the existing evidence-case writer.
+
+What landed:
+
+- Added `lib/evidence-case-research-runner.ts`.
+- Added `scripts/evidence-case-research.ts`.
+- Added `tests/evidence-case-research-runner.test.ts`.
+- Added `docs/evidence-case-research-cli.md`.
+- Added `examples/dji-middle-east-search-results.fixture.json`.
+- Added `npm run evidence:case:research`.
+
+How it works:
+
+- Input: `--product`, `--market`, `--trend`, `--risk`, `--profile`, optional competitors
+  and platforms.
+- Query builder creates lanes for audience, use case, commercial intent, timing,
+  brand safety, and competitor/message bridge.
+- Search results are converted into `additionalCandidates`; source-tiering still happens
+  inside the existing classifier.
+- Outputs are the same standard evidence JSON and markdown case memo.
+
+Current boundary:
+
+- The built-in live provider uses web search with site filters for Reddit, X/Twitter,
+  Xiaohongshu, and YouTube discovery. It does not yet authenticate into those platforms
+  or call Google Trends directly.
+- The `ResearchSource` interface is intentionally small so GooseWorks, OpenCLI,
+  Google Trends, X, Xiaohongshu, TikTok, and marketplace providers can be added without
+  changing scoring or file-writing logic.
+
+## 2026-06-10 — P5c Evidence Case CLI / File Writer
+
+Status:
+
+- Implemented the second-phase file-writing layer that turns provider output JSON into
+  real evidence case artifacts.
+- This is the first runnable bridge from "provider findings exist" to generated
+  `data/*_evidence.json` and `outputs/*_evidence_case.md` files.
+
+What landed:
+
+- Added `lib/evidence-case-file-writer.ts`.
+- Added `scripts/evidence-case.ts`.
+- Added `examples/evidence-case-input.example.json`.
+- Added `tests/evidence-case-file-writer.test.ts`.
+- Added `npm run evidence:case`.
+
+How it works:
+
+- Input JSON contains baseline scores, risk tolerance, profile, and any mix of:
+  `customerResearchFindings`, `seoKeywordFindings`, `competitorResearchFindings`, and
+  `additionalCandidates`.
+- The writer calls `orchestrateEvidenceCase()`, so source-tier classification,
+  confidence caps, evidence adjustment, recommendation rigor, and gate logic stay inside
+  the existing project pipeline.
+- The CLI writes a structured evidence JSON file and a readable markdown evidence memo.
+
+Example:
+
+- `npm run evidence:case -- --input examples/evidence-case-input.example.json`
+
+Why this matters:
+
+- The project can now accept provider/skill outputs as data and produce auditable case
+  files without manually assembling JSON and markdown each time.
+- Provider skills still only supply candidate sources; final evidence tiering and scoring
+  remain controlled by the project's classifier and orchestrator.
+
+## 2026-06-10 — Thailand EV + LatAm Gaming Peripherals Evidence Cases
+
+Status:
+
+- Added the sixth and seventh evidence cases from the user's 15-case GTM / BD candidate
+  list.
+- Both cases use the `ecommerce_conversion` profile because the important question is
+  whether there is enough commercial proof to justify conversion-oriented GTM tests.
+
+What landed:
+
+- Added `data/thailand_ev.json`.
+- Added `data/thailand_ev_evidence.json`.
+- Added `outputs/thailand_ev_evidence_case.md`.
+- Added `data/latam_gaming_peripherals.json`.
+- Added `data/latam_gaming_peripherals_evidence.json`.
+- Added `outputs/latam_gaming_peripherals_evidence_case.md`.
+- Extended scoring, evidence-adjustment, and recommendation-rigor tests for both
+  ecommerce-profile case computations.
+
+Case results:
+
+- Thailand EV baseline under `ecommerce_conversion`: `83 / Go`.
+- Thailand EV evidence-adjusted under `ecommerce_conversion`: `90 / Strong Go`.
+- Thailand EV evidence gate: `pass`; stability: `moderate`; decision type:
+  `organic push`.
+- LatAm gaming peripherals baseline under `ecommerce_conversion`: `84 / Go`.
+- LatAm gaming peripherals evidence-adjusted under `ecommerce_conversion`: `93 / Strong Go`.
+- LatAm gaming peripherals evidence gate: `pass`; stability: `moderate`; decision type:
+  `organic push`.
+
+Key interpretation:
+
+- Thailand EV is the harder commercial case: evidence supports real Thai EV adoption,
+  Chinese-brand sales, policy momentum, and local production. The limiting factor is
+  buyer trust around resale value, charging, price volatility, dealer quality, and
+  aftersales.
+- LatAm gaming peripherals is a strong community/ecommerce case: Brazil and Mexico
+  gaming audiences, esports visibility, budget-performance messaging, and localized
+  Redragon commercialization support a conversion test. The limiting factor is local
+  warranty, delivery, software, and durability trust.
+
+Next evidence to collect:
+
+- Thailand EV: Thai owner reviews, dealer test-drive conversion, charging access by
+  city, financing/resale comparisons, and price-cut complaint themes.
+- LatAm gaming peripherals: marketplace keyword/review exports, creator comments,
+  SKU-level price ladders, return/warranty complaints, and bundle-level conversion tests.
+
+## 2026-06-10 — POP MART Middle East Evidence Case
+
+Status:
+
+- Added the fifth evidence case from the user's 15-case GTM / BD candidate list.
+- This case uses the `brand_awareness` weight profile because the first move should be
+  creator seeding and mall-retail validation, not pure ecommerce conversion.
+
+What landed:
+
+- Added `data/popmart_middle_east.json`.
+- Added `data/popmart_middle_east_evidence.json`.
+- Added `outputs/popmart_middle_east_evidence_case.md`.
+- Extended scoring, evidence-adjustment, and recommendation-rigor tests for the
+  brand-awareness-profile case computation.
+
+Case result:
+
+- Baseline under `brand_awareness`: `74 / Go`.
+- Evidence-adjusted under `brand_awareness`: `75 / Go`.
+- Evidence gate: `pass`.
+- Stability: `moderate`.
+- Decision type: `creator seeding`.
+
+Key interpretation:
+
+- The case is directionally good for controlled Gulf creator seeding: mall retail,
+  anime / Asian pop-culture acceptance, global Labubu demand, and strong accessory
+  content mechanics all support a test.
+- It is not a paid-scale Strong Go yet. GCC-specific purchase data is still missing,
+  Timing & Saturation remains `50`, and Brand Safety remains `50` due to counterfeit,
+  safety, backlash, and cultural interpretation risks.
+
+Next evidence to collect:
+
+- GCC Google Trends / TikTok / Instagram velocity for POP MART, Labubu, Molly, and blind
+  box terms.
+- UAE / Saudi mall distributor availability and sell-through.
+- Creator seeding split tests by styling, gifting, unboxing, and character type.
+- Shelf checks against Miniso, Sanrio, anime retailers, and mall gift stores.
+
+## 2026-06-10 — Japan Service Robot Evidence Case
+
+Status:
+
+- Added the fourth evidence case from the user's 15-case GTM / BD candidate list.
+- This is the first new case intentionally using the `b2b_pipeline` weight profile.
+
+What landed:
+
+- Added `data/service_robot_japan.json`.
+- Added `data/service_robot_japan_evidence.json`.
+- Added `outputs/service_robot_japan_evidence_case.md`.
+- Extended scoring, evidence-adjustment, and recommendation-rigor tests for B2B-profile
+  case computation.
+
+Case result:
+
+- Baseline under `b2b_pipeline`: `88 / Strong Go`.
+- Evidence-adjusted under `b2b_pipeline`: `93 / Strong Go`.
+- Evidence gate: `pass`.
+- Stability: `moderate`.
+- Decision type: `organic push`.
+
+Key interpretation:
+
+- This is a strong B2B / BD pipeline case. Japanese restaurant labor shortage pressure,
+  observable restaurant automation, and service-robot field-study evidence support pilots.
+- The recommendation must stay operational and scoped: task relief, peak-hour workload
+  reduction, and workflow assistance. Do not sell robots as human replacement,
+  especially in eldercare.
+
+Next evidence to collect:
+
+- Named Pudu / Keenon / Bear Robotics Japan deployments.
+- Operator interviews or trade-show lead notes.
+- Local cost model: lease, maintenance, staff hourly cost, payback period.
+- Integration/safety failure modes in narrow aisles, eldercare settings, and emergency
+  handling.
+
+## 2026-06-10 — Anker Europe Evidence Case + Source-Tier URL Pattern Fix
+
+Status:
+
+- Added the third evidence case from the user's 15-case GTM / BD candidate list.
+- Fixed a source-tier classifier false positive found while building the case.
+
+What landed:
+
+- Added `data/anker_europe.json`.
+- Added `data/anker_europe_evidence.json`.
+- Added `outputs/anker_europe_evidence_case.md`.
+- Extended scoring, evidence-adjustment, recommendation-rigor, and source-tier guard
+  coverage.
+- Updated `lib/source-tier-classifier.ts` so normal words like `desktop` do not trigger
+  the `top-` listicle URL pattern.
+
+Case result:
+
+- Baseline: `85 / Strong Go`.
+- Evidence-adjusted: `85 / Strong Go`.
+- Evidence gate: `pass`.
+- Stability: `fragile`.
+- Decision type: `organic push`.
+
+Key interpretation:
+
+- This is the strongest of the first three new cases. EU USB-C standardization,
+  laptop/multi-device charging, and Anker's compact GaN story support Strong Go.
+- It remains fragile because Timing & Saturation is only `50`: UGREEN, Baseus, Belkin,
+  Apple, Satechi, and low-cost GaN alternatives create real crowding and price pressure.
+- The recommended push is specific organic workflow positioning, not generic paid
+  "fast charging" messaging.
+
+Classifier fix:
+
+- Existing listicle detection used broad substring checks for `top-`, which incorrectly
+  matched URLs containing words like `desktop-charger`.
+- The classifier now tokenizes path segments and only treats `best-*` / `top-*` segment
+  prefixes and explicit `affordable` / `dupe` tokens as listicle-style signals.
+
+## 2026-06-10 — OBgE China Evidence Case
+
+Status:
+
+- Added the second evidence case from the user's 15-case GTM / BD candidate list.
+
+What landed:
+
+- Added `data/obge_china.json`.
+- Added `data/obge_china_evidence.json`.
+- Added `outputs/obge_china_evidence_case.md`.
+- Extended scoring, evidence-adjustment, recommendation-rigor, and source-tier guard
+  coverage so the case is recomputed.
+
+Case result:
+
+- Baseline: `75 / Go`.
+- Evidence-adjusted: `83 / Go`.
+- Evidence gate: `pass`.
+- Stability: `fragile`.
+- Decision type: `small test`.
+
+Key interpretation:
+
+- China male grooming evidence is strong enough to raise Audience and Commercial Intent,
+  but it is still broader than men's BB cream specifically. The case should be positioned
+  as natural image management / quick confidence, not a loud "men wearing makeup" push.
+- Brand Safety remains `50` because masculinity stigma, shade mismatch, and over-gendered
+  messaging can still create backlash.
+
+Next evidence to collect:
+
+- Xiaohongshu/Douyin comments for `男士素颜霜`, `男生BB霜`, `男士遮瑕`, `面试形象`.
+- Tmall/JD review language for men's BB/tone-up products.
+- Creator before/after posts with engagement and negative-comment themes.
+
+## 2026-06-10 — SAVAS China Evidence Case
+
+Status:
+
+- Added the first new evidence case from the user's 15-case GTM / BD candidate list.
+
+What landed:
+
+- Added `data/savas_china.json`.
+- Added `data/savas_china_evidence.json`.
+- Added `outputs/savas_china_evidence_case.md`.
+- Extended scoring, evidence-adjustment, recommendation-rigor, source-tier, and
+  orchestrator coverage so the case is recomputed rather than trusted as static output.
+
+Case result:
+
+- Baseline: `78 / Go`.
+- Evidence-adjusted: `83 / Go`.
+- Evidence gate: `pass`.
+- Stability: `fragile`.
+- Decision type: `small test`.
+
+Key interpretation:
+
+- This is intentionally not a Strong Go. Public evidence supports SAVAS-style daily
+  protein convenience and the broader China health/fitness audience, but this run did
+  not use GooseWorks/OpenCLI/ecommerce/social providers, so China-specific RTD commercial
+  intent and content feasibility remain under-supported.
+
+Next evidence to collect:
+
+- Xiaohongshu/Douyin comments for `蛋白饮`, `高蛋白早餐`, `减脂便利店`.
+- Ecommerce search/review language for SAVAS, Keep, ffit8, Boohee, and high-protein
+  yogurt/drinks.
+- Convenience-store availability/pricing screenshots.
+- Creator examples with measurable engagement around protein breakfast or post-workout
+  drink routines.
+
+## 2026-06-10 — P5a/b Offline Evidence Case Orchestrator
+
+Status:
+
+- Implemented the first P5 evidence automation layer: deterministic offline orchestration
+  across the existing P2/P3/P4 provider outputs.
+
+What landed:
+
+- Added `lib/evidence-case-orchestrator.ts`.
+- Added `tests/evidence-case-orchestrator.test.ts`.
+- `orchestrateEvidenceCase()` now accepts baseline metadata plus optional customer
+  research, SEO/timing, competitor research findings, and `additionalCandidates` for
+  verified manual/browser research that does not naturally belong to a provider adapter.
+- The orchestrator normalizes provider findings in deterministic order:
+  customer -> SEO/timing -> competitor -> additional candidates.
+- It calls the existing project-owned evidence pipeline:
+  `buildEvidenceDraft()` -> `generateEvidenceAdjustmentCaseFromDraft()`.
+- It returns `{ candidates, draft, evidenceCase }`, so future CLI/UI layers can inspect
+  raw candidates, accepted/dropped evidence, and the final generated evidence case.
+
+Key design decision:
+
+- This layer is deliberately offline and deterministic. It does not browse, call OpenCLI,
+  invoke GooseWorks, or write files. Research providers own data collection; the
+  orchestrator owns merging normalized findings into the source-tiered scoring pipeline.
+
+Known issues / not done:
+
+- P5c CLI/file writer is not implemented yet.
+- Trend discovery / trend-shortlist orchestration is not implemented yet.
+- The app UI still uses frozen demo inputs rather than running this orchestrator from a
+  user-entered product.
+
+Verification:
+
+- `npx tsc --noEmit` passed.
+- `npm run build` passed.
+- `node --import tsx --test tests/*.test.ts` passed: 54 tests.
+- `npm test` still cannot run in the current sandbox because the `tsx --test` CLI fails
+  to create its IPC pipe with `listen EPERM`; the Node test runner with `--import tsx`
+  works and was used for verification.
+
 ## 2026-06-10 — Handoff Docs For P0-P4 Evidence Automation
 
 Status:

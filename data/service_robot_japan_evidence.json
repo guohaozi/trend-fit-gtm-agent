@@ -1,0 +1,114 @@
+{
+  "id": "service_robot_japan_evidence",
+  "case": "service_robot_japan",
+  "researchDate": "2026-06-10",
+  "tooling": "manual browser research fallback + P5 evidence-case orchestrator; no GooseWorks/OpenCLI provider calls in this run",
+  "baselineScores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 100,
+    "creativeFeasibility": 50,
+    "commercialIntent": 75,
+    "brandSafety": 50,
+    "timingSaturation": 75
+  },
+  "evidence": [
+    {
+      "id": "service-robot-audience-restaurant-labor-shortage",
+      "dimension": "audienceOverlap",
+      "direction": "confirm",
+      "magnitude": "strong",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://m.economictimes.com/nri/work/japan-halts-visa-applications-for-foreign-restaurant-workers-as-cap-nears/articleshow/130327320.cms",
+      "note": "Economic Times, citing Japan Times reporting, says Japan halted new specified-skilled-worker visa applications for restaurant workers because the quota was nearing its cap. This confirms labor-shortage pressure in food service buyers. (verified secondary source signal)"
+    },
+    {
+      "id": "service-robot-usecase-pronto-techmagic",
+      "dimension": "useCaseRelevance",
+      "direction": "confirm",
+      "magnitude": "strong",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.foodandwine.com/news/pasta-robot-restaurant-japan-e-vino-spaghetti",
+      "note": "Food & Wine covers a Tokyo restaurant using TechMagic/Pronto P-Robo to cook pasta and address labor and food-cost challenges, confirming restaurant automation as a real Japan use case. (verified secondary source signal)"
+    },
+    {
+      "id": "service-robot-commercial-pronto-techmagic",
+      "dimension": "commercialIntent",
+      "direction": "up",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.foodandwine.com/news/pasta-robot-restaurant-japan-e-vino-spaghetti",
+      "note": "The same Tokyo deployment includes plans to expand the cooking robot to more restaurants, supporting buyer willingness to test automation, not just passive interest. (verified secondary source signal)"
+    },
+    {
+      "id": "service-robot-timing-jal-unitree-trial",
+      "dimension": "timingSaturation",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://www.theguardian.com/world/2026/apr/28/humanoid-robots-baggage-handlers-japan-airports",
+      "note": "Guardian reports JAL will trial China-made Unitree humanoid robots at Haneda to reduce physical workload under labor-shortage pressure. This confirms Japanese institutions are actively testing robots, while also showing pilots remain cautious. (verified secondary source signal)"
+    },
+    {
+      "id": "service-robot-creative-bakery-field-study",
+      "dimension": "creativeFeasibility",
+      "direction": "up",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://arxiv.org/abs/2208.09260",
+      "note": "A Japanese bakery field study with service robots found in-store recommendation behavior could positively affect sales and provides concrete demo mechanics for sales-promotion robots. (verified secondary source signal)"
+    },
+    {
+      "id": "service-robot-safety-eldercare-limitations",
+      "dimension": "brandSafety",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://arxiv.org/abs/2403.14673",
+      "note": "A review of Robots Won't Save Japan highlights eldercare robot failures where robots increased workload or undermined meaningful care, confirming a moderate safety/positioning risk: sell task relief, not human replacement. (verified secondary source signal)"
+    },
+    {
+      "id": "service-robot-message-bakery-assist-not-replace",
+      "dimension": "messageBridge",
+      "direction": "confirm",
+      "magnitude": "moderate",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://arxiv.org/abs/2208.09260",
+      "note": "The bakery study separates entrance attraction from in-store recommendation impact, supporting a message bridge around targeted operational assistance rather than generic robot spectacle. (verified secondary source signal)"
+    }
+  ],
+  "expectedAdjustedScores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 100,
+    "creativeFeasibility": 75,
+    "commercialIntent": 100,
+    "brandSafety": 50,
+    "timingSaturation": 75
+  },
+  "expectedAdjustedTotal": 93,
+  "expectedAdjustedBand": "Strong Go",
+  "profileUsed": "b2b_pipeline",
+  "expectedEvidenceGate": "pass",
+  "expectedGatedBand": "Strong Go",
+  "expectedGateMissing": [],
+  "expectedDimensionCaps": [],
+  "expectedStability": "moderate",
+  "expectedDecisionType": "organic push",
+  "expectedDimensionConfidence": {
+    "audienceOverlap": "evidence-confirmed (high)",
+    "useCaseRelevance": "evidence-confirmed (high)",
+    "messageBridge": "evidence-confirmed (high)",
+    "creativeFeasibility": "evidence-revised (high)",
+    "commercialIntent": "evidence-revised (high)",
+    "brandSafety": "evidence-confirmed (high)",
+    "timingSaturation": "evidence-confirmed (high)"
+  }
+}
