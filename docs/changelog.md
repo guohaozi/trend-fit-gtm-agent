@@ -2,6 +2,34 @@
 
 This changelog records project-level changes and the reasoning behind them. It is intended for handoff between Codex / Claude conversations, not just release notes.
 
+## 2026-06-11 — Handoff Docs Refresh
+
+Status:
+
+- Refreshed handoff docs after completing and pushing the workspace Google Trends and
+  workspace save/import/export work.
+- `main` is synced with `origin/main` at `0f72840 Add workspace state import export`.
+
+What changed:
+
+- `docs/current-state.md` now records the exact latest pushed commit and confirms the
+  branch was clean/synced at handoff.
+- This changelog now records the final handoff state for a fresh Codex / Claude
+  conversation.
+
+Next conversation starting point:
+
+```bash
+cd /Users/guo/gtm/trend-fit-gtm-agent
+git status --short --branch
+git log -3 --oneline
+```
+
+Recommended next step:
+
+- Add provider health checks for `/workspace`, then add multi-query Google Trends
+  planning.
+
 ## 2026-06-11 — Workspace Save / Import / Export
 
 Status:

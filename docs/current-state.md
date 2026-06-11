@@ -26,13 +26,14 @@ This file is a handoff snapshot for starting a fresh Codex / Claude conversation
 - Latest round added the first `evidence-collector` implementation: reusable source-tier classification code, an evidence draft builder, tests, and a project skill that can borrow GooseWorks/manual research as candidate-source input without letting the research agent self-grade evidence upward.
 - Latest classifier fix: `desktop-charger` URL paths no longer accidentally trigger the `top-` listicle pattern. This was found while building the Anker Europe case.
 - Previous round implemented the source-tier classifier as an executable test guard and re-audited the fashion, AI-tool, and snack evidence cases against it.
-- The project is published to GitHub. The exact latest pushed commit hash should be checked with `git log -1 --oneline` in the next conversation.
+- The project is published to GitHub. Latest pushed commit at handoff:
+  `0f72840 Add workspace state import export`.
 - Previous review round was a Claude **review + fix** pass on the evidence cases Codex produced: it verified the cited sources are real, found a source-tier inflation bug in the AI-tool case, fixed it, and added a deterministic source-tier classifier to prevent recurrence.
 - Previous round added the AI photo-tool evidence case and the snack / Dubai-style chocolate evidence case.
 - This handoff corresponds to the workspace evidence-editor, SerpApi Google Trends
-  provider, and workspace Google Trends API follow-up. Check `git log -1 --oneline` and
-  `git status --short --branch` for the exact pushed commit state in the next
-  conversation.
+  provider, workspace Google Trends API, and workspace save/import/export follow-up.
+  At handoff, `main` was pushed to `origin/main` and `git status --short --branch`
+  reported `## main...origin/main`.
 
 ## Latest Conversation Handoff
 
