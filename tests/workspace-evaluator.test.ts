@@ -7,6 +7,7 @@ import {
   buildWorkspaceEvidenceGaps,
   buildWorkspaceEvidenceRowsFromEvidence,
   buildWorkspaceProviderPreview,
+  appendWorkspaceEvidenceRows,
   materializeWorkspaceEvidenceRows,
   evaluateSingleWorkspaceTrend,
   evaluateWorkspaceShortlist,
@@ -240,5 +241,39 @@ describe("workspace evaluator", () => {
     assert.equal(materialized.droppedRows.length, 1);
     assert.equal(materialized.rows[0].computedSourceTier, null);
     assert.equal(materialized.rows[0].classification.action, "drop");
+  });
+
+  it("appends provider evidence rows with stable unique ids for the workspace editor", () => {
+    const rows = appendWorkspaceEvidenceRows(
+      [
+        {
+          id: "google-trends-rising",
+          dimension: "timingSaturation",
+          direction: "up",
+          magnitude: "moderate",
+          desiredConfidence: "medium",
+          sourceUrl: "https://serpapi.com/search?engine=google_trends&q=protein",
+          verificationStatus: "verified",
+          sourceSignals: ["research_report"],
+          note: "Existing row."
+        }
+      ],
+      [
+        {
+          id: "google-trends-rising",
+          dimension: "timingSaturation",
+          direction: "up",
+          magnitude: "moderate",
+          desiredConfidence: "medium",
+          sourceUrl: "https://serpapi.com/search?engine=google_trends&q=protein",
+          verificationStatus: "verified",
+          sourceSignals: ["research_report"],
+          note: "Provider row."
+        }
+      ]
+    );
+
+    assert.deepEqual(rows.map((row) => row.id), ["google-trends-rising", "google-trends-rising-2"]);
+    assert.equal(rows[1].note, "Provider row.");
   });
 });

@@ -15,6 +15,7 @@ import {
   buildWorkspaceEvidenceGaps,
   buildWorkspaceEvidenceRowsFromEvidence,
   buildWorkspaceProviderPreview,
+  appendWorkspaceEvidenceRows,
   evaluateSingleWorkspaceTrend,
   evaluateWorkspaceShortlist,
   materializeWorkspaceEvidenceRows,
@@ -30,6 +31,13 @@ import type { SourceSignal, VerificationStatus } from "@/lib/source-tier-classif
 import { useMemo, useState } from "react";
 
 type WorkspaceMode = "single" | "shortlist";
+type ProviderRunStatus = "idle" | "running" | "succeeded" | "failed";
+type GoogleTrendsProviderPayload = {
+  rows?: WorkspaceEvidenceRow[];
+  findingsCount?: number;
+  evidenceCount?: number;
+  error?: string;
+};
 
 const SCORE_OPTIONS: ScoreValue[] = [0, 25, 50, 75, 100];
 const DIRECTION_OPTIONS = [
@@ -196,6 +204,8 @@ export function WorkspaceClient() {
   const [activeCandidateIndex, setActiveCandidateIndex] = useState(0);
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
   const [providerCopyStatus, setProviderCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
+  const [providerRunStatus, setProviderRunStatus] = useState<ProviderRunStatus>("idle");
+  const [providerRunMessage, setProviderRunMessage] = useState("");
 
   const singleResult = useMemo(
     () => evaluateSingleWorkspaceTrend(product, candidates[activeCandidateIndex]),
@@ -270,6 +280,51 @@ export function WorkspaceClient() {
     }
   }
 
+  async function runGoogleTrendsProvider({ fixture = false }: { fixture?: boolean } = {}) {
+    const targetIndex = candidates.findIndex((candidate) => candidate.id === providerCandidate.id);
+    const resolvedTargetIndex = targetIndex >= 0 ? targetIndex : activeCandidateIndex;
+    const targetCandidate = candidates[resolvedTargetIndex];
+
+    setProviderRunStatus("running");
+    setProviderRunMessage(fixture ? "正在 replay committed Google Trends fixture..." : "正在通过 server API 拉取 Google Trends...");
+
+    try {
+      const response = await fetch("/api/workspace/google-trends", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({
+          product: product.name,
+          market: product.market,
+          trend: targetCandidate.trendName,
+          fixture
+        })
+      });
+      const payload = await response.json() as GoogleTrendsProviderPayload;
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Google Trends provider failed.");
+      }
+      const rows = payload.rows ?? [];
+      setCandidates((currentCandidates) => {
+        const currentTarget = currentCandidates[resolvedTargetIndex];
+        const currentRows = currentTarget.evidenceRows ?? buildWorkspaceEvidenceRowsFromEvidence(currentTarget.evidence ?? []);
+        return candidateUpdate(currentCandidates, resolvedTargetIndex, {
+          evidenceRows: appendWorkspaceEvidenceRows(currentRows, rows)
+        });
+      });
+      setActiveCandidateIndex(resolvedTargetIndex);
+      setProviderRunStatus("succeeded");
+      setProviderRunMessage(
+        `已追加 ${rows.length} 条 ${fixture ? "fixture" : "Google Trends"} 证据；${payload.evidenceCount ?? rows.length} 条可计入评分。`
+      );
+    } catch (error) {
+      setProviderRunStatus("failed");
+      setProviderRunMessage(error instanceof Error ? error.message : String(error));
+    }
+  }
+
   return (
     <div className="workspace-page">
       <header className="workspace-hero">
@@ -277,7 +332,7 @@ export function WorkspaceClient() {
           <h1>真实工作台</h1>
           <p>
             输入产品画像和候选趋势，直接运行确定性评分、严谨层 gate 和 shortlist 排名。当前版本先使用手动锚点评分，
-            live provider 调用会放在下一阶段接入。
+            Google Trends 证据会通过 server API 写入证据编辑区。
           </p>
         </div>
         <div className="mode-toggle" aria-label="工作模式">
@@ -489,6 +544,10 @@ export function WorkspaceClient() {
                 preview={providerPreview}
                 copyStatus={providerCopyStatus}
                 onCopy={copyProviderCommands}
+                runStatus={providerRunStatus}
+                runMessage={providerRunMessage}
+                onRunGoogleTrends={() => runGoogleTrendsProvider()}
+                onRunFixture={() => runGoogleTrendsProvider({ fixture: true })}
               />
             </>
           ) : (
@@ -545,6 +604,10 @@ export function WorkspaceClient() {
                 preview={providerPreview}
                 copyStatus={providerCopyStatus}
                 onCopy={copyProviderCommands}
+                runStatus={providerRunStatus}
+                runMessage={providerRunMessage}
+                onRunGoogleTrends={() => runGoogleTrendsProvider()}
+                onRunFixture={() => runGoogleTrendsProvider({ fixture: true })}
               />
             </>
           )}
@@ -704,11 +767,19 @@ function EvidenceEditor({
 function ProviderPreviewPanel({
   preview,
   copyStatus,
-  onCopy
+  onCopy,
+  runStatus,
+  runMessage,
+  onRunGoogleTrends,
+  onRunFixture
 }: {
   preview: WorkspaceProviderPreview;
   copyStatus: "idle" | "copied" | "failed";
   onCopy: () => void;
+  runStatus: ProviderRunStatus;
+  runMessage: string;
+  onRunGoogleTrends: () => void;
+  onRunFixture: () => void;
 }) {
   return (
     <section className="provider-preview-panel" aria-label="Provider dry-run preview">
@@ -722,6 +793,27 @@ function ProviderPreviewPanel({
         </button>
       </div>
       <p className="provider-target">Target: {preview.targetTrend}</p>
+      <div className="provider-live-actions">
+        <button
+          className="primary-action"
+          type="button"
+          disabled={runStatus === "running"}
+          onClick={onRunGoogleTrends}
+        >
+          {runStatus === "running" ? "运行中..." : "运行 Google Trends"}
+        </button>
+        <button
+          className="secondary-action"
+          type="button"
+          disabled={runStatus === "running"}
+          onClick={onRunFixture}
+        >
+          运行 Fixture
+        </button>
+        <span className={runStatus === "failed" ? "provider-run-error" : ""} aria-live="polite">
+          {runMessage || " "}
+        </span>
+      </div>
       <div className="provider-command-list">
         {[preview.dryRunCommand, preview.fixtureCommand].map((command) => (
           <article key={command.label}>

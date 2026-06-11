@@ -153,7 +153,7 @@ npm run dev
 
 | Route | What it does |
 |-------|-------------|
-| `/workspace` | Editable product + trend workflow for single-trend scoring, 3-trend shortlist ranking, classifier-owned evidence editing, evidence gaps, provider command preview, and Markdown export |
+| `/workspace` | Editable product + trend workflow for single-trend scoring, 3-trend shortlist ranking, classifier-owned evidence editing, evidence gaps, server-side Google Trends run, provider command preview, and Markdown export |
 | `/product-profile` | Review the selected demo product name, category, audience, positioning, brand tone, risk tolerance |
 | `/trend-input` | Review the selected demo trend name, platform, region, description, format, controversy |
 | `/fit-score` | See the seven-dimension score breakdown and the recommendation |
@@ -167,7 +167,7 @@ For demo mode, load any of the five baseline cases from [`data/`](data/) directl
 npm test
 ```
 
-Current local verification: 100 Node tests pass via `npm test`; `npm run build` produces
+Current local verification: 104 Node tests pass via `npm test`; `npm run build` produces
 a successful Next.js production build. CI now runs both commands on GitHub Actions.
 
 Covers: scoring math, evidence adjustment, recommendation rigor, source-tier
@@ -182,8 +182,8 @@ parsing.
 **This version does:**
 - Deterministic scoring from manual product + trend input
 - Editable `/workspace` flow for single-trend scoring, 3-trend shortlist ranking,
-  classifier-owned evidence editing, evidence-gap guidance, provider dry-run / fixture
-  commands, and Markdown export
+  classifier-owned evidence editing, evidence-gap guidance, server-side Google Trends
+  evidence collection, fixture replay, provider dry-run commands, and Markdown export
 - Full GTM brief output with 12 structured sections
 - Five fully worked baseline demo cases with defensible reasoning
 - 13 structured evidence cases that show how real sources revise or validate the

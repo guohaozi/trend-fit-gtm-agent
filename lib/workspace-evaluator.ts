@@ -7,6 +7,7 @@ import {
   type EvidenceMagnitude,
   type SourceTier
 } from "./evidence-adjustment";
+import type { EvidenceCandidate } from "./evidence-collector";
 import {
   applyRecommendationRigor,
   calculateTrendFitWithProfile,
@@ -168,6 +169,47 @@ export function buildWorkspaceEvidenceRowsFromEvidence(evidence: EvidenceItem[])
     sourceSignals: defaultSignalsForTier(item.sourceTier),
     note: item.note
   }));
+}
+
+export function buildWorkspaceEvidenceRowsFromCandidates(candidates: EvidenceCandidate[]): WorkspaceEvidenceRow[] {
+  return candidates.map((candidate) => ({
+    id: candidate.id,
+    dimension: candidate.dimension,
+    direction: candidate.direction,
+    magnitude: candidate.magnitude,
+    desiredConfidence: candidate.desiredConfidence,
+    sourceUrl: candidate.sourceUrl,
+    verificationStatus: candidate.verificationStatus,
+    sourceSignals: candidate.sourceSignals ?? ["unknown"],
+    note: candidate.note
+  }));
+}
+
+function nextWorkspaceEvidenceRowId(existingIds: Set<string>, requestedId: string): string {
+  if (!existingIds.has(requestedId)) return requestedId;
+
+  let suffix = 2;
+  while (existingIds.has(`${requestedId}-${suffix}`)) {
+    suffix += 1;
+  }
+  return `${requestedId}-${suffix}`;
+}
+
+export function appendWorkspaceEvidenceRows(
+  existingRows: WorkspaceEvidenceRow[],
+  incomingRows: WorkspaceEvidenceRow[]
+): WorkspaceEvidenceRow[] {
+  const ids = new Set(existingRows.map((row) => row.id));
+  const appended = incomingRows.map((row) => {
+    const id = nextWorkspaceEvidenceRowId(ids, row.id);
+    ids.add(id);
+    return {
+      ...row,
+      id
+    };
+  });
+
+  return [...existingRows, ...appended];
 }
 
 export function materializeWorkspaceEvidenceRows(

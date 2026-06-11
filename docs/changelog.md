@@ -2,6 +2,55 @@
 
 This changelog records project-level changes and the reasoning behind them. It is intended for handoff between Codex / Claude conversations, not just release notes.
 
+## 2026-06-11 — Workspace Google Trends API Run
+
+Status:
+
+- Added the first browser-triggered live provider path for `/workspace`.
+- Google Trends execution now runs through a server route so the browser never receives
+  or submits the SerpApi key.
+
+What landed:
+
+- Added `app/api/workspace/google-trends/route.ts`.
+- The route reads `SERPAPI_API_KEY` from server env, calls `SerpApiGoogleTrendsSource`,
+  maps findings into `EvidenceCandidate[]`, then returns classifier-ready
+  `WorkspaceEvidenceRow[]`.
+- Added `buildWorkspaceEvidenceRowsFromCandidates()` and
+  `appendWorkspaceEvidenceRows()` in `lib/workspace-evaluator.ts`.
+- Updated `/workspace` provider panel with a "运行 Google Trends" action.
+- Successful provider rows are appended to the active/winning trend's evidence editor;
+  duplicate row ids are made stable with numeric suffixes.
+- `sourceTier` remains read-only: provider rows are still rematerialized through
+  `source-tier-classifier` before affecting score or gates.
+- Added styles for the live provider action and status/error messages.
+- Added `examples/google-trends-workspace.fixture.json` and a "运行 Fixture" action so
+  the same provider-to-evidence path can be demonstrated without a SerpApi key.
+
+Verification:
+
+- `npm test` passes with 104 tests.
+- `npm run build` passes.
+- Local HTTP verification:
+  - `GET /workspace` returns 200 and includes the Google Trends action.
+  - `POST /api/workspace/google-trends` without `SERPAPI_API_KEY` returns 503 with a
+    server-only setup message.
+  - `POST /api/workspace/google-trends` with `fixture: true` returns fixture evidence
+    without a SerpApi key.
+
+Known issues:
+
+- Workspace edits and provider results are still client-state only; refresh loses them.
+- The API uses one query made from product + market + trend. Multi-query planning is not
+  implemented yet.
+- No provider-health panel exists yet.
+- OpenCLI, GooseWorks, marketplace, and social-platform providers are still not
+  browser-triggered.
+
+Recommended next step:
+
+- Add provider health checks, then add save/import/export for workspace state.
+
 ## 2026-06-11 — SerpApi Google Trends Provider
 
 Status:

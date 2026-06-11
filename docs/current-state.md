@@ -10,10 +10,10 @@ This file is a handoff snapshot for starting a fresh Codex / Claude conversation
 - Git branch: `main`
 - Public GitHub repo: `https://github.com/guohaozi/trend-fit-gtm-agent`
 - Remote: `origin https://github.com/guohaozi/trend-fit-gtm-agent.git`
-- Current state: v1.2 rigor layer is implemented in docs, skills, TypeScript, tests, UI, seven new 15-case-list evidence-backed cases, one competitor-layer AI-tool evidence variant, P0-P4 evidence automation provider layers, P5a/b offline evidence-case orchestration, P5c CLI/file writer, live OpenCLI-backed and SerpApi Google Trends research providers, a fixture/dry-run provider panel in `/workspace`, classifier-owned workspace evidence editing, and a GitHub Actions CI workflow.
-- Verification status: `npm test` currently runs 100 passing Node tests; `npm run build` completes a successful Next.js production build. `.github/workflows/ci.yml` now runs `npm ci`, `npm test`, and `npm run build` on pushes to `main` and pull requests.
+- Current state: v1.2 rigor layer is implemented in docs, skills, TypeScript, tests, UI, seven new 15-case-list evidence-backed cases, one competitor-layer AI-tool evidence variant, P0-P4 evidence automation provider layers, P5a/b offline evidence-case orchestration, P5c CLI/file writer, live OpenCLI-backed and SerpApi Google Trends research providers, a fixture/dry-run provider panel in `/workspace`, classifier-owned workspace evidence editing, server-side workspace Google Trends execution, workspace fixture replay, and a GitHub Actions CI workflow.
+- Verification status: `npm test` currently runs 104 passing Node tests; `npm run build` completes a successful Next.js production build. `.github/workflows/ci.yml` now runs `npm ci`, `npm test`, and `npm run build` on pushes to `main` and pull requests.
 - Automation status: P0 product-marketing context, P1 evidence case generator, P2 customer-research provider, P3 SEO/timing provider, P4 competitor provider, P5a/b offline orchestration, P5c CLI/file writer, product+market+trend research runner, and the first deterministic trend-shortlist ranking layer are done. Live trend discovery has not been implemented yet.
-- Latest UI layer: `/workspace` is now an editable workflow page backed by `lib/workspace-evaluator.ts`. It lets users edit product fields, risk/profile, three candidate trends, seven anchored score dimensions, and evidence input rows, then switch between single-trend scoring and shortlist ranking. Evidence rows can edit source URL, dimension, direction, magnitude, desired confidence, verification status, source signal, and notes; `sourceTier` and computed confidence are read-only outputs from `source-tier-classifier`. The workspace also surfaces evidence gaps, previews provider dry-run commands for the active/winning trend, exposes a portable fixture smoke command, and can copy Markdown or provider commands. It still does not execute live providers from the browser.
+- Latest UI layer: `/workspace` is now an editable workflow page backed by `lib/workspace-evaluator.ts`. It lets users edit product fields, risk/profile, three candidate trends, seven anchored score dimensions, and evidence input rows, then switch between single-trend scoring and shortlist ranking. Evidence rows can edit source URL, dimension, direction, magnitude, desired confidence, verification status, source signal, and notes; `sourceTier` and computed confidence are read-only outputs from `source-tier-classifier`. The workspace also surfaces evidence gaps, previews provider dry-run commands for the active/winning trend, exposes a portable fixture smoke command, can copy Markdown or provider commands, can run SerpApi Google Trends through the server-only `/api/workspace/google-trends` route, and can replay `examples/google-trends-workspace.fixture.json` without a key. OpenCLI, GooseWorks, marketplace, and social-platform live runs are not yet browser-triggered.
 - Latest shortlist layer: `lib/trend-shortlist.ts` ranks manually supplied candidate trends by gated band, evidence-adjusted total, stability, and Timing & Saturation. The first demo is LEGO comparing World Cup fan culture, F1 race weekend, and graduation season gifting in `data/lego_trend_shortlist.json` and `outputs/lego_trend_shortlist.md`; F1 ranks first.
 - Latest automation layer: `lib/evidence-case-research-runner.ts`, `lib/opencli-research-source.ts`, `lib/seo-keyword-provider.ts`, and `scripts/evidence-case-research.ts` add `npm run evidence:case:research`, which starts from product + market + trend, builds research queries, can use fixture / web / OpenCLI / SerpApi Google Trends providers, converts results into evidence inputs, then writes `data/*_evidence.json` and `outputs/*_evidence_case.md`. The OpenCLI provider maps Reddit and YouTube search rows into `customerResearchFindings`, and maps Twitter/X plus Google Search rows into conservative `additionalCandidates`. The SerpApi provider calls `engine=google_trends` for related queries and timeseries, then maps the result into SEO keyword findings for Timing & Saturation and Commercial Intent. Xiaohongshu, TikTok, GooseWorks, and marketplace-specific mappers are the next provider adapters.
 - Latest live research proof: DJI drones entering UAE / Saudi / Middle East for video creation, security inspection, and tourism enablement can be generated with OpenCLI via `npm run evidence:case:research`. The current generated report is `outputs/dji_drones_uae_saudi_middle_east_video_creation_security_inspection_tourism_enablement_evidence_case.md`; latest run produced 16 accepted evidence items, `76 / Cautious test`, evidence gate `partial`, stability `fragile`.
@@ -29,9 +29,10 @@ This file is a handoff snapshot for starting a fresh Codex / Claude conversation
 - The project is published to GitHub. The exact latest pushed commit hash should be checked with `git log -1 --oneline` in the next conversation.
 - Previous review round was a Claude **review + fix** pass on the evidence cases Codex produced: it verified the cited sources are real, found a source-tier inflation bug in the AI-tool case, fixed it, and added a deterministic source-tier classifier to prevent recurrence.
 - Previous round added the AI photo-tool evidence case and the snack / Dubai-style chocolate evidence case.
-- This handoff corresponds to the workspace evidence-editor and SerpApi Google Trends
-  provider follow-up. Check `git log -1 --oneline` and `git status --short --branch` for
-  the exact pushed commit state in the next conversation.
+- This handoff corresponds to the workspace evidence-editor, SerpApi Google Trends
+  provider, and workspace Google Trends API follow-up. Check `git log -1 --oneline` and
+  `git status --short --branch` for the exact pushed commit state in the next
+  conversation.
 
 ## Latest Conversation Handoff
 
@@ -71,17 +72,28 @@ This is the compact handoff for the next Codex / Claude conversation.
 - **CLI wiring:** `scripts/evidence-case-research.ts` now supports `--provider
   google-trends` / `--provider serpapi`, `--serpapi-key`, `--serpapi-geo`, and
   `--serpapi-date`. It also defaults to `SERPAPI_API_KEY` for local runs.
+- **Workspace Google Trends API:** `/api/workspace/google-trends` runs the SerpApi
+  provider on the server, never accepts an API key from browser input, redacts provider
+  keys from source URLs, and returns classifier-ready workspace evidence rows.
+- **Workspace provider action:** the `/workspace` provider panel now has a "运行 Google
+  Trends" action. It calls the server API and appends returned rows into the active or
+  winning trend's evidence editor; source tier remains read-only and recomputed.
+- **Workspace fixture replay:** the same route supports `fixture: true` and replays
+  `examples/google-trends-workspace.fixture.json`, so the provider-to-evidence flow can
+  be demonstrated without `SERPAPI_API_KEY`.
 - **Tests:** Added focused tests for shortlist ranking, workspace evaluation/export,
   provider-preview generation, portable OpenCLI dry-run output, and classifier-owned
   workspace evidence materialization, plus SerpApi Google Trends collection and CLI
-  wiring.
+  wiring, workspace API coverage, and provider-row append behavior.
 
 ### Key design decisions
 
 - Build the frontend workflow before adding more live providers, because an editable UI
   exposes exactly which evidence slots and provider gaps matter.
-- Keep `/workspace` deterministic for now: no browser-triggered OpenCLI, GooseWorks, or
-  Google Trends calls yet. Live Google Trends is CLI-only through SerpApi.
+- Keep provider execution server-owned. `/workspace` may trigger Google Trends through
+  `/api/workspace/google-trends`, but API keys stay in server env (`SERPAPI_API_KEY`) and
+  are not accepted from browser state. OpenCLI / GooseWorks should get the same server
+  boundary before browser-triggered execution.
 - Treat provider preview as a contract/demo layer first: dry-run commands and fixture
   smoke runs prove the pipeline shape before the browser is allowed to execute live
   local CLIs.
@@ -100,8 +112,9 @@ This is the compact handoff for the next Codex / Claude conversation.
 
 - `/workspace` can edit evidence rows, but edits are currently client-state only. There
   is no database, import/export for edited workspace state, or server persistence yet.
-- The UI does not execute live providers. Evidence gaps now produce dry-run / fixture
-  commands, but browser-triggered OpenCLI, GooseWorks, Google Trends, and marketplace
+- The UI can execute SerpApi Google Trends through the server API when
+  `SERPAPI_API_KEY` is configured, or replay a committed Google Trends fixture without a
+  key. Browser-triggered OpenCLI, GooseWorks, marketplace, and social-platform
   collection are still not wired.
 - LEGO shortlist evidence is curated fixture evidence, not a full live market-research
   run.
@@ -109,20 +122,20 @@ This is the compact handoff for the next Codex / Claude conversation.
   the SerpApi Google Trends CLI provider rather than broad Google Search rows.
 - Xiaohongshu, TikTok, marketplace/review providers, real provider health checks, and
   browser-run collection are not wired into the UI.
-- Browser screenshot verification was attempted but blocked because the available
-  Playwright package had no browser binary installed. HTTP verification confirmed
-  `/workspace` returns the provider panel and expected commands.
+- Browser screenshot verification was attempted earlier but blocked because the
+  available Playwright package had no browser binary installed. HTTP verification now
+  confirms `/workspace` returns the provider panel and Google Trends action; the API
+  returns a server-only setup error when `SERPAPI_API_KEY` is missing.
 - `gh auth status` showed the GitHub CLI token as invalid during this handoff; plain
   `git push` may still work through local Git credentials.
 
 ### Recommended next steps
 
-1. Add provider health checks and an API boundary for fixture runs before allowing live
-   browser-triggered OpenCLI execution.
+1. Add provider health checks for the workspace provider panel.
 2. Add save/import/export for workspace state so edited evidence rows can survive refresh
    without introducing auth or a database.
-3. Add a fixture-backed or server/API boundary for running the SerpApi Google Trends
-   provider from `/workspace` without exposing keys in the browser.
+3. Add multi-query Google Trends planning so the workspace compares several keyword
+   variants instead of one product + market + trend query.
 4. Add Xiaohongshu / TikTok social-language mappers and marketplace/review providers.
 5. Add route-level smoke coverage or browser screenshots for `/workspace` so future UI
    regressions are easier to catch.
@@ -272,8 +285,7 @@ Known limitations:
 
 Recommended next implementation:
 
-1. Add fixture/server execution support so `/workspace` can run or replay provider
-   collection without exposing SerpApi keys in the browser.
+1. Add provider health checks for the workspace provider panel.
 2. Add multi-query Google Trends planning instead of one product + market + trend query.
 3. Add Xiaohongshu / TikTok row mappers as raw social candidate providers.
 4. Add a shortlist runner: product + market -> 3-5 candidate trends -> run
@@ -903,7 +915,7 @@ git push
    - normalize them into `EvidenceCandidate[]`;
    - pass candidates into `buildEvidenceDraft()`.
 3. Add route smoke tests for `/`, `/fit-score`, and `/report`, including `demo_ai_tool` and `demo_snack`.
-4. Add provider-backed evidence collection controls to `/workspace`, starting with dry-run / fixture mode before live OpenCLI or SerpApi execution.
+4. Add more provider-backed evidence collection controls to `/workspace`, starting with fixture replay and health checks before live OpenCLI / GooseWorks execution.
 5. Add portfolio screenshots and a short case-study page/doc showing the evidence-backed examples, the LEGO shortlist, and the editable workspace.
 6. Later, integrate a real evidence toolchain:
    - GooseWorks for Reddit/X comments, competitor activity, and creator discovery

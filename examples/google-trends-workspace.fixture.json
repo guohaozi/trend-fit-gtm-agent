@@ -1,0 +1,27 @@
+{
+  "idPrefix": "protein drink US convenience retail grab-and-go protein",
+  "sourceUrl": "https://serpapi.com/search?engine=google_trends&q=protein+drink+US+convenience+retail+grab-and-go+protein&data_type=RELATED_QUERIES&date=today+12-m&geo=US",
+  "relatedQueries": {
+    "rising": [
+      {
+        "query": "protein drink convenience store",
+        "formatted_value": "Breakout"
+      },
+      {
+        "query": "where to buy protein drink",
+        "formatted_value": "+120%",
+        "extracted_value": 120
+      }
+    ],
+    "top": [
+      {
+        "query": "protein drink",
+        "extracted_value": 100
+      }
+    ]
+  },
+  "trend": {
+    "direction": "RISING",
+    "change_pct": 366.67
+  }
+}
