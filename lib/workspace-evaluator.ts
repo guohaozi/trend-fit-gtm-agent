@@ -11,6 +11,7 @@ import type { EvidenceCandidate } from "./evidence-collector";
 import {
   applyRecommendationRigor,
   calculateTrendFitWithProfile,
+  PROFILE_OPTIONS,
   type GatedRecommendation,
   type WeightProfile
 } from "./recommendation-rigor";
@@ -105,6 +106,21 @@ export type WorkspaceEvidenceMaterialization = {
   droppedRows: ComputedWorkspaceEvidenceRow[];
 };
 
+export type WorkspaceMode = "single" | "shortlist";
+
+export type WorkspaceStateSnapshot = {
+  version: 1;
+  savedAt: string;
+  mode: WorkspaceMode;
+  product: WorkspaceProduct;
+  candidates: WorkspaceCandidate[];
+  activeCandidateIndex: number;
+};
+
+export type WorkspaceStateParseResult =
+  | { ok: true; state: WorkspaceStateSnapshot }
+  | { ok: false; error: string };
+
 const DIMENSION_LABELS: Record<string, string> = {
   audienceOverlap: "Audience overlap",
   useCaseRelevance: "Use-case relevance",
@@ -150,6 +166,22 @@ const SLOT_PLATFORMS: Record<string, string[]> = {
   timingSaturation: ["google", "youtube"],
   stability: ["google", "reddit"]
 };
+const SCORE_KEYS: ScoreKey[] = [
+  "audienceOverlap",
+  "useCaseRelevance",
+  "messageBridge",
+  "creativeFeasibility",
+  "commercialIntent",
+  "brandSafety",
+  "timingSaturation"
+];
+const SCORE_VALUES = new Set([0, 25, 50, 75, 100]);
+const RISK_TOLERANCES = new Set<RiskTolerance>(["low", "medium", "high"]);
+const WEIGHT_PROFILES = new Set(PROFILE_OPTIONS.map((profile) => profile.id));
+const EVIDENCE_DIRECTIONS = new Set<EvidenceDirection>(["confirm", "up", "down"]);
+const EVIDENCE_MAGNITUDES = new Set<EvidenceMagnitude>(["weak", "moderate", "strong"]);
+const EVIDENCE_CONFIDENCES = new Set<EvidenceConfidence>(["low", "medium", "high"]);
+const VERIFICATION_STATUSES = new Set<VerificationStatus>(["verified", "unverified", "contradicted"]);
 
 function defaultSignalsForTier(sourceTier: SourceTier): SourceSignal[] {
   if (sourceTier === "primary") return ["direct_competitor_campaign"];
@@ -210,6 +242,131 @@ export function appendWorkspaceEvidenceRows(
   });
 
   return [...existingRows, ...appended];
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function isWorkspaceMode(value: unknown): value is WorkspaceMode {
+  return value === "single" || value === "shortlist";
+}
+
+function isScores(value: unknown): value is Scores {
+  if (!isRecord(value)) return false;
+  return SCORE_KEYS.every((key) => typeof value[key] === "number" && SCORE_VALUES.has(value[key] as number));
+}
+
+function isWorkspaceProduct(value: unknown): value is WorkspaceProduct {
+  if (!isRecord(value)) return false;
+  const stringFields: Array<keyof WorkspaceProduct> = [
+    "name",
+    "category",
+    "market",
+    "audience",
+    "positioning",
+    "sellingPoints",
+    "brandTone"
+  ];
+  if (!stringFields.every((key) => isNonEmptyString(value[key]))) return false;
+  if (!RISK_TOLERANCES.has(value.riskTolerance as RiskTolerance)) {
+    throw new Error("Invalid risk tolerance in workspace state.");
+  }
+  if (!WEIGHT_PROFILES.has(value.profileUsed as WeightProfile)) {
+    throw new Error("Invalid weight profile in workspace state.");
+  }
+  return true;
+}
+
+function isWorkspaceEvidenceRow(value: unknown): value is WorkspaceEvidenceRow {
+  if (!isRecord(value)) return false;
+  return (
+    isNonEmptyString(value.id) &&
+    SCORE_KEYS.includes(value.dimension as ScoreKey) &&
+    EVIDENCE_DIRECTIONS.has(value.direction as EvidenceDirection) &&
+    EVIDENCE_MAGNITUDES.has(value.magnitude as EvidenceMagnitude) &&
+    EVIDENCE_CONFIDENCES.has(value.desiredConfidence as EvidenceConfidence) &&
+    isNonEmptyString(value.sourceUrl) &&
+    VERIFICATION_STATUSES.has(value.verificationStatus as VerificationStatus) &&
+    Array.isArray(value.sourceSignals) &&
+    value.sourceSignals.every((signal) => typeof signal === "string") &&
+    typeof value.note === "string"
+  );
+}
+
+function isWorkspaceCandidate(value: unknown): value is WorkspaceCandidate {
+  if (!isRecord(value)) return false;
+  if (!isNonEmptyString(value.id) || !isNonEmptyString(value.trendName) || typeof value.trendDescription !== "string") return false;
+  if (!isScores(value.scores)) return false;
+  if (value.evidenceRows !== undefined && (!Array.isArray(value.evidenceRows) || !value.evidenceRows.every(isWorkspaceEvidenceRow))) {
+    return false;
+  }
+  return true;
+}
+
+function clampActiveCandidateIndex(index: number, candidates: WorkspaceCandidate[]): number {
+  if (candidates.length === 0) return 0;
+  if (!Number.isInteger(index)) return 0;
+  return Math.min(Math.max(index, 0), candidates.length - 1);
+}
+
+export function createWorkspaceStateSnapshot({
+  mode,
+  product,
+  candidates,
+  activeCandidateIndex
+}: {
+  mode: WorkspaceMode;
+  product: WorkspaceProduct;
+  candidates: WorkspaceCandidate[];
+  activeCandidateIndex: number;
+}): WorkspaceStateSnapshot {
+  return {
+    version: 1,
+    savedAt: new Date().toISOString(),
+    mode,
+    product,
+    candidates,
+    activeCandidateIndex: clampActiveCandidateIndex(activeCandidateIndex, candidates)
+  };
+}
+
+export function serializeWorkspaceState(state: WorkspaceStateSnapshot): string {
+  return `${JSON.stringify(state, null, 2)}\n`;
+}
+
+export function parseWorkspaceStateJson(json: string): WorkspaceStateParseResult {
+  try {
+    const parsed = JSON.parse(json) as unknown;
+    if (!isRecord(parsed)) return { ok: false, error: "Workspace state must be a JSON object." };
+    if (parsed.version !== 1) return { ok: false, error: "Unsupported workspace state version." };
+    if (!isWorkspaceMode(parsed.mode)) return { ok: false, error: "Invalid workspace mode." };
+    if (!isWorkspaceProduct(parsed.product)) return { ok: false, error: "Invalid workspace product." };
+    if (!Array.isArray(parsed.candidates) || parsed.candidates.length === 0 || !parsed.candidates.every(isWorkspaceCandidate)) {
+      return { ok: false, error: "Invalid workspace candidates." };
+    }
+    const activeCandidateIndex = clampActiveCandidateIndex(Number(parsed.activeCandidateIndex), parsed.candidates);
+    return {
+      ok: true,
+      state: {
+        version: 1,
+        savedAt: isNonEmptyString(parsed.savedAt) ? parsed.savedAt : new Date().toISOString(),
+        mode: parsed.mode,
+        product: parsed.product,
+        candidates: parsed.candidates,
+        activeCandidateIndex
+      }
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "Invalid workspace state JSON."
+    };
+  }
 }
 
 export function materializeWorkspaceEvidenceRows(

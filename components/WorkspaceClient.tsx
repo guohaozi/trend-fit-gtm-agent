@@ -16,21 +16,24 @@ import {
   buildWorkspaceEvidenceRowsFromEvidence,
   buildWorkspaceProviderPreview,
   appendWorkspaceEvidenceRows,
+  createWorkspaceStateSnapshot,
   evaluateSingleWorkspaceTrend,
   evaluateWorkspaceShortlist,
   materializeWorkspaceEvidenceRows,
+  parseWorkspaceStateJson,
   renderShortlistWorkspaceMarkdown,
   renderSingleWorkspaceMarkdown,
+  serializeWorkspaceState,
   type WorkspaceCandidate,
   type WorkspaceEvidenceGap,
   type WorkspaceEvidenceRow,
+  type WorkspaceMode,
   type WorkspaceProviderPreview,
   type WorkspaceProduct
 } from "@/lib/workspace-evaluator";
 import type { SourceSignal, VerificationStatus } from "@/lib/source-tier-classifier";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-type WorkspaceMode = "single" | "shortlist";
 type ProviderRunStatus = "idle" | "running" | "succeeded" | "failed";
 type GoogleTrendsProviderPayload = {
   rows?: WorkspaceEvidenceRow[];
@@ -39,6 +42,7 @@ type GoogleTrendsProviderPayload = {
   error?: string;
 };
 
+const WORKSPACE_STORAGE_KEY = "trend-fit-workspace-state-v1";
 const SCORE_OPTIONS: ScoreValue[] = [0, 25, 50, 75, 100];
 const DIRECTION_OPTIONS = [
   { value: "confirm", label: "确认" },
@@ -206,6 +210,41 @@ export function WorkspaceClient() {
   const [providerCopyStatus, setProviderCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
   const [providerRunStatus, setProviderRunStatus] = useState<ProviderRunStatus>("idle");
   const [providerRunMessage, setProviderRunMessage] = useState("");
+  const [storageReady, setStorageReady] = useState(false);
+  const [workspaceStateStatus, setWorkspaceStateStatus] = useState("本地状态准备中");
+  const [importOpen, setImportOpen] = useState(false);
+  const [importValue, setImportValue] = useState("");
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem(WORKSPACE_STORAGE_KEY);
+    if (saved) {
+      const parsed = parseWorkspaceStateJson(saved);
+      if (parsed.ok) {
+        setMode(parsed.state.mode);
+        setProduct(parsed.state.product);
+        setCandidates(parsed.state.candidates);
+        setActiveCandidateIndex(parsed.state.activeCandidateIndex);
+        setWorkspaceStateStatus("已恢复本地保存");
+      } else {
+        setWorkspaceStateStatus(`本地保存无效：${parsed.error}`);
+      }
+    } else {
+      setWorkspaceStateStatus("已使用默认工作台");
+    }
+    setStorageReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!storageReady) return;
+    const snapshot = createWorkspaceStateSnapshot({
+      mode,
+      product,
+      candidates,
+      activeCandidateIndex
+    });
+    window.localStorage.setItem(WORKSPACE_STORAGE_KEY, serializeWorkspaceState(snapshot));
+    setWorkspaceStateStatus("已自动保存到本机");
+  }, [activeCandidateIndex, candidates, mode, product, storageReady]);
 
   const singleResult = useMemo(
     () => evaluateSingleWorkspaceTrend(product, candidates[activeCandidateIndex]),
@@ -280,6 +319,59 @@ export function WorkspaceClient() {
     }
   }
 
+  async function exportWorkspaceState() {
+    const snapshot = createWorkspaceStateSnapshot({
+      mode,
+      product,
+      candidates,
+      activeCandidateIndex
+    });
+    const serialized = serializeWorkspaceState(snapshot);
+    try {
+      await navigator.clipboard.writeText(serialized);
+      setWorkspaceStateStatus("状态 JSON 已复制");
+    } catch {
+      setImportValue(serialized);
+      setImportOpen(true);
+      setWorkspaceStateStatus("复制失败，已放入导入框供手动复制");
+    }
+  }
+
+  function importWorkspaceState() {
+    const parsed = parseWorkspaceStateJson(importValue);
+    if (!parsed.ok) {
+      setWorkspaceStateStatus(`导入失败：${parsed.error}`);
+      return;
+    }
+
+    setMode(parsed.state.mode);
+    setProduct(parsed.state.product);
+    setCandidates(parsed.state.candidates);
+    setActiveCandidateIndex(parsed.state.activeCandidateIndex);
+    window.localStorage.setItem(WORKSPACE_STORAGE_KEY, serializeWorkspaceState(parsed.state));
+    setWorkspaceStateStatus("导入成功，已保存到本机");
+    setImportOpen(false);
+  }
+
+  function resetWorkspaceState() {
+    const nextProduct = initialProduct();
+    const nextCandidates = initialCandidates();
+    setMode("shortlist");
+    setProduct(nextProduct);
+    setCandidates(nextCandidates);
+    setActiveCandidateIndex(0);
+    window.localStorage.setItem(
+      WORKSPACE_STORAGE_KEY,
+      serializeWorkspaceState(createWorkspaceStateSnapshot({
+        mode: "shortlist",
+        product: nextProduct,
+        candidates: nextCandidates,
+        activeCandidateIndex: 0
+      }))
+    );
+    setWorkspaceStateStatus("已重置为默认工作台");
+  }
+
   async function runGoogleTrendsProvider({ fixture = false }: { fixture?: boolean } = {}) {
     const targetIndex = candidates.findIndex((candidate) => candidate.id === providerCandidate.id);
     const resolvedTargetIndex = targetIndex >= 0 ? targetIndex : activeCandidateIndex;
@@ -335,15 +427,50 @@ export function WorkspaceClient() {
             Google Trends 证据会通过 server API 写入证据编辑区。
           </p>
         </div>
-        <div className="mode-toggle" aria-label="工作模式">
-          <button className={mode === "single" ? "active" : ""} type="button" onClick={() => setMode("single")}>
-            单趋势
-          </button>
-          <button className={mode === "shortlist" ? "active" : ""} type="button" onClick={() => setMode("shortlist")}>
-            Shortlist
-          </button>
+        <div className="workspace-hero-actions">
+          <div className="mode-toggle" aria-label="工作模式">
+            <button className={mode === "single" ? "active" : ""} type="button" onClick={() => setMode("single")}>
+              单趋势
+            </button>
+            <button className={mode === "shortlist" ? "active" : ""} type="button" onClick={() => setMode("shortlist")}>
+              Shortlist
+            </button>
+          </div>
+          <div className="workspace-state-actions" aria-label="工作台状态">
+            <button className="secondary-action" type="button" onClick={exportWorkspaceState}>
+              导出 JSON
+            </button>
+            <button className="secondary-action" type="button" onClick={() => setImportOpen((open) => !open)}>
+              导入 JSON
+            </button>
+            <button className="text-action compact-action" type="button" onClick={resetWorkspaceState}>
+              重置
+            </button>
+            <span aria-live="polite">{workspaceStateStatus}</span>
+          </div>
         </div>
       </header>
+
+      {importOpen ? (
+        <section className="workspace-import-panel" aria-label="导入工作台状态">
+          <label className="field-row wide">
+            <span>粘贴 workspace JSON</span>
+            <textarea
+              rows={6}
+              value={importValue}
+              onChange={(event) => setImportValue(event.target.value)}
+            />
+          </label>
+          <div>
+            <button className="primary-action" type="button" onClick={importWorkspaceState}>
+              导入
+            </button>
+            <button className="secondary-action" type="button" onClick={() => setImportOpen(false)}>
+              取消
+            </button>
+          </div>
+        </section>
+      ) : null}
 
       <div className="workspace-grid">
         <section className="workspace-panel" aria-label="输入区">

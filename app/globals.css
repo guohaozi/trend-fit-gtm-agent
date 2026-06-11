@@ -769,6 +769,52 @@ th {
   margin-bottom: 22px;
 }
 
+.workspace-hero-actions {
+  display: grid;
+  gap: 10px;
+  justify-items: end;
+  min-width: min(100%, 360px);
+}
+
+.workspace-state-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.workspace-state-actions .secondary-action,
+.workspace-state-actions .text-action {
+  min-height: 34px;
+}
+
+.workspace-state-actions span {
+  color: var(--muted);
+  flex-basis: 100%;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  min-height: 18px;
+  text-align: right;
+}
+
+.workspace-import-panel {
+  background: #f8fafb;
+  border: 1px solid #e3e8ee;
+  border-radius: 8px;
+  display: grid;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 14px;
+}
+
+.workspace-import-panel div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .workspace-hero h1 {
   margin-bottom: 10px;
 }
@@ -1331,12 +1377,19 @@ th {
   .page-header,
   .recommendation-band,
   .workspace-hero,
+  .workspace-hero-actions,
+  .workspace-state-actions,
   .trend-editor-header,
   .evidence-editor-head,
   .provider-preview-head,
   .provider-live-actions {
     align-items: stretch;
     flex-direction: column;
+    justify-items: stretch;
+  }
+
+  .workspace-state-actions span {
+    text-align: left;
   }
 
   .dashboard-grid,

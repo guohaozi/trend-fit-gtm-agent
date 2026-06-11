@@ -8,11 +8,14 @@ import {
   buildWorkspaceEvidenceRowsFromEvidence,
   buildWorkspaceProviderPreview,
   appendWorkspaceEvidenceRows,
+  createWorkspaceStateSnapshot,
   materializeWorkspaceEvidenceRows,
+  parseWorkspaceStateJson,
   evaluateSingleWorkspaceTrend,
   evaluateWorkspaceShortlist,
   renderSingleWorkspaceMarkdown,
   renderShortlistWorkspaceMarkdown,
+  serializeWorkspaceState,
   type WorkspaceCandidate,
   type WorkspaceProduct
 } from "../lib/workspace-evaluator";
@@ -275,5 +278,44 @@ describe("workspace evaluator", () => {
 
     assert.deepEqual(rows.map((row) => row.id), ["google-trends-rising", "google-trends-rising-2"]);
     assert.equal(rows[1].note, "Provider row.");
+  });
+
+  it("serializes and parses workspace state snapshots for save/import/export", () => {
+    const snapshot = createWorkspaceStateSnapshot({
+      mode: "single",
+      product,
+      candidates: [f1Candidate],
+      activeCandidateIndex: 99
+    });
+    const parsed = parseWorkspaceStateJson(serializeWorkspaceState(snapshot));
+
+    assert.equal(snapshot.version, 1);
+    assert.equal(snapshot.activeCandidateIndex, 0);
+    assert.equal(parsed.ok, true);
+    if (parsed.ok) {
+      assert.equal(parsed.state.product.name, "LEGO");
+      assert.equal(parsed.state.candidates[0].trendName, "F1 race weekend");
+      assert.equal(parsed.state.mode, "single");
+    }
+  });
+
+  it("rejects invalid workspace state imports without throwing", () => {
+    const badJson = JSON.stringify({
+      version: 1,
+      mode: "single",
+      activeCandidateIndex: 0,
+      product: {
+        ...product,
+        riskTolerance: "reckless"
+      },
+      candidates: [f1Candidate]
+    });
+    const parsed = parseWorkspaceStateJson(badJson);
+
+    assert.equal(parsed.ok, false);
+    if (!parsed.ok) {
+      assert.match(parsed.error, /risk tolerance/i);
+    }
+    assert.equal(parseWorkspaceStateJson("not-json").ok, false);
   });
 });

@@ -2,6 +2,41 @@
 
 This changelog records project-level changes and the reasoning behind them. It is intended for handoff between Codex / Claude conversations, not just release notes.
 
+## 2026-06-11 — Workspace Save / Import / Export
+
+Status:
+
+- Added local persistence and portable JSON handoff for `/workspace`.
+- Edited evidence rows and provider-generated rows now survive refresh without adding
+  auth, a database, or server persistence.
+
+What landed:
+
+- Added versioned workspace state helpers in `lib/workspace-evaluator.ts`:
+  `createWorkspaceStateSnapshot()`, `serializeWorkspaceState()`, and
+  `parseWorkspaceStateJson()`.
+- Import parsing validates mode, product fields, risk tolerance, profile, candidates,
+  score anchors, and evidence rows before replacing current workspace state.
+- `/workspace` now auto-saves product, mode, active trend, candidates, scores, and
+  evidence rows to localStorage.
+- Added UI controls for exporting state JSON, importing pasted JSON, and resetting to
+  the default LEGO workspace.
+
+Verification:
+
+- `npm test` passes with 106 tests.
+- `npm run build` passes.
+
+Known issues:
+
+- Persistence is local-only. There is no user account, server storage, sharing URL, or
+  collaboration model.
+- Export uses clipboard-first JSON; it does not create a downloaded file yet.
+
+Recommended next step:
+
+- Add provider health checks, then add multi-query Google Trends planning.
+
 ## 2026-06-11 — Workspace Google Trends API Run
 
 Status:
