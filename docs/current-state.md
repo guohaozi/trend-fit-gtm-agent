@@ -43,6 +43,31 @@ This is the compact handoff for the next Codex / Claude conversation.
 
 ### What was completed
 
+**Most recent round (Claude — review, verification, fixes). HEAD `6c4509a`, pushed:**
+
+- **Source-tier inflation fix:** caught that Codex's AI-tool evidence case tagged three
+  vendor pages (shopify/picsart) as `primary` when the rubric makes vendor copy `proxy`;
+  re-tiered them so `creativeFeasibility` is correctly flagged in `dimensionCaps`. Added
+  `skills/trend-product-fit/source_tier_classifier.md` as the deterministic guard.
+- **Route + page smoke tests:** `tests/route-smoke.test.ts` covers the report download API
+  and all six pages across cases/profiles/fallback inputs — closes the `/workspace`
+  UI-regression gap that earlier handoffs listed as a TODO. Test-only global React shim
+  for the classic JSX transform; product code unchanged.
+- **SerpApi verified live + two real bugs fixed** (first real, non-fixture run):
+  1. A near-zero-demand query makes SerpApi return an `error` and the relative interest
+     index produced a bogus `-100% trend_declining / verified` finding; `collect` now
+     emits no findings (plus a `ProviderFindingResult.notes` entry) when SerpApi reports
+     no results.
+  2. Query construction concatenated product+market+trend into one long string Google
+     Trends returned nothing for; `collect` now queries the trend term only (market →
+     `geo`). Live proof: "dubai chocolate" (geo=DE) → 12 findings where the old long query
+     → 0. Field paths + fixture shape confirmed correct against live data.
+- **`scripts/verify-serpapi.ts`:** reusable live-check harness; the SerpApi key stays in
+  the caller's environment, never committed.
+- All green: `npm test` 117 passing, `npm run build` OK, CI on `main`.
+
+**Prior round (Codex — workspace + provider layer):**
+
 - **Credibility cleanup:** README, product-marketing context, current-state, and
   changelog were updated to stop overstating demo readiness and to reflect the current
   evidence-case, test, build, and CI status.
@@ -127,23 +152,37 @@ This is the compact handoff for the next Codex / Claude conversation.
   run.
 - Google Search is still not Google Trends. Hard Timing / SEO evidence should now use
   the SerpApi Google Trends CLI provider rather than broad Google Search rows.
+- Google Trends related_queries can include noise/spam even for a clean trend term
+  ("labubu", SEO-spam strings), which currently flows through as breakout/buying evidence.
+  A relevance filter is the top data-quality follow-up (see next steps).
 - Xiaohongshu, TikTok, marketplace/review providers, real provider health checks, and
   browser-run collection are not wired into the UI.
-- Browser screenshot verification was attempted earlier but blocked because the
-  available Playwright package had no browser binary installed. HTTP verification now
-  confirms `/workspace` returns the provider panel and Google Trends action; the API
-  returns a server-only setup error when `SERPAPI_API_KEY` is missing.
+- Route-level smoke tests now cover `/workspace` and every page (`tests/route-smoke.test.ts`):
+  page functions are invoked across cases/profiles/fallbacks. Full browser-screenshot
+  verification is still not wired (the earlier Playwright attempt was blocked by a missing
+  browser binary). HTTP verification confirms `/workspace` returns the provider panel and
+  Google Trends action; the API returns a server-only setup error when `SERPAPI_API_KEY`
+  is missing.
 - `gh auth status` showed the GitHub CLI token as invalid during this handoff; plain
   `git push` may still work through local Git credentials.
 
 ### Recommended next steps
 
-1. Add provider health checks for the workspace provider panel.
-2. Add multi-query Google Trends planning so the workspace compares several keyword
-   variants instead of one product + market + trend query.
-3. Add Xiaohongshu / TikTok social-language mappers and marketplace/review providers.
-4. Add route-level smoke coverage or browser screenshots for `/workspace` so future UI
-   regressions are easier to catch.
+1. **Google Trends related_queries relevance filter.** The live query-construction fix
+   surfaced noise: a clean trend term ("dubai chocolate") returns useful breakout/buying
+   queries but also spam ("labubu", "...caramelbbw emerald ebook cashback code"). Require
+   related queries to share a trend token and drop obvious SEO-spam before they become
+   evidence. This is the highest-leverage data-quality follow-up.
+2. **One real end-to-end through the workspace UI** with a live `SERPAPI_API_KEY` (rotate
+   the key first — it was shared in chat): confirm the browser → `/api/workspace/google-trends`
+   → classifier → score path on real data, not just the `verify-serpapi.ts` harness.
+3. Add provider health checks for the workspace provider panel.
+4. Add Xiaohongshu / TikTok social-language mappers and marketplace/review providers.
+5. Optional: multi-keyword Google Trends planning (compare several trend-term variants for
+   one trend) now that single-term querying works.
+6. (Direction confirmed with the user) Automatic trend discovery is intentionally NOT on
+   the roadmap. The project stays "given product + market + trend, score it"; the user does
+   not want a "product → candidate trends" discovery layer for now.
 
 ## Portfolio / Interview Positioning
 
