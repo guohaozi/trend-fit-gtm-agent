@@ -2,6 +2,64 @@
 
 This changelog records project-level changes and the reasoning behind them. It is intended for handoff between Codex / Claude conversations, not just release notes.
 
+## 2026-06-11 — Workspace Evidence Editor With Classifier-Owned Tier
+
+Status:
+
+- Added evidence-item editing to `/workspace`.
+- Preserved the core evidence-governance rule: `sourceTier` is read-only and computed by
+  the project classifier, not selected by the user.
+
+What landed:
+
+- Added `WorkspaceEvidenceRow`, `buildWorkspaceEvidenceRowsFromEvidence()`, and
+  `materializeWorkspaceEvidenceRows()` in `lib/workspace-evaluator.ts`.
+- Updated workspace evaluation and shortlist ranking so editable evidence rows are
+  materialized through `source-tier-classifier` before they affect scores or gates.
+- Extended `components/WorkspaceClient.tsx` with an evidence editor for the active trend.
+- Added workspace styles for compact evidence row editing and read-only computed tier
+  display.
+- Added tests proving vendor evidence is downgraded to proxy/medium despite a high
+  requested confidence, and contradicted evidence is dropped before scoring.
+- Updated README, product-marketing context, and current-state test counts to 97.
+
+Current behavior:
+
+- Users can edit evidence source URL, scoring dimension, direction, magnitude, desired
+  confidence, verification status, source signal, and note.
+- The UI displays computed source tier, computed confidence, and classifier reasons.
+- Users can add and remove evidence rows for the active trend.
+- Source tier cannot be manually upgraded from the browser.
+- Evidence edits are client-state only; they recalculate the current score/gate but are
+  not persisted across refresh.
+
+Key design decisions:
+
+- Existing fixture evidence is converted into editable rows, but every row is still
+  rematerialized through the classifier before scoring.
+- The editor exposes one source-signal selector per row for now. This keeps the UI simple
+  while still giving the classifier enough signal to distinguish raw platform data,
+  competitor campaign examples, vendor copy, listicles, and unknown sources.
+- Dropped evidence remains visible in the editor with `computed tier = dropped`, but it
+  does not enter `EvidenceItem[]` or score adjustment.
+
+Verification:
+
+- `npm test` passes with 97 tests.
+- `npm run build` passes.
+
+Known issues:
+
+- Edited workspace state is not saved, exported, or imported yet.
+- The browser still does not run fixture or live provider collection.
+- The source-signal editor is intentionally single-select; multi-signal editing can be
+  added later if real provider outputs need it.
+
+Recommended next step:
+
+- Add provider health checks and a server/API boundary for fixture provider runs, then
+  add save/import/export for edited workspace state.
+
 ## 2026-06-10 — Workspace Provider Preview and Portable OpenCLI Default
 
 Status:

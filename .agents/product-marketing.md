@@ -151,10 +151,10 @@
 - Five baseline demo cases.
 - 13 structured evidence cases across demo, competitor-layer, market-expansion, and live OpenCLI-backed research paths.
 - One trend-shortlist demo comparing LEGO against World Cup, F1, and graduation-season trends.
-- One editable workspace route for live single-trend scoring, shortlist ranking, evidence-gap guidance, and Markdown export without editing JSON.
+- One editable workspace route for live single-trend scoring, shortlist ranking, classifier-owned evidence editing, evidence-gap guidance, provider command preview, and Markdown export without editing JSON.
 - Seven scoring dimensions.
 - Fixed score anchors: 0, 25, 50, 75, 100.
-- Current local verification: 95 tests pass via `npm test`; production build passes via `npm run build`.
+- Current local verification: 97 tests pass via `npm test`; production build passes via `npm run build`.
 - GitHub Actions CI runs `npm ci`, `npm test`, and `npm run build` on pushes to `main` and pull requests.
 
 **Customers:** No external customer logos. This is currently a portfolio/demo project.

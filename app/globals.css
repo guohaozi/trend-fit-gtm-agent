@@ -901,6 +901,110 @@ th {
   padding: 8px 9px;
 }
 
+.evidence-editor {
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 18px;
+}
+
+.evidence-editor-head {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.evidence-editor-head .section-heading.compact {
+  margin-bottom: 0;
+}
+
+.evidence-editor-head .secondary-action {
+  border: 1px solid rgba(11, 111, 104, 0.28);
+  color: var(--teal);
+  cursor: pointer;
+  min-height: 34px;
+}
+
+.evidence-editor-empty {
+  color: var(--muted);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.evidence-row-list {
+  display: grid;
+  gap: 12px;
+}
+
+.evidence-row-card {
+  background: #fbfcfd;
+  border: 1px solid #e7ebf0;
+  border-radius: 8px;
+  display: grid;
+  gap: 11px;
+  padding: 12px;
+}
+
+.evidence-row-topline {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.evidence-row-topline strong {
+  font-size: 13px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.compact-action {
+  color: var(--rose);
+  font-size: 12px;
+  min-height: 28px;
+  padding: 0 8px;
+}
+
+.evidence-edit-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.computed-tier-strip {
+  background: white;
+  border: 1px solid #e7ebf0;
+  border-radius: 8px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 120px)) minmax(0, 1fr);
+  padding: 10px;
+}
+
+.computed-tier-strip span {
+  color: var(--muted);
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.computed-tier-strip strong {
+  display: block;
+  font-size: 13px;
+}
+
+.computed-tier-strip p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
 .result-headline {
   background: linear-gradient(135deg, #10231f, #1c3347);
   border-radius: 8px;
@@ -1188,6 +1292,7 @@ th {
   .recommendation-band,
   .workspace-hero,
   .trend-editor-header,
+  .evidence-editor-head,
   .provider-preview-head {
     align-items: stretch;
     flex-direction: column;
@@ -1198,6 +1303,8 @@ th {
   .form-surface,
   .workspace-grid,
   .workspace-form-grid,
+  .evidence-edit-grid,
+  .computed-tier-strip,
   .trend-editor,
   .score-row,
   .recommendation-band {

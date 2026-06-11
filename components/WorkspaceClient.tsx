@@ -13,21 +13,61 @@ import type { TrendShortlistInput } from "@/lib/trend-shortlist";
 import type { RiskTolerance, ScoreKey, Scores, ScoreValue } from "@/lib/types";
 import {
   buildWorkspaceEvidenceGaps,
+  buildWorkspaceEvidenceRowsFromEvidence,
   buildWorkspaceProviderPreview,
   evaluateSingleWorkspaceTrend,
   evaluateWorkspaceShortlist,
+  materializeWorkspaceEvidenceRows,
   renderShortlistWorkspaceMarkdown,
   renderSingleWorkspaceMarkdown,
   type WorkspaceCandidate,
   type WorkspaceEvidenceGap,
+  type WorkspaceEvidenceRow,
   type WorkspaceProviderPreview,
   type WorkspaceProduct
 } from "@/lib/workspace-evaluator";
+import type { SourceSignal, VerificationStatus } from "@/lib/source-tier-classifier";
 import { useMemo, useState } from "react";
 
 type WorkspaceMode = "single" | "shortlist";
 
 const SCORE_OPTIONS: ScoreValue[] = [0, 25, 50, 75, 100];
+const DIRECTION_OPTIONS = [
+  { value: "confirm", label: "确认" },
+  { value: "up", label: "上调" },
+  { value: "down", label: "下调" }
+] as const;
+const MAGNITUDE_OPTIONS = [
+  { value: "weak", label: "弱" },
+  { value: "moderate", label: "中" },
+  { value: "strong", label: "强" }
+] as const;
+const CONFIDENCE_OPTIONS = [
+  { value: "low", label: "低" },
+  { value: "medium", label: "中" },
+  { value: "high", label: "高" }
+] as const;
+const VERIFICATION_OPTIONS: Array<{ value: VerificationStatus; label: string }> = [
+  { value: "verified", label: "已核验" },
+  { value: "unverified", label: "未核验" },
+  { value: "contradicted", label: "内容不符" }
+];
+const SOURCE_SIGNAL_OPTIONS: Array<{ value: SourceSignal; label: string }> = [
+  { value: "raw_platform_data", label: "平台原始数据" },
+  { value: "comment_corpus", label: "评论语料" },
+  { value: "direct_competitor_campaign", label: "竞品 campaign" },
+  { value: "named_expert_quote", label: "专家引用" },
+  { value: "reputable_journalism", label: "可信媒体" },
+  { value: "research_report", label: "研究报告" },
+  { value: "supplier_category_report", label: "供应商类目报告" },
+  { value: "vendor_copy", label: "厂商营销页" },
+  { value: "vendor_documentation", label: "厂商文档" },
+  { value: "listicle_affiliate_seo", label: "榜单/SEO" },
+  { value: "press_release", label: "新闻稿" },
+  { value: "single_social_thread", label: "单条社媒" },
+  { value: "single_anecdote", label: "单个轶事" },
+  { value: "unknown", label: "未知" }
+];
 const SCORE_META: Array<{ key: ScoreKey; label: string; hint: string }> = [
   { key: "audienceOverlap", label: "受众", hint: "趋势受众是否匹配目标用户" },
   { key: "useCaseRelevance", label: "场景", hint: "产品参与是否自然" },
@@ -60,6 +100,7 @@ function initialCandidates(): WorkspaceCandidate[] {
     trendDescription: candidate.trendDescription ?? "",
     scores: candidate.baselineScores,
     evidence: candidate.evidence,
+    evidenceRows: buildWorkspaceEvidenceRowsFromEvidence(candidate.evidence ?? []),
     oneLineVerdict: candidate.oneLineVerdict,
     recommendedCampaign: candidate.recommendedCampaign
   }));
@@ -101,6 +142,53 @@ function scoreUpdate(
   });
 }
 
+function evidenceRowUpdate(
+  candidates: WorkspaceCandidate[],
+  candidateIndex: number,
+  rowIndex: number,
+  update: Partial<WorkspaceEvidenceRow>
+): WorkspaceCandidate[] {
+  const candidate = candidates[candidateIndex];
+  const evidenceRows = candidate.evidenceRows ?? buildWorkspaceEvidenceRowsFromEvidence(candidate.evidence ?? []);
+  return candidateUpdate(candidates, candidateIndex, {
+    evidenceRows: evidenceRows.map((row, index) => (index === rowIndex ? { ...row, ...update } : row))
+  });
+}
+
+function addEvidenceRow(candidates: WorkspaceCandidate[], candidateIndex: number): WorkspaceCandidate[] {
+  const candidate = candidates[candidateIndex];
+  const evidenceRows = candidate.evidenceRows ?? buildWorkspaceEvidenceRowsFromEvidence(candidate.evidence ?? []);
+  const nextIndex = evidenceRows.length + 1;
+  return candidateUpdate(candidates, candidateIndex, {
+    evidenceRows: [
+      ...evidenceRows,
+      {
+        id: `${candidate.id}-workspace-evidence-${nextIndex}`,
+        dimension: "audienceOverlap",
+        direction: "confirm",
+        magnitude: "moderate",
+        desiredConfidence: "medium",
+        sourceUrl: "https://example.com/source",
+        verificationStatus: "unverified",
+        sourceSignals: ["unknown"],
+        note: "Describe the source claim before counting it."
+      }
+    ]
+  });
+}
+
+function removeEvidenceRow(
+  candidates: WorkspaceCandidate[],
+  candidateIndex: number,
+  rowIndex: number
+): WorkspaceCandidate[] {
+  const candidate = candidates[candidateIndex];
+  const evidenceRows = candidate.evidenceRows ?? buildWorkspaceEvidenceRowsFromEvidence(candidate.evidence ?? []);
+  return candidateUpdate(candidates, candidateIndex, {
+    evidenceRows: evidenceRows.filter((_, index) => index !== rowIndex)
+  });
+}
+
 export function WorkspaceClient() {
   const [mode, setMode] = useState<WorkspaceMode>("shortlist");
   const [product, setProduct] = useState<WorkspaceProduct>(() => initialProduct());
@@ -118,6 +206,11 @@ export function WorkspaceClient() {
     [product, candidates]
   );
   const activeCandidate = candidates[activeCandidateIndex];
+  const activeEvidenceRows = activeCandidate.evidenceRows ?? buildWorkspaceEvidenceRowsFromEvidence(activeCandidate.evidence ?? []);
+  const activeEvidenceMaterialization = useMemo(
+    () => materializeWorkspaceEvidenceRows(activeEvidenceRows),
+    [activeEvidenceRows]
+  );
   const providerCandidate = useMemo(
     () =>
       mode === "single"
@@ -307,7 +400,10 @@ export function WorkspaceClient() {
             </label>
             <label className="field-row">
               <span>证据条数</span>
-              <input value={`${activeCandidate.evidence?.length ?? 0} 条样例证据`} readOnly />
+              <input
+                value={`${activeEvidenceMaterialization.evidence.length} 条计入 · ${activeEvidenceMaterialization.droppedRows.length} 条丢弃`}
+                readOnly
+              />
             </label>
             <label className="field-row wide">
               <span>趋势描述</span>
@@ -343,6 +439,15 @@ export function WorkspaceClient() {
               </label>
             ))}
           </div>
+
+          <EvidenceEditor
+            rows={activeEvidenceMaterialization.rows}
+            onAdd={() => setCandidates(addEvidenceRow(candidates, activeCandidateIndex))}
+            onRemove={(rowIndex) => setCandidates(removeEvidenceRow(candidates, activeCandidateIndex, rowIndex))}
+            onUpdate={(rowIndex, update) =>
+              setCandidates(evidenceRowUpdate(candidates, activeCandidateIndex, rowIndex, update))
+            }
+          />
         </section>
 
         <aside className="workspace-panel result-panel" aria-label="结果区">
@@ -446,6 +551,153 @@ export function WorkspaceClient() {
         </aside>
       </div>
     </div>
+  );
+}
+
+function EvidenceEditor({
+  rows,
+  onAdd,
+  onRemove,
+  onUpdate
+}: {
+  rows: ReturnType<typeof materializeWorkspaceEvidenceRows>["rows"];
+  onAdd: () => void;
+  onRemove: (rowIndex: number) => void;
+  onUpdate: (rowIndex: number, update: Partial<WorkspaceEvidenceRow>) => void;
+}) {
+  return (
+    <section className="evidence-editor" aria-label="Evidence editor">
+      <div className="evidence-editor-head">
+        <div className="section-heading compact">
+          <p className="eyebrow">Evidence</p>
+          <h2>证据编辑</h2>
+        </div>
+        <button className="secondary-action" type="button" onClick={onAdd}>
+          新增证据
+        </button>
+      </div>
+      {rows.length === 0 ? (
+        <p className="evidence-editor-empty">还没有证据。新增一条来源后，tier 会由 classifier 自动计算。</p>
+      ) : (
+        <div className="evidence-row-list">
+          {rows.map((row, rowIndex) => (
+            <article className="evidence-row-card" key={row.id}>
+              <div className="evidence-row-topline">
+                <strong>{row.id}</strong>
+                <button className="text-action compact-action" type="button" onClick={() => onRemove(rowIndex)}>
+                  移除
+                </button>
+              </div>
+              <div className="evidence-edit-grid">
+                <label className="field-row wide">
+                  <span>Source URL</span>
+                  <input value={row.sourceUrl} onChange={(event) => onUpdate(rowIndex, { sourceUrl: event.target.value })} />
+                </label>
+                <label className="field-row">
+                  <span>维度</span>
+                  <select
+                    value={row.dimension}
+                    onChange={(event) => onUpdate(rowIndex, { dimension: event.target.value as ScoreKey })}
+                  >
+                    {SCORE_META.map((dimension) => (
+                      <option key={dimension.key} value={dimension.key}>
+                        {dimension.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="field-row">
+                  <span>方向</span>
+                  <select
+                    value={row.direction}
+                    onChange={(event) =>
+                      onUpdate(rowIndex, { direction: event.target.value as WorkspaceEvidenceRow["direction"] })
+                    }
+                  >
+                    {DIRECTION_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="field-row">
+                  <span>强度</span>
+                  <select
+                    value={row.magnitude}
+                    onChange={(event) =>
+                      onUpdate(rowIndex, { magnitude: event.target.value as WorkspaceEvidenceRow["magnitude"] })
+                    }
+                  >
+                    {MAGNITUDE_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="field-row">
+                  <span>请求置信度</span>
+                  <select
+                    value={row.desiredConfidence}
+                    onChange={(event) =>
+                      onUpdate(rowIndex, { desiredConfidence: event.target.value as WorkspaceEvidenceRow["desiredConfidence"] })
+                    }
+                  >
+                    {CONFIDENCE_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="field-row">
+                  <span>核验状态</span>
+                  <select
+                    value={row.verificationStatus}
+                    onChange={(event) => onUpdate(rowIndex, { verificationStatus: event.target.value as VerificationStatus })}
+                  >
+                    {VERIFICATION_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="field-row">
+                  <span>Source signal</span>
+                  <select
+                    value={row.sourceSignals[0] ?? "unknown"}
+                    onChange={(event) => onUpdate(rowIndex, { sourceSignals: [event.target.value as SourceSignal] })}
+                  >
+                    {SOURCE_SIGNAL_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="field-row wide">
+                  <span>Note</span>
+                  <textarea rows={2} value={row.note} onChange={(event) => onUpdate(rowIndex, { note: event.target.value })} />
+                </label>
+              </div>
+              <div className="computed-tier-strip">
+                <div>
+                  <span>Computed tier</span>
+                  <strong>{row.computedSourceTier ?? "dropped"}</strong>
+                </div>
+                <div>
+                  <span>Computed confidence</span>
+                  <strong>{row.computedConfidence ?? "none"}</strong>
+                </div>
+                <p>{row.classification.reasons.join("; ")}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
   );
 }
 

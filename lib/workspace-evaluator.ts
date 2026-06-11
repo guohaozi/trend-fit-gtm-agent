@@ -1,10 +1,25 @@
-import { adjustScores, type EvidenceAdjustment, type EvidenceItem } from "./evidence-adjustment";
+import {
+  adjustScores,
+  type EvidenceAdjustment,
+  type EvidenceConfidence,
+  type EvidenceDirection,
+  type EvidenceItem,
+  type EvidenceMagnitude,
+  type SourceTier
+} from "./evidence-adjustment";
 import {
   applyRecommendationRigor,
   calculateTrendFitWithProfile,
   type GatedRecommendation,
   type WeightProfile
 } from "./recommendation-rigor";
+import {
+  clampEvidenceConfidence,
+  classifySourceTier,
+  type SourceSignal,
+  type SourceTierClassification,
+  type VerificationStatus
+} from "./source-tier-classifier";
 import { buildTrendShortlist, type RankedTrendShortlistRow, type TrendShortlistResult } from "./trend-shortlist";
 import type { RiskTolerance, ScoreKey, Scores, ScoringResult } from "./types";
 
@@ -26,6 +41,7 @@ export type WorkspaceCandidate = {
   trendDescription: string;
   scores: Scores;
   evidence?: EvidenceItem[];
+  evidenceRows?: WorkspaceEvidenceRow[];
   oneLineVerdict?: string;
   recommendedCampaign?: string;
 };
@@ -62,6 +78,30 @@ export type WorkspaceProviderPreview = {
   fixtureCommand: WorkspaceProviderCommand;
   commandsText: string;
   notes: string[];
+};
+
+export type WorkspaceEvidenceRow = {
+  id: string;
+  dimension: ScoreKey;
+  direction: EvidenceDirection;
+  magnitude: EvidenceMagnitude;
+  desiredConfidence: EvidenceConfidence;
+  sourceUrl: string;
+  verificationStatus: VerificationStatus;
+  sourceSignals: SourceSignal[];
+  note: string;
+};
+
+export type ComputedWorkspaceEvidenceRow = WorkspaceEvidenceRow & {
+  computedSourceTier: SourceTier | null;
+  computedConfidence: EvidenceConfidence | null;
+  classification: SourceTierClassification;
+};
+
+export type WorkspaceEvidenceMaterialization = {
+  rows: ComputedWorkspaceEvidenceRow[];
+  evidence: EvidenceItem[];
+  droppedRows: ComputedWorkspaceEvidenceRow[];
 };
 
 const DIMENSION_LABELS: Record<string, string> = {
@@ -109,6 +149,76 @@ const SLOT_PLATFORMS: Record<string, string[]> = {
   timingSaturation: ["google", "youtube"],
   stability: ["google", "reddit"]
 };
+
+function defaultSignalsForTier(sourceTier: SourceTier): SourceSignal[] {
+  if (sourceTier === "primary") return ["direct_competitor_campaign"];
+  if (sourceTier === "secondary") return ["reputable_journalism"];
+  return ["unknown"];
+}
+
+export function buildWorkspaceEvidenceRowsFromEvidence(evidence: EvidenceItem[]): WorkspaceEvidenceRow[] {
+  return evidence.map((item) => ({
+    id: item.id,
+    dimension: item.dimension,
+    direction: item.direction,
+    magnitude: item.magnitude,
+    desiredConfidence: item.confidence,
+    sourceUrl: item.sourceUrl,
+    verificationStatus: "verified",
+    sourceSignals: defaultSignalsForTier(item.sourceTier),
+    note: item.note
+  }));
+}
+
+export function materializeWorkspaceEvidenceRows(
+  rows: WorkspaceEvidenceRow[]
+): WorkspaceEvidenceMaterialization {
+  const computedRows: ComputedWorkspaceEvidenceRow[] = rows.map((row) => {
+    const classification = classifySourceTier({
+      sourceUrl: row.sourceUrl,
+      dimension: row.dimension,
+      verificationStatus: row.verificationStatus,
+      sourceSignals: row.sourceSignals
+    });
+    return {
+      ...row,
+      computedSourceTier: classification.sourceTier,
+      computedConfidence:
+        classification.action === "keep" && classification.sourceTier
+          ? clampEvidenceConfidence(row.desiredConfidence, classification.maxConfidence)
+          : null,
+      classification
+    };
+  });
+  const evidence = computedRows.flatMap((row): EvidenceItem[] => {
+    if (row.classification.action === "drop" || row.computedSourceTier === null || row.computedConfidence === null) {
+      return [];
+    }
+
+    return [
+      {
+        id: row.id,
+        dimension: row.dimension,
+        direction: row.direction,
+        magnitude: row.magnitude,
+        confidence: row.computedConfidence,
+        sourceTier: row.computedSourceTier,
+        sourceUrl: row.sourceUrl,
+        note: row.note
+      }
+    ];
+  });
+
+  return {
+    rows: computedRows,
+    evidence,
+    droppedRows: computedRows.filter((row) => row.classification.action === "drop")
+  };
+}
+
+function evidenceForWorkspaceCandidate(candidate: WorkspaceCandidate): EvidenceItem[] {
+  return candidate.evidenceRows ? materializeWorkspaceEvidenceRows(candidate.evidenceRows).evidence : candidate.evidence ?? [];
+}
 
 function formatScoreBlock(scores: Scores): string {
   return Object.entries(scores)
@@ -265,7 +375,7 @@ export function evaluateSingleWorkspaceTrend(
   product: WorkspaceProduct,
   candidate: WorkspaceCandidate
 ): SingleWorkspaceTrendResult {
-  const evidence = candidate.evidence ?? [];
+  const evidence = evidenceForWorkspaceCandidate(candidate);
   const baselineResult = calculateTrendFitWithProfile(
     candidate.scores,
     product.riskTolerance,
@@ -306,7 +416,7 @@ export function evaluateWorkspaceShortlist(
       trendName: candidate.trendName,
       trendDescription: candidate.trendDescription,
       baselineScores: candidate.scores,
-      evidence: candidate.evidence,
+      evidence: evidenceForWorkspaceCandidate(candidate),
       oneLineVerdict: candidate.oneLineVerdict ?? "Use this row as a working trend-fit hypothesis.",
       recommendedCampaign: candidate.recommendedCampaign
     }))

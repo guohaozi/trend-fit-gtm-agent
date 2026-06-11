@@ -5,7 +5,9 @@ import { describe, it } from "node:test";
 import type { TrendShortlistInput } from "../lib/trend-shortlist";
 import {
   buildWorkspaceEvidenceGaps,
+  buildWorkspaceEvidenceRowsFromEvidence,
   buildWorkspaceProviderPreview,
+  materializeWorkspaceEvidenceRows,
   evaluateSingleWorkspaceTrend,
   evaluateWorkspaceShortlist,
   renderSingleWorkspaceMarkdown,
@@ -186,5 +188,57 @@ describe("workspace evaluator", () => {
     assert.match(preview.fixtureCommand.command, /--fixture-results examples\/dji-middle-east-search-results\.fixture\.json/);
     assert.equal(preview.commandsText.includes("sourceTier"), false);
     assert.equal(preview.targetedSlots.some((slot) => slot.plannedSources.some((source) => /policy|backlash/i.test(source))), true);
+  });
+
+  it("materializes editable evidence rows through the source-tier classifier", () => {
+    const rows = buildWorkspaceEvidenceRowsFromEvidence([
+      {
+        id: "vendor-magic",
+        dimension: "creativeFeasibility",
+        direction: "confirm",
+        magnitude: "strong",
+        confidence: "high",
+        sourceTier: "primary",
+        sourceUrl: "https://www.shopify.com/magic",
+        note: "Vendor page should not stay primary when edited in the workspace."
+      }
+    ]);
+    const materialized = materializeWorkspaceEvidenceRows([
+      {
+        ...rows[0],
+        desiredConfidence: "high",
+        verificationStatus: "verified",
+        sourceSignals: ["vendor_copy"]
+      }
+    ]);
+
+    assert.equal(materialized.evidence.length, 1);
+    assert.equal(materialized.evidence[0].sourceTier, "proxy");
+    assert.equal(materialized.evidence[0].confidence, "medium");
+    assert.equal(materialized.rows[0].computedSourceTier, "proxy");
+    assert.equal(materialized.rows[0].computedConfidence, "medium");
+    assert.equal(materialized.rows[0].classification.action, "keep");
+    assert.match(materialized.rows[0].classification.reasons.join(" "), /vendor copy/);
+  });
+
+  it("drops contradicted workspace evidence rows before scoring", () => {
+    const materialized = materializeWorkspaceEvidenceRows([
+      {
+        id: "bad-source",
+        dimension: "brandSafety",
+        direction: "down",
+        magnitude: "strong",
+        desiredConfidence: "high",
+        sourceUrl: "https://example.com/claim-not-present",
+        verificationStatus: "contradicted",
+        sourceSignals: ["reputable_journalism"],
+        note: "This should be dropped."
+      }
+    ]);
+
+    assert.equal(materialized.evidence.length, 0);
+    assert.equal(materialized.droppedRows.length, 1);
+    assert.equal(materialized.rows[0].computedSourceTier, null);
+    assert.equal(materialized.rows[0].classification.action, "drop");
   });
 });

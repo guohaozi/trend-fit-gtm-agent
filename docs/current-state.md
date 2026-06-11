@@ -1,6 +1,6 @@
 # Current State — Trend-Fit GTM Agent
 
-Last updated: 2026-06-10
+Last updated: 2026-06-11
 
 This file is a handoff snapshot for starting a fresh Codex / Claude conversation.
 
@@ -10,10 +10,10 @@ This file is a handoff snapshot for starting a fresh Codex / Claude conversation
 - Git branch: `main`
 - Public GitHub repo: `https://github.com/guohaozi/trend-fit-gtm-agent`
 - Remote: `origin https://github.com/guohaozi/trend-fit-gtm-agent.git`
-- Current state: v1.2 rigor layer is implemented in docs, skills, TypeScript, tests, UI, seven new 15-case-list evidence-backed cases, one competitor-layer AI-tool evidence variant, P0-P4 evidence automation provider layers, P5a/b offline evidence-case orchestration, P5c CLI/file writer, the first live OpenCLI-backed research CLI, a fixture/dry-run provider panel in `/workspace`, and a GitHub Actions CI workflow.
-- Verification status: `npm test` currently runs 95 passing Node tests; `npm run build` completes a successful Next.js production build. `.github/workflows/ci.yml` now runs `npm ci`, `npm test`, and `npm run build` on pushes to `main` and pull requests.
+- Current state: v1.2 rigor layer is implemented in docs, skills, TypeScript, tests, UI, seven new 15-case-list evidence-backed cases, one competitor-layer AI-tool evidence variant, P0-P4 evidence automation provider layers, P5a/b offline evidence-case orchestration, P5c CLI/file writer, the first live OpenCLI-backed research CLI, a fixture/dry-run provider panel in `/workspace`, classifier-owned workspace evidence editing, and a GitHub Actions CI workflow.
+- Verification status: `npm test` currently runs 97 passing Node tests; `npm run build` completes a successful Next.js production build. `.github/workflows/ci.yml` now runs `npm ci`, `npm test`, and `npm run build` on pushes to `main` and pull requests.
 - Automation status: P0 product-marketing context, P1 evidence case generator, P2 customer-research provider, P3 SEO/timing provider, P4 competitor provider, P5a/b offline orchestration, P5c CLI/file writer, product+market+trend research runner, and the first deterministic trend-shortlist ranking layer are done. Live trend discovery has not been implemented yet.
-- Latest UI layer: `/workspace` is now an editable workflow page backed by `lib/workspace-evaluator.ts`. It lets users edit product fields, risk/profile, three candidate trends, and seven anchored score dimensions, then switch between single-trend scoring and shortlist ranking. It surfaces evidence gaps, previews provider dry-run commands for the active/winning trend, exposes a portable fixture smoke command, and can copy Markdown or provider commands. It uses existing deterministic scoring, rigor gate, and `lib/trend-shortlist.ts`; it still does not execute live providers from the browser.
+- Latest UI layer: `/workspace` is now an editable workflow page backed by `lib/workspace-evaluator.ts`. It lets users edit product fields, risk/profile, three candidate trends, seven anchored score dimensions, and evidence input rows, then switch between single-trend scoring and shortlist ranking. Evidence rows can edit source URL, dimension, direction, magnitude, desired confidence, verification status, source signal, and notes; `sourceTier` and computed confidence are read-only outputs from `source-tier-classifier`. The workspace also surfaces evidence gaps, previews provider dry-run commands for the active/winning trend, exposes a portable fixture smoke command, and can copy Markdown or provider commands. It still does not execute live providers from the browser.
 - Latest shortlist layer: `lib/trend-shortlist.ts` ranks manually supplied candidate trends by gated band, evidence-adjusted total, stability, and Timing & Saturation. The first demo is LEGO comparing World Cup fan culture, F1 race weekend, and graduation season gifting in `data/lego_trend_shortlist.json` and `outputs/lego_trend_shortlist.md`; F1 ranks first.
 - Latest automation layer: `lib/evidence-case-research-runner.ts`, `lib/opencli-research-source.ts`, and `scripts/evidence-case-research.ts` add `npm run evidence:case:research`, which starts from product + market + trend, builds research queries, can use fixture / web / OpenCLI providers, converts results into evidence inputs, then writes `data/*_evidence.json` and `outputs/*_evidence_case.md`. The OpenCLI provider maps Reddit and YouTube search rows into `customerResearchFindings`, and maps Twitter/X plus Google Search rows into conservative `additionalCandidates`. It now tolerates individual OpenCLI command failures and applies relevance guards before rows become evidence. Xiaohongshu, TikTok, Google Trends, GooseWorks, and marketplace-specific mappers are the next provider adapters.
 - Latest live research proof: DJI drones entering UAE / Saudi / Middle East for video creation, security inspection, and tourism enablement can be generated with OpenCLI via `npm run evidence:case:research`. The current generated report is `outputs/dji_drones_uae_saudi_middle_east_video_creation_security_inspection_tourism_enablement_evidence_case.md`; latest run produced 16 accepted evidence items, `76 / Cautious test`, evidence gate `partial`, stability `fragile`.
@@ -29,9 +29,9 @@ This file is a handoff snapshot for starting a fresh Codex / Claude conversation
 - The project is published to GitHub. The exact latest pushed commit hash should be checked with `git log -1 --oneline` in the next conversation.
 - Previous review round was a Claude **review + fix** pass on the evidence cases Codex produced: it verified the cited sources are real, found a source-tier inflation bug in the AI-tool case, fixed it, and added a deterministic source-tier classifier to prevent recurrence.
 - Previous round added the AI photo-tool evidence case and the snack / Dubai-style chocolate evidence case.
-- This handoff corresponds to the latest provider-preview follow-up after the workspace /
-  shortlist / credibility batch. `e1f82d5` has been pushed to `origin/main`; the provider
-  preview changes are local until committed/pushed.
+- This handoff corresponds to the latest evidence-editor follow-up after the provider
+  preview batch. `e1f82d5` has been pushed to `origin/main`; local commits after that may
+  still need to be pushed depending on network availability.
 
 ## Latest Conversation Handoff
 
@@ -55,13 +55,18 @@ This is the compact handoff for the next Codex / Claude conversation.
   active single trend or current shortlist winner, plus a committed fixture smoke command
   using `examples/dji-middle-east-search-results.fixture.json`. The panel can copy both
   commands and explicitly states that source tier remains classifier-owned.
+- **Evidence editor:** `/workspace` now exposes editable evidence rows. Users can edit
+  source URL, dimension, direction, magnitude, desired confidence, verification status,
+  source signal, and notes. `sourceTier`, computed confidence, and classifier reasons
+  are read-only outputs, so the UI cannot manually upgrade evidence strength.
 - **OpenCLI portability:** `lib/opencli-research-source.ts` no longer defaults to
   `/Users/guo/.npm-global/bin/opencli` or injects that path into `PATH`. Runtime
   resolution is now `--opencli-bin`, then `OPENCLI_BIN`, then `opencli` from `PATH`.
 - **Workspace evaluator:** `lib/workspace-evaluator.ts` bridges frontend state into the
   existing scoring, recommendation-rigor, and shortlist modules.
 - **Tests:** Added focused tests for shortlist ranking, workspace evaluation/export,
-  provider-preview generation, and portable OpenCLI dry-run output.
+  provider-preview generation, portable OpenCLI dry-run output, and classifier-owned
+  workspace evidence materialization.
 
 ### Key design decisions
 
@@ -75,9 +80,9 @@ This is the compact handoff for the next Codex / Claude conversation.
 - Treat live providers as candidate-source collectors, not scoring authorities. Scores
   still pass through source-tier classification, evidence gates, profile weighting, and
   stability checks.
-- Do not make `sourceTier` editable in the workspace. Users can eventually edit source
-  URL, signals, direction, note, and verification status; tier must be recomputed by the
-  classifier.
+- `sourceTier` is not editable in the workspace. Users edit source URL, source signal,
+  direction, note, verification status, desired confidence, and dimension; tier is
+  recomputed by the classifier.
 - Use client state instead of database/auth/background jobs in the first workflow pass,
   so the workflow is usable without creating infrastructure surface area.
 - Keep demo/review pages (`/product-profile`, `/trend-input`) separate from the real
@@ -85,8 +90,8 @@ This is the compact handoff for the next Codex / Claude conversation.
 
 ### Known issues / limitations
 
-- `/workspace` can edit score inputs but not individual evidence items yet; evidence
-  count is currently read from the fixture data.
+- `/workspace` can edit evidence rows, but edits are currently client-state only. There
+  is no database, import/export for edited workspace state, or server persistence yet.
 - The UI does not execute live providers. Evidence gaps now produce dry-run / fixture
   commands, but browser-triggered OpenCLI, GooseWorks, Google Trends, and marketplace
   collection are still not wired.
@@ -104,11 +109,10 @@ This is the compact handoff for the next Codex / Claude conversation.
 
 ### Recommended next steps
 
-1. Add evidence-item editing in `/workspace`, but keep `sourceTier` read-only and
-   classifier-owned. Editable fields should be source URL, source signals, supported
-   dimension, direction, verification status, and notes.
-2. Add provider health checks and an API boundary for fixture runs before allowing live
+1. Add provider health checks and an API boundary for fixture runs before allowing live
    browser-triggered OpenCLI execution.
+2. Add save/import/export for workspace state so edited evidence rows can survive refresh
+   without introducing auth or a database.
 3. Add a real Google Trends / SEO timeseries provider to fill Timing, Search Demand,
    and Commercial Intent with hard evidence.
 4. Add Xiaohongshu / TikTok social-language mappers and marketplace/review providers.
