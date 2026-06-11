@@ -1,6 +1,7 @@
 # Current State — Trend-Fit GTM Agent
 
-Last updated: 2026-06-11 · HEAD `090a079` (main, pushed, working tree clean).
+Last updated: 2026-06-11. Main is pushed to origin; run `git log -1` for the exact HEAD
+(do not hardcode a commit hash here — it goes stale on every commit).
 
 Compact handoff snapshot for the next Codex / Claude conversation. **Full change history
 lives in `docs/changelog.md` and `git log` — this file is current state only.**
@@ -161,6 +162,6 @@ Verification: `npm test` → **117 passing**; `npm run build` succeeds; CI
 ```bash
 cd /Users/guo/gtm/trend-fit-gtm-agent
 git status --short --branch   # expect: ## main...origin/main, clean
-git log -3 --oneline          # HEAD = 090a079
+git log -3 --oneline          # newest commit = your starting point
 npm test                      # 117 passing
 ```
