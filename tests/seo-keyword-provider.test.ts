@@ -71,7 +71,7 @@ describe("SEO keyword provider", () => {
     assert.equal(requested[0].searchParams.get("api_key"), "test-serpapi-key");
     assert.equal(requested[0].searchParams.get("geo"), "US");
     assert.equal(requested[0].searchParams.get("date"), "today 12-m");
-    assert.equal(requested[0].searchParams.get("q"), "protein drink US convenience retail grab-and-go protein");
+    assert.equal(requested[0].searchParams.get("q"), "grab-and-go protein");
     assert.equal(result.tooling, "SerpApi Google Trends");
     assert.deepEqual(
       result.seoKeywordFindings?.map((finding) => [finding.signal, finding.query, finding.growthLabel ?? finding.changePct]),
@@ -81,6 +81,31 @@ describe("SEO keyword provider", () => {
         ["trend_rising", "protein drink", 366.67]
       ]
     );
+  });
+
+  it("queries Google Trends with the trend term only, not product or market", async () => {
+    let capturedQuery = "";
+    const source = new SerpApiGoogleTrendsSource({
+      apiKey: "test-serpapi-key",
+      fetcher: async (url) => {
+        capturedQuery = url.searchParams.get("q") ?? "";
+        return url.searchParams.get("data_type") === "RELATED_QUERIES"
+          ? { related_queries: { rising: [], top: [] } }
+          : { interest_over_time: { timeline_data: [] } };
+      }
+    });
+
+    await source.collect({
+      product: "snack brand x",
+      market: "germany",
+      trend: "dubai chocolate",
+      queries: [],
+      limitPerQuery: 2
+    });
+
+    // product and market must not pollute the Google Trends search term; market
+    // belongs in the geo parameter, not the query text.
+    assert.equal(capturedQuery, "dubai chocolate");
   });
 
   it("emits no fabricated trend when search demand is near zero", async () => {

@@ -338,7 +338,11 @@ export class SerpApiGoogleTrendsSource {
     market: string;
     trend: string;
   }): Promise<ProviderFindingResult> {
-    const query = [product, market, trend].map((value) => value.trim()).filter(Boolean).join(" ");
+    // Google Trends measures the relative search interest of a single term, so
+    // query the trend itself — not product+market+trend. A long composite string
+    // returns no results. Market is expressed through the geo parameter (this.geo),
+    // not the query text; product specificity is covered by other dimensions.
+    const query = trend.trim() || [product, market].map((value) => value.trim()).filter(Boolean).join(" ");
     const relatedUrl = buildSerpApiUrl({
       apiKey: this.apiKey,
       query,

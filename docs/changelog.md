@@ -2,6 +2,48 @@
 
 This changelog records project-level changes and the reasoning behind them. It is intended for handoff between Codex / Claude conversations, not just release notes.
 
+## 2026-06-11 — Google Trends Query Construction Fix
+
+Status:
+
+- Fixed the query-construction half of the SerpApi issue (the near-zero-demand half was
+  fixed earlier the same day). Verified live.
+
+Problem:
+
+- `SerpApiGoogleTrendsSource.collect` queried Google Trends with product+market+trend
+  concatenated into one long string. Google Trends measures a single term's relative
+  interest, so the composite string returned no results — `Timing & Saturation` (and the
+  buying-intent slice of `Commercial Intent`) almost never got real evidence, which quietly
+  pushed cases toward fragile/downgraded because the Strong Go gate needs Timing evidence.
+
+Fix:
+
+- `collect` now queries the trend term only (`trend`), with market expressed through the
+  `geo` parameter, not the query text. Product specificity is covered by other dimensions.
+
+Live verification (real key):
+
+- Before: long query "protein drink united states ..." → 0 findings.
+- After: trend "dubai chocolate" (geo=DE) → 12 findings: breakout derivatives (dubai
+  chocolate brownie, chocovia/picca dubai chocolate), buying intent ("dubai chocolate
+  price" +800%, "near me" +200%, "lidl near me"), and `trend_rising +15.86%`.
+
+Files:
+
+- `lib/seo-keyword-provider.ts` — collect query construction.
+- `tests/seo-keyword-provider.test.ts` — updated `q` assertion + trend-only test.
+
+Verification:
+
+- `npm test`: 117 passing (+1).
+
+Known follow-up (not done):
+
+- Google Trends related_queries can include noise/spam ("labubu", SEO-spam strings) even
+  for a clean trend term. A relevance filter (related query must share a trend token, drop
+  obvious spam) would raise evidence quality. Separate from this fix.
+
 ## 2026-06-11 — Live SerpApi Verification + Near-Zero-Demand Fix
 
 Status:
