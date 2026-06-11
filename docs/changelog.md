@@ -2,6 +2,47 @@
 
 This changelog records project-level changes and the reasoning behind them. It is intended for handoff between Codex / Claude conversations, not just release notes.
 
+## 2026-06-11 — Route + Page Smoke Tests
+
+Status:
+
+- Added the project's first route- and page-level smoke coverage. Closes the gap where
+  `/workspace` (the complex main entry) and every other page had zero UI-regression
+  protection — all prior tests were lib/logic only.
+
+What landed:
+
+- `tests/route-smoke.test.ts` (pure `node:test`, no new dependencies):
+  - report download API (`app/api/report/[id]/route.ts`): a known case returns a markdown
+    attachment with correct headers; an unknown id falls back to a default report instead
+    of throwing. This route had no test before.
+  - All six pages (`/`, `/workspace`, `/product-profile`, `/trend-input`, `/fit-score`,
+    `/report`): each page function is invoked across all four demo cases and several
+    profiles plus unknown case/profile inputs, asserting it produces a renderable element
+    without throwing. This exercises the real demo-data loading path and the fallback
+    branches.
+  - Importing `app/workspace/page` also evaluates the 589-line `WorkspaceClient` module,
+    so its loadability is covered.
+
+Key detail:
+
+- The pages use the automatic JSX runtime (Next 15 / React 19) and correctly do not
+  `import React`. Under tsx/esbuild the test transform compiles JSX to the classic
+  `React.createElement`, so the test file installs a global React shim. Product code is
+  unchanged; only the test environment is shimmed. The first run caught a real
+  `React is not defined` failure, proving the smoke tests actually execute page code
+  rather than passing trivially.
+
+Verification:
+
+- `npm test` passes: 114 tests, 0 failures (was 106; +8 new `it` blocks).
+
+Next recommended step:
+
+- Manually run the real SerpApi path once with a live `SERPAPI_API_KEY` to confirm the
+  production data shape matches the committed fixture; then add the product-only
+  trend-shortlist UI entry.
+
 ## 2026-06-11 — Handoff Docs Refresh
 
 Status:
