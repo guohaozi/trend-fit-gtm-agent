@@ -4,6 +4,7 @@ import type {
   EvidenceMagnitude
 } from "./evidence-adjustment";
 import type { EvidenceCandidate } from "./evidence-collector";
+import type { ProviderFindingResult } from "./evidence-case-research-runner";
 import type { SourceSignal, VerificationStatus } from "./source-tier-classifier";
 import type { ScoreKey } from "./types";
 
@@ -32,6 +33,7 @@ export type SerpApiRelatedQuery = {
   query?: string;
   formatted_value?: string;
   value?: number;
+  extracted_value?: number;
 };
 
 export type SerpApiKeywordResearchInput = {
@@ -48,6 +50,29 @@ export type SerpApiKeywordResearchInput = {
 };
 
 const BUYING_QUERY_PATTERN = /\b(buy|price|where to buy|near me|review|reviews|worth it|coupon|discount|best)\b/i;
+const DEFAULT_SERPAPI_DATE = "today 12-m";
+const GOOGLE_TRENDS_ENGINE = "google_trends";
+const TREND_RISING_THRESHOLD = 15;
+const TREND_DECLINING_THRESHOLD = -15;
+
+type SerpApiDataType = "RELATED_QUERIES" | "TIMESERIES";
+type UnknownRecord = Record<string, unknown>;
+
+export type SerpApiFetcher = (url: URL) => Promise<unknown>;
+
+export type SerpApiGoogleTrendsSourceOptions = {
+  apiKey?: string;
+  geo?: string;
+  date?: string;
+  fetcher?: SerpApiFetcher;
+};
+
+export class SeoKeywordProviderError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "SeoKeywordProviderError";
+  }
+}
 
 const SIGNAL_TO_EVIDENCE: Record<
   SeoKeywordSignal,
@@ -137,6 +162,126 @@ function formatNote(finding: SeoKeywordFinding): string {
   return details.join(" ");
 }
 
+function asRecord(value: unknown): UnknownRecord | undefined {
+  return value && typeof value === "object" && !Array.isArray(value) ? value as UnknownRecord : undefined;
+}
+
+function asArray(value: unknown): unknown[] {
+  return Array.isArray(value) ? value : [];
+}
+
+function asNumber(value: unknown): number | undefined {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string") {
+    const parsed = Number.parseFloat(value.replace(/[+%,]/g, ""));
+    return Number.isFinite(parsed) ? parsed : undefined;
+  }
+  return undefined;
+}
+
+function asString(value: unknown): string | undefined {
+  return typeof value === "string" ? value : undefined;
+}
+
+function normalizeRelatedQuery(value: unknown): SerpApiRelatedQuery | undefined {
+  const record = asRecord(value);
+  if (!record) return undefined;
+  const query = asString(record.query);
+  if (!query) return undefined;
+
+  const formattedValue =
+    asString(record.formatted_value) ??
+    asString(record.formattedValue) ??
+    asString(record.value);
+
+  return {
+    query,
+    formatted_value: formattedValue,
+    value: asNumber(record.value),
+    extracted_value: asNumber(record.extracted_value)
+  };
+}
+
+function extractRelatedQueries(response: unknown): SerpApiKeywordResearchInput["relatedQueries"] {
+  const root = asRecord(response);
+  const related = asRecord(root?.related_queries);
+  return {
+    rising: asArray(related?.rising).map(normalizeRelatedQuery).filter((item): item is SerpApiRelatedQuery => Boolean(item)),
+    top: asArray(related?.top).map(normalizeRelatedQuery).filter((item): item is SerpApiRelatedQuery => Boolean(item))
+  };
+}
+
+function extractTimeseriesValues(response: unknown): number[] {
+  const root = asRecord(response);
+  const interest = asRecord(root?.interest_over_time);
+  const rows = asArray(interest?.timeline_data);
+
+  return rows.flatMap((row) => {
+    const values = asArray(asRecord(row)?.values);
+    const firstValue = asRecord(values[0]);
+    const value = asNumber(firstValue?.extracted_value) ?? asNumber(firstValue?.value);
+    return typeof value === "number" ? [value] : [];
+  });
+}
+
+function calculateTrend(values: number[]): SerpApiKeywordResearchInput["trend"] | undefined {
+  if (values.length < 2) return undefined;
+  const midpoint = Math.floor(values.length / 2);
+  const previousValues = values.slice(0, midpoint);
+  const recentValues = values.slice(midpoint);
+  const average = (items: number[]) => items.reduce((sum, item) => sum + item, 0) / items.length;
+  const previousAverage = average(previousValues);
+  const recentAverage = average(recentValues);
+  const rawChange =
+    previousAverage === 0
+      ? recentAverage > 0
+        ? 100
+        : 0
+      : ((recentAverage - previousAverage) / previousAverage) * 100;
+  const changePct = Number(rawChange.toFixed(2));
+
+  if (changePct >= TREND_RISING_THRESHOLD) return { direction: "RISING", change_pct: changePct };
+  if (changePct <= TREND_DECLINING_THRESHOLD) return { direction: "DECLINING", change_pct: changePct };
+  return { direction: "STABLE", change_pct: changePct };
+}
+
+async function defaultSerpApiFetcher(url: URL): Promise<unknown> {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new SeoKeywordProviderError(`SerpApi Google Trends request failed: ${response.status} ${response.statusText}`);
+  }
+  return response.json();
+}
+
+function buildSerpApiUrl({
+  apiKey,
+  query,
+  dataType,
+  geo,
+  date
+}: {
+  apiKey: string;
+  query: string;
+  dataType: SerpApiDataType;
+  geo?: string;
+  date: string;
+}): URL {
+  const url = new URL("https://serpapi.com/search");
+  url.searchParams.set("engine", GOOGLE_TRENDS_ENGINE);
+  url.searchParams.set("q", query);
+  url.searchParams.set("data_type", dataType);
+  url.searchParams.set("date", date);
+  if (geo) url.searchParams.set("geo", geo);
+  url.searchParams.set("api_key", apiKey);
+  return url;
+}
+
+function redactApiKey(url: URL): string {
+  const redacted = new URL(url.toString());
+  redacted.searchParams.delete("api_key");
+  return redacted.toString();
+}
+
 export function seoKeywordFindingsToCandidates(findings: SeoKeywordFinding[]): EvidenceCandidate[] {
   return findings.map((finding) => {
     const evidence = SIGNAL_TO_EVIDENCE[finding.signal];
@@ -152,6 +297,66 @@ export function seoKeywordFindingsToCandidates(findings: SeoKeywordFinding[]): E
       note: formatNote(finding)
     };
   });
+}
+
+export class SerpApiGoogleTrendsSource {
+  private readonly apiKey: string;
+  private readonly geo?: string;
+  private readonly date: string;
+  private readonly fetcher: SerpApiFetcher;
+
+  constructor({ apiKey, geo, date = DEFAULT_SERPAPI_DATE, fetcher = defaultSerpApiFetcher }: SerpApiGoogleTrendsSourceOptions = {}) {
+    const resolvedApiKey = apiKey ?? process.env.SERPAPI_API_KEY;
+    if (!resolvedApiKey) {
+      throw new SeoKeywordProviderError("Missing SerpApi key. Set SERPAPI_API_KEY or pass --serpapi-key.");
+    }
+
+    this.apiKey = resolvedApiKey;
+    this.geo = geo;
+    this.date = date;
+    this.fetcher = fetcher;
+  }
+
+  async collect({
+    product,
+    market,
+    trend
+  }: {
+    product: string;
+    market: string;
+    trend: string;
+  }): Promise<ProviderFindingResult> {
+    const query = [product, market, trend].map((value) => value.trim()).filter(Boolean).join(" ");
+    const relatedUrl = buildSerpApiUrl({
+      apiKey: this.apiKey,
+      query,
+      dataType: "RELATED_QUERIES",
+      geo: this.geo,
+      date: this.date
+    });
+    const timeseriesUrl = buildSerpApiUrl({
+      apiKey: this.apiKey,
+      query,
+      dataType: "TIMESERIES",
+      geo: this.geo,
+      date: this.date
+    });
+
+    const [relatedResponse, timeseriesResponse] = await Promise.all([
+      this.fetcher(relatedUrl),
+      this.fetcher(timeseriesUrl)
+    ]);
+
+    return {
+      seoKeywordFindings: serpApiKeywordResearchToFindings({
+        idPrefix: query,
+        sourceUrl: redactApiKey(relatedUrl),
+        relatedQueries: extractRelatedQueries(relatedResponse),
+        trend: calculateTrend(extractTimeseriesValues(timeseriesResponse))
+      }),
+      tooling: "SerpApi Google Trends"
+    };
+  }
 }
 
 function growthSignal(formattedValue: string | undefined): SeoKeywordSignal | null {

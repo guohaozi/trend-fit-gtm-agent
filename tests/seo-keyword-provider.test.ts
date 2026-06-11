@@ -2,7 +2,12 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { generateEvidenceAdjustmentCaseFromDraft } from "../lib/evidence-case-generator";
 import { buildEvidenceDraft } from "../lib/evidence-collector";
-import { seoKeywordFindingsToCandidates, serpApiKeywordResearchToFindings } from "../lib/seo-keyword-provider";
+import {
+  SeoKeywordProviderError,
+  SerpApiGoogleTrendsSource,
+  seoKeywordFindingsToCandidates,
+  serpApiKeywordResearchToFindings
+} from "../lib/seo-keyword-provider";
 import type { Scores } from "../lib/types";
 
 const baselineScores: Scores = {
@@ -16,6 +21,75 @@ const baselineScores: Scores = {
 };
 
 describe("SEO keyword provider", () => {
+  it("collects live Google Trends findings through SerpApi", async () => {
+    const requested: URL[] = [];
+    const source = new SerpApiGoogleTrendsSource({
+      apiKey: "test-serpapi-key",
+      geo: "US",
+      date: "today 12-m",
+      fetcher: async (url) => {
+        requested.push(new URL(url.toString()));
+        const dataType = url.searchParams.get("data_type");
+        if (dataType === "RELATED_QUERIES") {
+          return {
+            related_queries: {
+              rising: [
+                { query: "protein drink convenience store", formatted_value: "Breakout" },
+                { query: "where to buy protein drink", formatted_value: "+120%", extracted_value: 120 }
+              ],
+              top: [{ query: "protein drink", extracted_value: 100 }]
+            }
+          };
+        }
+        return {
+          interest_over_time: {
+            timeline_data: [
+              { values: [{ extracted_value: 10 }] },
+              { values: [{ extracted_value: 20 }] },
+              { values: [{ extracted_value: 60 }] },
+              { values: [{ extracted_value: 80 }] }
+            ]
+          }
+        };
+      }
+    });
+
+    const result = await source.collect({
+      product: "protein drink",
+      market: "US convenience retail",
+      trend: "grab-and-go protein",
+      queries: [],
+      limitPerQuery: 2
+    });
+
+    assert.equal(requested.length, 2);
+    assert.deepEqual(
+      requested.map((url) => url.searchParams.get("data_type")),
+      ["RELATED_QUERIES", "TIMESERIES"]
+    );
+    assert.equal(requested[0].searchParams.get("engine"), "google_trends");
+    assert.equal(requested[0].searchParams.get("api_key"), "test-serpapi-key");
+    assert.equal(requested[0].searchParams.get("geo"), "US");
+    assert.equal(requested[0].searchParams.get("date"), "today 12-m");
+    assert.equal(requested[0].searchParams.get("q"), "protein drink US convenience retail grab-and-go protein");
+    assert.equal(result.tooling, "SerpApi Google Trends");
+    assert.deepEqual(
+      result.seoKeywordFindings?.map((finding) => [finding.signal, finding.query, finding.growthLabel ?? finding.changePct]),
+      [
+        ["breakout_keyword", "protein drink convenience store", "Breakout"],
+        ["related_buying_query", "where to buy protein drink", "+120%"],
+        ["trend_rising", "protein drink", 366.67]
+      ]
+    );
+  });
+
+  it("requires a SerpApi key for live Google Trends collection", async () => {
+    assert.throws(
+      () => new SerpApiGoogleTrendsSource({ apiKey: "" }),
+      (error) => error instanceof SeoKeywordProviderError && /SERPAPI_API_KEY/.test(error.message)
+    );
+  });
+
   it("maps SEO keyword findings into timing and commercial-intent evidence candidates", () => {
     const candidates = seoKeywordFindingsToCandidates([
       {

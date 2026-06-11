@@ -10,12 +10,12 @@ This file is a handoff snapshot for starting a fresh Codex / Claude conversation
 - Git branch: `main`
 - Public GitHub repo: `https://github.com/guohaozi/trend-fit-gtm-agent`
 - Remote: `origin https://github.com/guohaozi/trend-fit-gtm-agent.git`
-- Current state: v1.2 rigor layer is implemented in docs, skills, TypeScript, tests, UI, seven new 15-case-list evidence-backed cases, one competitor-layer AI-tool evidence variant, P0-P4 evidence automation provider layers, P5a/b offline evidence-case orchestration, P5c CLI/file writer, the first live OpenCLI-backed research CLI, a fixture/dry-run provider panel in `/workspace`, classifier-owned workspace evidence editing, and a GitHub Actions CI workflow.
-- Verification status: `npm test` currently runs 97 passing Node tests; `npm run build` completes a successful Next.js production build. `.github/workflows/ci.yml` now runs `npm ci`, `npm test`, and `npm run build` on pushes to `main` and pull requests.
+- Current state: v1.2 rigor layer is implemented in docs, skills, TypeScript, tests, UI, seven new 15-case-list evidence-backed cases, one competitor-layer AI-tool evidence variant, P0-P4 evidence automation provider layers, P5a/b offline evidence-case orchestration, P5c CLI/file writer, live OpenCLI-backed and SerpApi Google Trends research providers, a fixture/dry-run provider panel in `/workspace`, classifier-owned workspace evidence editing, and a GitHub Actions CI workflow.
+- Verification status: `npm test` currently runs 100 passing Node tests; `npm run build` completes a successful Next.js production build. `.github/workflows/ci.yml` now runs `npm ci`, `npm test`, and `npm run build` on pushes to `main` and pull requests.
 - Automation status: P0 product-marketing context, P1 evidence case generator, P2 customer-research provider, P3 SEO/timing provider, P4 competitor provider, P5a/b offline orchestration, P5c CLI/file writer, product+market+trend research runner, and the first deterministic trend-shortlist ranking layer are done. Live trend discovery has not been implemented yet.
 - Latest UI layer: `/workspace` is now an editable workflow page backed by `lib/workspace-evaluator.ts`. It lets users edit product fields, risk/profile, three candidate trends, seven anchored score dimensions, and evidence input rows, then switch between single-trend scoring and shortlist ranking. Evidence rows can edit source URL, dimension, direction, magnitude, desired confidence, verification status, source signal, and notes; `sourceTier` and computed confidence are read-only outputs from `source-tier-classifier`. The workspace also surfaces evidence gaps, previews provider dry-run commands for the active/winning trend, exposes a portable fixture smoke command, and can copy Markdown or provider commands. It still does not execute live providers from the browser.
 - Latest shortlist layer: `lib/trend-shortlist.ts` ranks manually supplied candidate trends by gated band, evidence-adjusted total, stability, and Timing & Saturation. The first demo is LEGO comparing World Cup fan culture, F1 race weekend, and graduation season gifting in `data/lego_trend_shortlist.json` and `outputs/lego_trend_shortlist.md`; F1 ranks first.
-- Latest automation layer: `lib/evidence-case-research-runner.ts`, `lib/opencli-research-source.ts`, and `scripts/evidence-case-research.ts` add `npm run evidence:case:research`, which starts from product + market + trend, builds research queries, can use fixture / web / OpenCLI providers, converts results into evidence inputs, then writes `data/*_evidence.json` and `outputs/*_evidence_case.md`. The OpenCLI provider maps Reddit and YouTube search rows into `customerResearchFindings`, and maps Twitter/X plus Google Search rows into conservative `additionalCandidates`. It now tolerates individual OpenCLI command failures and applies relevance guards before rows become evidence. Xiaohongshu, TikTok, Google Trends, GooseWorks, and marketplace-specific mappers are the next provider adapters.
+- Latest automation layer: `lib/evidence-case-research-runner.ts`, `lib/opencli-research-source.ts`, `lib/seo-keyword-provider.ts`, and `scripts/evidence-case-research.ts` add `npm run evidence:case:research`, which starts from product + market + trend, builds research queries, can use fixture / web / OpenCLI / SerpApi Google Trends providers, converts results into evidence inputs, then writes `data/*_evidence.json` and `outputs/*_evidence_case.md`. The OpenCLI provider maps Reddit and YouTube search rows into `customerResearchFindings`, and maps Twitter/X plus Google Search rows into conservative `additionalCandidates`. The SerpApi provider calls `engine=google_trends` for related queries and timeseries, then maps the result into SEO keyword findings for Timing & Saturation and Commercial Intent. Xiaohongshu, TikTok, GooseWorks, and marketplace-specific mappers are the next provider adapters.
 - Latest live research proof: DJI drones entering UAE / Saudi / Middle East for video creation, security inspection, and tourism enablement can be generated with OpenCLI via `npm run evidence:case:research`. The current generated report is `outputs/dji_drones_uae_saudi_middle_east_video_creation_security_inspection_tourism_enablement_evidence_case.md`; latest run produced 16 accepted evidence items, `76 / Cautious test`, evidence gate `partial`, stability `fragile`.
 - File-writing layer: `lib/evidence-case-file-writer.ts` and `scripts/evidence-case.ts` provide a real file-writing CLI. Run `npm run evidence:case -- --input examples/evidence-case-input.example.json` to merge provider findings, apply source-tier classification, generate `data/*_evidence.json`, and generate `outputs/*_evidence_case.md`.
 - Latest provider layer: `lib/competitor-research-provider.ts` maps competitor-profiling / product-swipefile style extracts into `EvidenceCandidate[]`, then the existing collector and generator compute source-tiered evidence cases.
@@ -29,9 +29,9 @@ This file is a handoff snapshot for starting a fresh Codex / Claude conversation
 - The project is published to GitHub. The exact latest pushed commit hash should be checked with `git log -1 --oneline` in the next conversation.
 - Previous review round was a Claude **review + fix** pass on the evidence cases Codex produced: it verified the cited sources are real, found a source-tier inflation bug in the AI-tool case, fixed it, and added a deterministic source-tier classifier to prevent recurrence.
 - Previous round added the AI photo-tool evidence case and the snack / Dubai-style chocolate evidence case.
-- This handoff corresponds to the latest evidence-editor follow-up after the provider
-  preview batch. `e1f82d5` has been pushed to `origin/main`; local commits after that may
-  still need to be pushed depending on network availability.
+- This handoff corresponds to the workspace evidence-editor and SerpApi Google Trends
+  provider follow-up. Check `git log -1 --oneline` and `git status --short --branch` for
+  the exact pushed commit state in the next conversation.
 
 ## Latest Conversation Handoff
 
@@ -64,16 +64,24 @@ This is the compact handoff for the next Codex / Claude conversation.
   resolution is now `--opencli-bin`, then `OPENCLI_BIN`, then `opencli` from `PATH`.
 - **Workspace evaluator:** `lib/workspace-evaluator.ts` bridges frontend state into the
   existing scoring, recommendation-rigor, and shortlist modules.
+- **SerpApi Google Trends provider:** `lib/seo-keyword-provider.ts` now includes
+  `SerpApiGoogleTrendsSource`, which calls SerpApi `engine=google_trends` for related
+  queries and timeseries, computes a conservative recent-vs-previous trend direction,
+  redacts API keys from evidence source URLs, and feeds the existing SEO finding mapper.
+- **CLI wiring:** `scripts/evidence-case-research.ts` now supports `--provider
+  google-trends` / `--provider serpapi`, `--serpapi-key`, `--serpapi-geo`, and
+  `--serpapi-date`. It also defaults to `SERPAPI_API_KEY` for local runs.
 - **Tests:** Added focused tests for shortlist ranking, workspace evaluation/export,
   provider-preview generation, portable OpenCLI dry-run output, and classifier-owned
-  workspace evidence materialization.
+  workspace evidence materialization, plus SerpApi Google Trends collection and CLI
+  wiring.
 
 ### Key design decisions
 
 - Build the frontend workflow before adding more live providers, because an editable UI
   exposes exactly which evidence slots and provider gaps matter.
 - Keep `/workspace` deterministic for now: no browser-triggered OpenCLI, GooseWorks, or
-  Google Trends calls yet.
+  Google Trends calls yet. Live Google Trends is CLI-only through SerpApi.
 - Treat provider preview as a contract/demo layer first: dry-run commands and fixture
   smoke runs prove the pipeline shape before the browser is allowed to execute live
   local CLIs.
@@ -97,8 +105,8 @@ This is the compact handoff for the next Codex / Claude conversation.
   collection are still not wired.
 - LEGO shortlist evidence is curated fixture evidence, not a full live market-research
   run.
-- Google Search is still not Google Trends. Hard Timing / SEO evidence needs a real
-  Google Trends or SEO timeseries provider.
+- Google Search is still not Google Trends. Hard Timing / SEO evidence should now use
+  the SerpApi Google Trends CLI provider rather than broad Google Search rows.
 - Xiaohongshu, TikTok, marketplace/review providers, real provider health checks, and
   browser-run collection are not wired into the UI.
 - Browser screenshot verification was attempted but blocked because the available
@@ -113,8 +121,8 @@ This is the compact handoff for the next Codex / Claude conversation.
    browser-triggered OpenCLI execution.
 2. Add save/import/export for workspace state so edited evidence rows can survive refresh
    without introducing auth or a database.
-3. Add a real Google Trends / SEO timeseries provider to fill Timing, Search Demand,
-   and Commercial Intent with hard evidence.
+3. Add a fixture-backed or server/API boundary for running the SerpApi Google Trends
+   provider from `/workspace` without exposing keys in the browser.
 4. Add Xiaohongshu / TikTok social-language mappers and marketplace/review providers.
 5. Add route-level smoke coverage or browser screenshots for `/workspace` so future UI
    regressions are easier to catch.
@@ -206,7 +214,22 @@ Latest DJI run:
 - Evidence-adjusted read: `76 / Cautious test`.
 - Evidence gate: `partial`.
 - Stability: `fragile`.
-- Main reason gate remains partial: Timing & Saturation has no hard Google Trends / SEO evidence yet; Message Bridge and Creative Feasibility are still assumptions.
+- Main reason gate remains partial: that run used OpenCLI / Google Search only. Re-run
+  the same product + market + trend with `--provider google-trends` to add hard
+  Timing & Saturation evidence before relying on the read.
+
+SerpApi Google Trends run shape:
+
+```bash
+SERPAPI_API_KEY=your_key npm run evidence:case:research -- \
+  --product "protein drink" \
+  --market "US convenience retail" \
+  --trend "grab-and-go protein" \
+  --risk medium \
+  --provider google-trends \
+  --serpapi-geo US \
+  --serpapi-date "today 12-m"
+```
 
 OpenCLI operational notes:
 
@@ -236,10 +259,11 @@ Evidence hygiene added this round:
 
 Known limitations:
 
-- Google Search is not Google Trends. It should not be treated as hard Timing evidence.
+- Google Search is not Google Trends. It should not be treated as hard Timing evidence;
+  use `--provider google-trends` / SerpApi for that slot.
 - Current Google rows still include some broad web/search results and listicles. The
-  source-tier classifier caps them, but next provider work should add real SERPAPI /
-  Google Trends / SEO timing data.
+  source-tier classifier caps them, but they should now be supplemented or replaced with
+  SerpApi Google Trends output.
 - Twitter/X and YouTube rows are useful for raw language and weak use-case evidence, but
   they should not decide final scores without the classifier and gate layer.
 - Xiaohongshu and TikTok adapters exist in OpenCLI but are not mapped yet.
@@ -248,10 +272,11 @@ Known limitations:
 
 Recommended next implementation:
 
-1. Add a real Google Trends / SEO execution provider around the existing
-   `seo-keyword-provider.ts` shape.
-2. Add Xiaohongshu / TikTok row mappers as raw social candidate providers.
-3. Add a shortlist runner: product + market -> 3-5 candidate trends -> run
+1. Add fixture/server execution support so `/workspace` can run or replay provider
+   collection without exposing SerpApi keys in the browser.
+2. Add multi-query Google Trends planning instead of one product + market + trend query.
+3. Add Xiaohongshu / TikTok row mappers as raw social candidate providers.
+4. Add a shortlist runner: product + market -> 3-5 candidate trends -> run
    `evidence:case:research` for each -> rank by gated evidence score and missing slots.
 
 What landed:
@@ -386,7 +411,7 @@ important pieces for Trend-Fit evidence collection:
 | Product and competitor research | `product-swipefile` | Strongest replacement for deep product/competitor inventory. Uses OpenCLI when available. |
 | Raw platform/user language | `opencli` | Best local platform-search layer for Reddit/X/TikTok/Douyin/Xiaohongshu/Bilibili/YouTube/etc. |
 | Reddit pain and buyer language | `reddit-icp-monitor` | Useful for Audience/Use-case raw language and commercial-intent comments. |
-| Trends / SEO / timing signals | `seo-keyword-research` | Requires `SERPAPI_KEY`; useful for Google Trends related queries and timing checks. |
+| Trends / SEO / timing signals | `seo-keyword-research` / `--provider google-trends` | Local CLI uses `SERPAPI_API_KEY`; useful for Google Trends related queries and timing checks. |
 | Market pain / ICP mapping | `map-your-market` | Useful if scripts are available; otherwise use its rubric manually. |
 | Channel/community discovery | `where-your-customer-lives` | Useful for reachability and community evidence. |
 | Competitor media / PR evidence | `competitor-pr-finder` | Requires `TAVILY_API_KEY`; useful for secondary evidence and competitor activity. |
@@ -851,15 +876,15 @@ git push
   - User terminal verified GooseWorks login: `npx gooseworks login` reports already logged in as `gh1225835497@gmail.com`; `npx gooseworks credits` reports 200 credits.
   - OpenCLI is installed at `/Users/guo/.npm-global/bin/opencli` and works when that bin directory is on `PATH`.
   - Current Codex shell may not include `/Users/guo/.npm-global/bin` by default, so run with `PATH=/Users/guo/.npm-global/bin:$PATH` or add that export to `~/.zshrc`.
-- Earlier evidence cases did not use GooseWorks/OpenCLI as an integrated collection pipeline; the new evidence-collector skill can borrow GooseWorks, OpenCLI, manual, or browser research as candidate-source input, but still requires project-local verification and source-tier classification before scoring.
-- Raw Google Trends / SEO timeseries was not used.
+- Earlier evidence cases did not use GooseWorks/OpenCLI/SerpApi as an integrated collection pipeline; the evidence-collector workflow can now borrow GooseWorks, OpenCLI, SerpApi Google Trends, manual, or browser research as candidate-source input, but still requires project-local verification and source-tier classification before scoring.
+- Raw Google Trends / SEO timeseries is now available through the CLI via SerpApi, but older evidence cases have not all been regenerated with that provider.
 - Commercial Intent in the fashion evidence case is still proxy-based, not measured purchase behavior or live "where to buy" comments.
 - Creative Feasibility in the fashion evidence case remains an assumption.
 - Reddit evidence in AI and snack cases is useful raw user language, but each thread is narrow and should not be treated as market-wide measurement.
 - `source_tier_classifier.md` now has an executable guard in `tests/source-tier-classifier.test.ts`; it is no longer only a soft prose constraint.
 - Fashion, AI-tool, and snack evidence cases have been re-audited against the classifier. Remaining limitation: this is a deterministic pattern guard, not a live URL content verifier.
 - The evidence-backed cases are not model-training labels. They are analyst-reviewed examples used to pressure-test and improve the scoring logic, evidence gate, and case-study story.
-- Timing & Saturation should eventually use raw Google Trends / SEO timeseries instead of secondary trend-analysis pages.
+- Timing & Saturation should prefer the SerpApi Google Trends CLI provider over secondary trend-analysis pages when a live key is available.
 - The app does not yet auto-discover trends; trends are still manual/demo inputs. The
   new shortlist module ranks supplied candidates but does not discover candidates.
 - The app does not yet run automatic multi-source evidence collection; the new collector is a library/skill workflow, not a UI crawler.
@@ -873,15 +898,16 @@ git push
 2. Add a lightweight provider flow for evidence collection:
    - detect GooseWorks via `npx gooseworks credits`;
    - detect OpenCLI via `PATH=/Users/guo/.npm-global/bin:$PATH opencli --help`;
-   - gather candidate sources with GooseWorks/OpenCLI/specialized skills first;
+   - detect SerpApi via `SERPAPI_API_KEY`;
+   - gather candidate sources with GooseWorks/OpenCLI/SerpApi/specialized skills first;
    - normalize them into `EvidenceCandidate[]`;
    - pass candidates into `buildEvidenceDraft()`.
 3. Add route smoke tests for `/`, `/fit-score`, and `/report`, including `demo_ai_tool` and `demo_snack`.
-4. Add provider-backed evidence collection controls to `/workspace`, starting with dry-run / fixture mode before live OpenCLI execution.
+4. Add provider-backed evidence collection controls to `/workspace`, starting with dry-run / fixture mode before live OpenCLI or SerpApi execution.
 5. Add portfolio screenshots and a short case-study page/doc showing the evidence-backed examples, the LEGO shortlist, and the editable workspace.
 6. Later, integrate a real evidence toolchain:
    - GooseWorks for Reddit/X comments, competitor activity, and creator discovery
-   - Google Trends / SEO timeseries for Timing & Saturation
+   - SerpApi Google Trends / SEO timeseries for Timing & Saturation
    - Product/competitor research skill for deeper product-market context
 7. Much later, build a real historical calibration set only from labelled campaign outcomes.
 

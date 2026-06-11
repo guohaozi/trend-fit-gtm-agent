@@ -1,8 +1,11 @@
 import { FixtureResearchSource, runEvidenceCaseResearch, type ResearchPlatform } from "../lib/evidence-case-research-runner";
 import { OpenCliResearchSource } from "../lib/opencli-research-source";
 import type { OpenCliResearchPlatform } from "../lib/opencli-research-source";
+import { SerpApiGoogleTrendsSource } from "../lib/seo-keyword-provider";
 import type { RiskTolerance } from "../lib/types";
 import type { WeightProfile } from "../lib/recommendation-rigor";
+
+type ResearchProviderName = "web" | "opencli" | "google-trends" | "serpapi";
 
 type ParsedArgs = {
   product?: string;
@@ -10,11 +13,14 @@ type ParsedArgs = {
   trend?: string;
   risk?: RiskTolerance;
   profile?: WeightProfile;
-  provider?: "web" | "opencli";
+  provider?: ResearchProviderName;
   competitors: string[];
   platforms?: ResearchPlatform[];
   fixtureResults?: string;
   openCliBin?: string;
+  serpApiKey?: string;
+  serpApiGeo?: string;
+  serpApiDate?: string;
   dryRunProviderCommands?: boolean;
   dataDir?: string;
   outputDir?: string;
@@ -33,11 +39,14 @@ function usage(): string {
     "  --trend <text>            Trend to validate",
     "  --risk <low|medium|high>  Risk tolerance",
     "  --profile <profile>       default | brand_awareness | ecommerce_conversion | b2b_pipeline | creator_seeding | risk_sensitive",
-    "  --provider <provider>     web | opencli (default: web, unless --fixture-results is used)",
+    "  --provider <provider>     web | opencli | google-trends | serpapi (default: web, unless --fixture-results is used)",
     "  --competitor <name>       Repeatable competitor name",
     "  --platforms <csv>         web,reddit,x,twitter,xiaohongshu,youtube,google",
     "  --fixture-results <path>  Use fixture search results instead of live web search",
     "  --opencli-bin <path>      OpenCLI binary path for --provider opencli",
+    "  --serpapi-key <key>       SerpApi API key for --provider google-trends (default: SERPAPI_API_KEY)",
+    "  --serpapi-geo <geo>       Google Trends geo code for SerpApi (for example US)",
+    "  --serpapi-date <date>     Google Trends date range for SerpApi (default: today 12-m)",
     "  --dry-run-provider-commands  Print provider commands and exit",
     "  --data-dir <path>         Evidence JSON output directory",
     "  --output-dir <path>       Markdown report output directory",
@@ -71,11 +80,14 @@ function parseArgs(argv: string[]): ParsedArgs {
     else if (arg === "--trend") args.trend = next;
     else if (arg === "--risk") args.risk = next as RiskTolerance;
     else if (arg === "--profile") args.profile = next as WeightProfile;
-    else if (arg === "--provider") args.provider = next as "web" | "opencli";
+    else if (arg === "--provider") args.provider = next as ResearchProviderName;
     else if (arg === "--competitor") args.competitors.push(next);
     else if (arg === "--platforms") args.platforms = next.split(",").map((value) => value.trim()).filter(Boolean) as ResearchPlatform[];
     else if (arg === "--fixture-results") args.fixtureResults = next;
     else if (arg === "--opencli-bin") args.openCliBin = next;
+    else if (arg === "--serpapi-key") args.serpApiKey = next;
+    else if (arg === "--serpapi-geo") args.serpApiGeo = next;
+    else if (arg === "--serpapi-date") args.serpApiDate = next;
     else if (arg === "--data-dir") args.dataDir = next;
     else if (arg === "--output-dir") args.outputDir = next;
     else if (arg === "--limit") args.limit = Number.parseInt(next, 10);
@@ -90,6 +102,27 @@ function parseArgs(argv: string[]): ParsedArgs {
 function requireValue<T>(value: T | undefined, label: string): T {
   if (!value) throw new Error(`Missing required ${label}.\n\n${usage()}`);
   return value;
+}
+
+function buildProvider(args: ParsedArgs) {
+  if (args.fixtureResults) return new FixtureResearchSource(args.fixtureResults);
+  if (args.provider === "opencli") {
+    return new OpenCliResearchSource({
+      openCliBin: args.openCliBin,
+      platforms: args.platforms?.map((platform) => platform === "x" ? "twitter" : platform).filter((platform) =>
+        platform === "reddit" || platform === "youtube" || platform === "twitter" || platform === "google"
+      ) as OpenCliResearchPlatform[] | undefined,
+      continueOnCommandError: true
+    });
+  }
+  if (args.provider === "google-trends" || args.provider === "serpapi") {
+    return new SerpApiGoogleTrendsSource({
+      apiKey: args.serpApiKey,
+      geo: args.serpApiGeo,
+      date: args.serpApiDate
+    });
+  }
+  return undefined;
 }
 
 async function main(): Promise<void> {
@@ -129,17 +162,7 @@ async function main(): Promise<void> {
     profileUsed: args.profile ?? "default",
     competitors: args.competitors,
     platforms: args.platforms,
-    provider: args.fixtureResults
-      ? new FixtureResearchSource(args.fixtureResults)
-      : args.provider === "opencli"
-        ? new OpenCliResearchSource({
-            openCliBin: args.openCliBin,
-            platforms: args.platforms?.map((platform) => platform === "x" ? "twitter" : platform).filter((platform) =>
-              platform === "reddit" || platform === "youtube" || platform === "twitter" || platform === "google"
-            ) as OpenCliResearchPlatform[] | undefined,
-            continueOnCommandError: true
-          })
-        : undefined,
+    provider: buildProvider(args),
     limitPerQuery: limit,
     dataDir: args.dataDir,
     outputDir: args.outputDir

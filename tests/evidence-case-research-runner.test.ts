@@ -152,4 +152,43 @@ describe("evidence case research runner", () => {
     assert.match(result.stdout, /dji_drones_middle_east_video_creation_security_inspection_tourism_enablement_evidence\.json/);
     assert.match(result.stdout, /accepted evidence: 4/);
   });
+
+  it("wires the Google Trends provider through the research CLI", () => {
+    const { dataDir, outputDir } = makeTempProject();
+
+    const result = spawnSync(
+      process.execPath,
+      [
+        "--import",
+        "tsx",
+        "scripts/evidence-case-research.ts",
+        "--product",
+        "protein drink",
+        "--market",
+        "US convenience retail",
+        "--trend",
+        "grab-and-go protein",
+        "--risk",
+        "medium",
+        "--provider",
+        "google-trends",
+        "--data-dir",
+        dataDir,
+        "--output-dir",
+        outputDir
+      ],
+      {
+        cwd: process.cwd(),
+        encoding: "utf8",
+        env: {
+          ...process.env,
+          SERPAPI_API_KEY: ""
+        }
+      }
+    );
+
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /SERPAPI_API_KEY/);
+    assert.doesNotMatch(result.stderr, /DuckDuckGo/);
+  });
 });

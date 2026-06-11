@@ -58,6 +58,19 @@ npm run evidence:case:research -- \
   --limit 3
 ```
 
+SerpApi Google Trends provider run:
+
+```bash
+SERPAPI_API_KEY=your_key npm run evidence:case:research -- \
+  --product "protein drink" \
+  --market "US convenience retail" \
+  --trend "grab-and-go protein" \
+  --risk medium \
+  --provider google-trends \
+  --serpapi-geo US \
+  --serpapi-date "today 12-m"
+```
+
 Dry-run the OpenCLI commands without executing platform searches:
 
 ```bash
@@ -94,11 +107,13 @@ The OpenCLI provider currently supports:
   evidence candidates.
 
 OpenCLI has Xiaohongshu adapters available, but their row-to-finding mapper has not been
-promoted into this CLI yet. Google Trends, GooseWorks, TikTok, and marketplace providers
-can be added behind the same provider interface without changing the evidence classifier
-or writer.
+promoted into this CLI yet. SerpApi Google Trends is available through `--provider
+google-trends` or `--provider serpapi`; it calls `engine=google_trends` for related
+queries and timeseries data, then maps those findings into Timing & Saturation and
+Commercial Intent evidence. GooseWorks, TikTok, and marketplace providers can be added
+behind the same provider interface without changing the evidence classifier or writer.
 
 Because broad web search is only a first pass, the generated report should be treated as
 an automated draft. Replace weak search-result evidence with direct platform exports,
-official policy pages, Google Trends data, marketplace data, customer comments, and
-competitor deployment proof before making high-budget decisions.
+official policy pages, marketplace data, customer comments, and competitor deployment
+proof before making high-budget decisions.

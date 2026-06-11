@@ -2,6 +2,74 @@
 
 This changelog records project-level changes and the reasoning behind them. It is intended for handoff between Codex / Claude conversations, not just release notes.
 
+## 2026-06-11 — SerpApi Google Trends Provider
+
+Status:
+
+- Added the first real SEO / Google Trends execution provider for the evidence-case
+  research CLI.
+- Pushed the two prior workspace commits to `origin/main` before starting this provider
+  work.
+
+What landed:
+
+- Added `SerpApiGoogleTrendsSource` in `lib/seo-keyword-provider.ts`.
+- The provider calls SerpApi `engine=google_trends` twice:
+  `data_type=RELATED_QUERIES` for breakout / buying queries and `data_type=TIMESERIES`
+  for recent-vs-previous trend direction.
+- Added structured response normalization for SerpApi related queries and timeseries
+  values, including `extracted_value` support.
+- API keys are used only for the request URL and are redacted from evidence `sourceUrl`.
+- Added `SeoKeywordProviderError` so missing keys and failed SerpApi requests fail
+  clearly.
+- Wired `scripts/evidence-case-research.ts` with `--provider google-trends`,
+  `--provider serpapi`, `--serpapi-key`, `--serpapi-geo`, and `--serpapi-date`.
+- Added tests for provider collection, missing-key behavior, and CLI provider wiring.
+
+Current behavior:
+
+- CLI usage:
+
+```bash
+SERPAPI_API_KEY=your_key npm run evidence:case:research -- \
+  --product "protein drink" \
+  --market "US convenience retail" \
+  --trend "grab-and-go protein" \
+  --risk medium \
+  --provider google-trends \
+  --serpapi-geo US \
+  --serpapi-date "today 12-m"
+```
+
+Key design decisions:
+
+- Keep SerpApi as a provider behind the existing `ProviderFindingSource` interface, not
+  a scoring shortcut.
+- Treat Google Trends API output as verified structured provider data, then still route
+  it through the SEO finding mapper, evidence collector, source-tier classifier, gates,
+  and stability layer.
+- Keep the key out of generated evidence and reports.
+
+Verification:
+
+- `npm test` passes with 100 tests.
+- `npm run build` passes.
+
+Known issues:
+
+- Live Google Trends execution is CLI-only. `/workspace` can preview provider commands
+  but still does not execute live providers from the browser.
+- The query is currently the simple concatenation of product + market + trend. It is
+  good enough for a first live provider, but future work should add query planning for
+  multiple keyword variants and compare them.
+- SerpApi quota / auth errors are surfaced as provider failures; there is not yet a
+  health-check panel or fixture fallback in the UI for this provider.
+
+Recommended next step:
+
+- Add a server/API boundary or fixture-backed run mode for provider execution from
+  `/workspace`, then add query planning for multiple Google Trends keyword variants.
+
 ## 2026-06-11 — Workspace Evidence Editor With Classifier-Owned Tier
 
 Status:

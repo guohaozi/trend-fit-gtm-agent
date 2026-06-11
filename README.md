@@ -167,12 +167,13 @@ For demo mode, load any of the five baseline cases from [`data/`](data/) directl
 npm test
 ```
 
-Current local verification: 97 Node tests pass via `npm test`; `npm run build` produces
+Current local verification: 100 Node tests pass via `npm test`; `npm run build` produces
 a successful Next.js production build. CI now runs both commands on GitHub Actions.
 
 Covers: scoring math, evidence adjustment, recommendation rigor, source-tier
 classification, provider adapters, evidence-case orchestration / file writing, OpenCLI
-research mapping, anchor validation, and report Markdown parsing.
+research mapping, SerpApi Google Trends mapping, anchor validation, and report Markdown
+parsing.
 
 ---
 
@@ -190,7 +191,7 @@ research mapping, anchor validation, and report Markdown parsing.
 - Evidence gates, source-tier discipline, recommendation stability, and goal-based weight
   profiles
 - Evidence-case CLI automation, provider normalization, and the first live
-  OpenCLI-backed research path
+  OpenCLI-backed and SerpApi Google Trends research paths
 - A first trend-shortlist ranking contract and LEGO shortlist demo
 - Skill architecture for extending with real data sources and shortlist workflows
 
@@ -205,9 +206,9 @@ The scoring layer and GTM brief are the core value. The data input is manual for
 The path to a full evidence agent is documented in [`skills/competitor-evidence/SKILL.md`](skills/competitor-evidence/SKILL.md),
 [`skills/trend-product-fit/evidence_model.md`](skills/trend-product-fit/evidence_model.md),
 and [`skills/trend-product-fit/source_tier_classifier.md`](skills/trend-product-fit/source_tier_classifier.md):
-once GooseWorks (Reddit/X scraping) and the seo-keyword-research skill (Google Trends)
-are connected, the weakest assumed dimensions — especially Timing & Saturation,
-Commercial Intent, and raw user-language Audience evidence — become data-backed.
+the CLI now has SerpApi Google Trends support for Timing & Saturation and Commercial
+Intent, while GooseWorks / social-platform collectors remain the next step for raw
+user-language Audience evidence.
 
 ---
 
