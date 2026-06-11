@@ -44,6 +44,7 @@ export type ProviderFindingResult = {
   competitorResearchFindings?: CompetitorResearchFinding[];
   additionalCandidates?: EvidenceCandidate[];
   tooling?: string;
+  notes?: string[];
 };
 
 export type ProviderFindingSource = {

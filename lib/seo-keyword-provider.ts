@@ -54,6 +54,9 @@ const DEFAULT_SERPAPI_DATE = "today 12-m";
 const GOOGLE_TRENDS_ENGINE = "google_trends";
 const TREND_RISING_THRESHOLD = 15;
 const TREND_DECLINING_THRESHOLD = -15;
+// Google Trends interest is a 0-100 index. If the peak interest across the window
+// is below this, the query has no meaningful demand and any relative change is noise.
+const MIN_MEANINGFUL_INTEREST = 5;
 
 type SerpApiDataType = "RELATED_QUERIES" | "TIMESERIES";
 type UnknownRecord = Record<string, unknown>;
@@ -226,6 +229,10 @@ function extractTimeseriesValues(response: unknown): number[] {
 
 function calculateTrend(values: number[]): SerpApiKeywordResearchInput["trend"] | undefined {
   if (values.length < 2) return undefined;
+  // A near-zero peak means the query has effectively no search demand, so a
+  // relative change (e.g. a late zero reading producing -100%) is noise, not a
+  // real trend. Emit nothing rather than fabricate a declining signal.
+  if (Math.max(...values) < MIN_MEANINGFUL_INTEREST) return undefined;
   const midpoint = Math.floor(values.length / 2);
   const previousValues = values.slice(0, midpoint);
   const recentValues = values.slice(midpoint);
@@ -243,6 +250,11 @@ function calculateTrend(values: number[]): SerpApiKeywordResearchInput["trend"] 
   if (changePct >= TREND_RISING_THRESHOLD) return { direction: "RISING", change_pct: changePct };
   if (changePct <= TREND_DECLINING_THRESHOLD) return { direction: "DECLINING", change_pct: changePct };
   return { direction: "STABLE", change_pct: changePct };
+}
+
+function serpApiReportsNoResults(response: unknown): boolean {
+  const error = asRecord(response)?.error;
+  return typeof error === "string" && error.trim().length > 0;
 }
 
 async function defaultSerpApiFetcher(url: URL): Promise<unknown> {
@@ -347,15 +359,36 @@ export class SerpApiGoogleTrendsSource {
       this.fetcher(timeseriesUrl)
     ]);
 
-    return {
-      seoKeywordFindings: serpApiKeywordResearchToFindings({
-        idPrefix: query,
-        sourceUrl: redactApiKey(relatedUrl),
-        relatedQueries: extractRelatedQueries(relatedResponse),
-        trend: calculateTrend(extractTimeseriesValues(timeseriesResponse))
-      }),
+    // SerpApi returns an `error` (instead of related_queries) when Google Trends
+    // has no results for the query. The interest index is relative, so a sparse
+    // long-tail query can still have a late zero reading that calculateTrend would
+    // turn into a bogus -100% decline. Treat "no results" as data-insufficient and
+    // emit nothing: no data must not become fabricated evidence.
+    const noTrendsData = serpApiReportsNoResults(relatedResponse);
+    const findings = noTrendsData
+      ? []
+      : serpApiKeywordResearchToFindings({
+          idPrefix: query,
+          sourceUrl: redactApiKey(relatedUrl),
+          relatedQueries: extractRelatedQueries(relatedResponse),
+          trend: calculateTrend(extractTimeseriesValues(timeseriesResponse))
+        });
+
+    const result: ProviderFindingResult = {
+      seoKeywordFindings: findings,
       tooling: "SerpApi Google Trends"
     };
+
+    if (findings.length === 0) {
+      const reason = noTrendsData
+        ? "SerpApi reported no Google Trends results"
+        : "Google Trends interest was near zero";
+      result.notes = [
+        `No Google Trends evidence for "${query}": ${reason}. Insufficient search demand is not scored as a declining trend.`
+      ];
+    }
+
+    return result;
   }
 }
 

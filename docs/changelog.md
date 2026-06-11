@@ -2,6 +2,54 @@
 
 This changelog records project-level changes and the reasoning behind them. It is intended for handoff between Codex / Claude conversations, not just release notes.
 
+## 2026-06-11 — Live SerpApi Verification + Near-Zero-Demand Fix
+
+Status:
+
+- Ran the real SerpApi Google Trends path for the first time (live key, not fixture/mock)
+  and fixed a real bug it surfaced.
+
+Verification result:
+
+- Field-path assumptions are correct: live `interest_over_time.timeline_data[].values[].extracted_value`
+  and `related_queries.rising/top[]` match `extractTimeseriesValues` / `extractRelatedQueries`
+  and the committed fixture. A normal high-demand query ("stanley cup") produced the
+  expected breakout + rising findings (9 total).
+
+Bug found and fixed:
+
+- For a low/near-zero-demand query, SerpApi returns an `error` ("hasn't returned any
+  results") instead of related_queries, and the relative interest index can show a late
+  zero reading. `calculateTrend` turned that into a bogus `trend_declining / -100% /
+  verified` finding that pushed Timing & Saturation down — fabricated evidence from no data.
+- Fix (per the "no data must not become evidence" rule): when SerpApi reports no results,
+  the provider now emits no findings and surfaces a `ProviderFindingResult.notes` entry
+  instead. A `MIN_MEANINGFUL_INTEREST` peak floor in `calculateTrend` backstops the
+  all-zero timeseries case. The primary guard is `related.error`, because the Google
+  Trends interest index is relative (the window peak is always 100), so an absolute peak
+  threshold alone cannot catch sparse long-tail queries.
+- This closes the long-standing caveat that `verificationStatus` was hardcoded `"verified"`,
+  for the no-data path.
+
+Files:
+
+- `lib/seo-keyword-provider.ts` — data-insufficiency guard + `serpApiReportsNoResults`.
+- `lib/evidence-case-research-runner.ts` — `ProviderFindingResult.notes`.
+- `tests/seo-keyword-provider.test.ts` — +2 tests.
+- `scripts/verify-serpapi.ts` — one-off live verification harness; the key stays in the
+  caller's environment, never committed.
+
+Verification:
+
+- `npm test`: 116 passing, 0 failures (was 114; +2).
+- Live re-run: the near-zero query now yields 0 findings; "stanley cup" still yields 9.
+
+Follow-up (not done):
+
+- Query construction still concatenates product+market+trend into one long string, which
+  is why related_queries often returns no results. Shorter/layered queries are a separate
+  improvement.
+
 ## 2026-06-11 — Route + Page Smoke Tests
 
 Status:

@@ -83,6 +83,54 @@ describe("SEO keyword provider", () => {
     );
   });
 
+  it("emits no fabricated trend when search demand is near zero", async () => {
+    const source = new SerpApiGoogleTrendsSource({
+      apiKey: "test-serpapi-key",
+      fetcher: async (url) => {
+        const dataType = url.searchParams.get("data_type");
+        if (dataType === "RELATED_QUERIES") {
+          // SerpApi signals "no results" via an error field, not related_queries.
+          return { error: "Google Trends hasn't returned any results for this query." };
+        }
+        // Even a computable (here upward) interest series must be discarded when
+        // SerpApi says the query has no results: the data is too sparse to trust.
+        return {
+          interest_over_time: {
+            timeline_data: [
+              { values: [{ extracted_value: 10 }] },
+              { values: [{ extracted_value: 20 }] },
+              { values: [{ extracted_value: 60 }] },
+              { values: [{ extracted_value: 80 }] }
+            ]
+          }
+        };
+      }
+    });
+
+    const result = await source.collect({
+      product: "ultra niche widget",
+      market: "nowhere market",
+      trend: "a query nobody searches",
+      queries: [],
+      limitPerQuery: 2
+    });
+
+    assert.deepEqual(result.seoKeywordFindings, []);
+    assert.ok(result.notes && result.notes.length > 0, "should surface a data-insufficiency note");
+    assert.match(result.notes[0], /No Google Trends evidence/);
+  });
+
+  it("produces no trend finding when calculateTrend yields no direction", () => {
+    const findings = serpApiKeywordResearchToFindings({
+      idPrefix: "lowdemand",
+      sourceUrl: "https://serpapi.com/search?engine=google_trends&q=lowdemand",
+      relatedQueries: { rising: [], top: [] },
+      trend: undefined
+    });
+
+    assert.deepEqual(findings, []);
+  });
+
   it("requires a SerpApi key for live Google Trends collection", async () => {
     assert.throws(
       () => new SerpApiGoogleTrendsSource({ apiKey: "" }),
