@@ -35,8 +35,13 @@ Chinese README:
   quiet luxury fashion, AI photo before/after, Dubai chocolate snack, and LEGO F1 shortlist.
 - `README.md` is now Chinese-first with local demo links, product preview images, project
   positioning, scoring model, API notes, deployment/domain guidance, and current gaps.
+- `/report` and `/api/report/[id]` now output customer-facing Chinese GTM brief Markdown
+  for all five demo cases. The brief copy avoids interviewer/AI-internal framing and focuses
+  on recommendation, marketing angle, risk boundary, creator fit, evidence status, and next
+  test. `outputs/demo_*_report.md` has been regenerated from the same Chinese generator.
 - `tests/route-smoke.test.ts` now asserts the redesigned Chinese homepage story and entry
-  points so the portfolio surface has a cheap regression guard.
+  points plus Chinese-only GTM brief downloads, so the portfolio/report surface has a cheap
+  regression guard.
 
 Important ops note from the same conversation: `http://127.0.0.1:3000` failed for the user
 because the local `npm run dev` process had been reclaimed. Restarting with
@@ -59,7 +64,9 @@ the host context when debugging this symptom.
    never hand-assigned.
 5. **Evidence adjustment**: evidence moves the baseline anchor scores by whole steps;
    evidence gate / caps / stability / decisionType applied on top (v1.2 rigor).
-6. **Output**: `outputs/*_evidence_case.md` (the GTM brief) + `data/*_evidence.json`.
+6. **Output**: `/report` + `/api/report/[id]` return the Chinese GTM brief; committed
+   `outputs/demo_*_report.md` mirror those demo briefs. Evidence collection still writes
+   `outputs/*_evidence_case.md` + `data/*_evidence.json`.
 
 ## How it runs (two entry points)
 

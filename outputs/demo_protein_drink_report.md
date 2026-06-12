@@ -1,137 +1,74 @@
-# GTM Brief: FitMilk Daily Protein x Everyday protein for lifestyle weight management
+# FitMilk Daily Protein × 日常蛋白补充 热点适配简报
 
-## 1. Recommendation
+> 这份简报用于判断「FitMilk Daily Protein」是否值得跟进「日常蛋白补充」这个热点，并把结论转成可执行的增长动作。
 
-**Go.** Baseline score: **78 / 100**.
+## 1. 最终建议
 
-The fit is real: the product is not asking consumers to adopt a specialist gym behavior.
-It turns protein into a familiar chilled drink for breakfast, office snacking, light
-exercise, and weight-management routines.
+**建议跟进。** 建议跟进。它不是健身房专属补剂，而是把蛋白补充变成早餐、办公室和轻运动场景里的日常饮品。
 
-Do not launch it as a miracle fat-loss product or meal replacement. The strongest
-positioning is: **daily protein made convenient**, with weight-management benefits framed
-as habit support rather than medical or transformation claims.
+- 基准分：**78/100**
+- 基准判断：**建议跟进**
+- 证据门槛后判断：**建议跟进**
+- 证据门槛：**证据不足**
+- 稳定性：**脆弱**
+- 建议动作：**小测试**
 
-## 2. Product / Trend Fit
+## 2. 为什么适合或不适合
 
-FitMilk Daily Protein is a 250ml, convenience-store ready-to-drink protein milk with 15g
-protein, low fat, and controlled sugar.
+即饮蛋白奶能降低用户进入门槛：不用摇粉、不像代餐、也不要求用户把自己定义成健身人群。核心机会在于便利店和日常场景教育；核心风险是减脂、代餐和健康宣称过度。
 
-The trend is the shift from gym-only protein to everyday protein: light-fitness consumers,
-office workers, and weight-management users want an easy bottle they can buy without
-mixing powder or entering supplement-shop culture.
+## 3. 评分明细
 
-Japan's SAVAS-style RTD protein shelf provides the reference behavior. China is not yet
-as mature in convenience-store protein drinks, but the health and fitness context makes
-the white space credible.
+评分模型：**默认平衡**；风险偏好：**中等风险偏好**。
 
-## 3. Score Breakdown
+| 维度 | 权重 | 分数 | 判断依据 |
+|------|------|------|----------|
+| 受众重合度 | 20% | 75 | 趋势受众是否和产品目标用户重合？ |
+| 使用场景相关性 | 20% | 100 | 产品加入这个热点是否自然、不牵强？ |
+| 卖点桥接 | 15% | 75 | 热点能否顺畅连接到真实卖点？ |
+| 内容可执行性 | 15% | 75 | 团队是否能产出适合平台语境的内容？ |
+| 商业意图 | 10% | 75 | 受众是否接近购买、试用或咨询心态？ |
+| 品牌安全 | 10% | 50 | 是否存在声誉、价值观或表达风险？ |
+| 时机与饱和度 | 10% | 75 | 现在进入是否仍有差异化空间？ |
 
-| Dimension | Score | Rationale |
-|-----------|-------|-----------|
-| Audience Overlap | 75 | Strong overlap with urban health, light-fitness, and weight-management consumers, but still needs China-specific routine evidence. |
-| Use-case Relevance | 100 | Protein drink naturally fits breakfast backup, office snack, post-workout, and sweet-drink replacement use cases. |
-| Message Bridge | 75 | "Daily protein without powder" is a clean bridge; avoid turning it into diet anxiety. |
-| Creative Feasibility | 75 | Convenience-store find, fridge restock, post-workout, and office snack content are easy to produce. |
-| Commercial Intent | 75 | Sports nutrition has purchase intent, but RTD protein still needs category education in China. |
-| Brand Safety | 50 | Moderate risk from overclaiming weight loss, meal replacement, kidney-health concerns, and supplement mistrust. |
-| Timing & Saturation | 75 | China appears early enough for differentiation; Japan shows the shelf behavior is plausible. |
+## 4. 营销切入点
 
-## 4. Core Angle
+**主切入点：**不是健身补剂，是每天都能顺手喝的蛋白饮品。
+- 备选 1：早餐来不及，也能补一点蛋白。
+- 备选 2：办公室下午四点，比甜饮更稳的一瓶。
 
-**Not a gym supplement. A daily protein drink.**
+## 5. 内容方向
 
-The campaign should show ordinary replacement moments:
+- 拍便利店蛋白饮品发现内容，对比普通甜饮和蛋白奶。
+- 展示没时间吃早餐时的组合：蛋白奶加水果或面包。
+- 做轻运动后的真实补给场景，不把它包装成健美补剂。
+- 用营养师或健康生活创作者解释蛋白、糖和热量，不做焦虑型内容。
 
-- Breakfast was rushed, so I grab protein milk.
-- I want an afternoon drink that does more than sugar.
-- After light training, I want something easier than powder.
-- During weight management, I choose a drink with protein instead of empty sweetness.
+## 6. 风险与边界
 
-## 5. Evidence-backed Read
+- 不要承诺快速减肥、燃脂或替代正餐。
+- 包装和详情页要清楚标注蛋白、糖、热量、乳糖和过敏信息。
+- 不要把它描述成医疗营养或疾病管理产品。
 
-The evidence-adjusted case moves the read from **78 / Go** to **85 / Strong Go**, but the
-recommendation remains **fragile** because it sits exactly on the Strong Go threshold and
-because Brand Safety is only 50.
+## 7. 品牌语气与用词
 
-What evidence changed:
+实用、日常、健康但不制造焦虑。重点是帮助用户稳定生活习惯，而不是制造身材压力。
 
-- China fitness / active-lifestyle evidence revised Audience Overlap from 75 to 100.
-- China sports-nutrition category evidence revised Commercial Intent from 75 to 100.
-- Harvard Health confirmed the need for conservative health-claim guardrails.
-- Japan SAVAS pages supported use-case and message direction, but they remain proxy
-  because they are vendor-owned.
+- 推荐使用：日常蛋白、即饮、早餐空档、办公室加餐、轻运动、习惯支持
+- 避免使用：快速瘦、代餐、燃脂、改变体质、不吃饭也行
 
-## 6. Messaging
+## 8. 合作人群
 
-Use:
+优先找轻健身、办公室生活、便利店新品、营养科普和小红书健康习惯创作者。避免极端减脂和夸张前后对比账号。
 
-- "15g protein, ready when your day is not."
-- "Daily protein without mixing powder."
-- "For breakfast gaps, office hunger, and light training days."
-- "A better bottle for your routine."
+## 9. 证据状态
 
-Avoid:
+- 证据修正后分数：**85/100**
+- 证据修正后建议：**强烈建议跟进**
+- 证据门槛：**证据门槛通过**
+- 仍需补齐：时机与饱和度、品牌安全、受众或使用场景
+- 高分但证据不足的维度：暂无
 
-- "Lose weight fast."
-- "Meal replacement."
-- "Burn fat."
-- "Fix your metabolism."
-- "Drink this instead of eating."
+## 10. 下一步测试
 
-## 7. Creator Fit
-
-Best creator types:
-
-- Light-fitness creators who show realistic workday routines.
-- Office-life creators who do convenience-store food finds.
-- Dietitians or nutrition-literate creators who can explain protein without hype.
-- Xiaohongshu users documenting calm weight-management habits.
-
-Avoid creators whose content depends on extreme before/after claims or body-anxiety hooks.
-
-## 8. Content Ideas
-
-1. **Convenience-store protein find** — creator buys a bottle before work and compares it
-   to a normal sweet drink.
-2. **Breakfast gap rescue** — no time for breakfast; protein drink plus fruit or bread.
-3. **Light workout routine** — not a bodybuilder shake, just post-Pilates or evening gym.
-4. **Office 4pm swap** — replace sugary milk tea with chilled protein milk.
-5. **Japan shelf inspiration** — explain why SAVAS-style RTD protein is common in Japan
-   and why China may be ready for a localized version.
-
-## 9. Risk Controls
-
-- Keep protein amount moderate and familiar: 15g is easier to accept than 30g for the
-  first mainstream China case.
-- Avoid direct fat-loss claims.
-- Explain sugar, calories, and protein clearly on pack.
-- Include allergen/lactose notes.
-- Do not position it as medical nutrition.
-- Use "supports routine" language, not transformation language.
-
-## 10. Launch Test
-
-Start with **creator seeding + organic push**, not broad paid acquisition.
-
-Suggested pilot:
-
-- 2 cities with high convenience-store density and fitness/office overlap.
-- 2-3 flavors: original, cocoa, coffee latte.
-- Creator content around routine replacement, not diet pressure.
-- Track sell-through, repurchase, comments asking where to buy, and flavor objections.
-
-## 11. Outreach DM
-
-Hi {Name}, we are testing a new ready-to-drink protein milk for everyday routines: 15g
-protein, low fat, and designed for breakfast gaps, office snacks, and light training days.
-
-Your content feels grounded and non-extreme, which is exactly the tone we want. We'd love
-to send a few bottles and see how it fits into your real day. No transformation claims or
-diet-pressure angle required: just an honest convenience-store routine test.
-
-## 12. Final Verdict
-
-This is a strong China GTM opportunity if the brand keeps the promise narrow:
-
-**daily protein convenience, not weight-loss magic.**
+先在便利店密度高、办公和轻健身人群重合的城市做小范围测试，配合 2 到 3 个口味和创作者种草，看试饮、复购和评论里的健康顾虑。

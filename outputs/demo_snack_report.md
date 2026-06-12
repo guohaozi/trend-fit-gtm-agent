@@ -1,91 +1,74 @@
-# Trend-Fit GTM Brief — CrunchCraft Minis × "Dubai-style Pistachio Kunafa Chocolate"
+# CrunchCraft Minis × 迪拜风开心果脆巧克力 热点适配简报
 
-> Demo report. Scores are deterministic from `data/demo_snack.json`. No live platform
-> metrics were supplied in the baseline, so every score is qualitative and assumptions
-> are labelled.
+> 这份简报用于判断「CrunchCraft Minis」是否值得跟进「迪拜风开心果脆巧克力」这个热点，并把结论转成可执行的增长动作。
 
-## 1. Executive recommendation
-**Go.** The trend is a strong product-format fit for a crunchy chocolate snack, but the
-category is already crowded and the safest move is a limited drop rather than a broad
-brand reset.
-**Total Fit Score: 81/100**
-> **Gate note (v1.2):** assumption-based brief, so the evidence gate is **fail**. The raw
-> band remains **Go**, but stability is **fragile** because Creative Feasibility is an
-> unsupported-high claim. Decision type: **small test** until Timing, Brand Safety, and
-> Use-case evidence are gathered.
+## 1. 最终建议
 
-## 2. Score breakdown
-| Dimension | Weight | Score | Weighted | Why this score |
-|-----------|--------|-------|----------|----------------|
-| Audience Overlap | 20% | 75 | 15.0 | Snack buyers and food-trend followers overlap strongly, but the exact retail audience is broader than the trend audience. |
-| Use-case Relevance | 20% | 100 | 20.0 | The product can literally become a pistachio-kunafa chocolate snack. |
-| Message Bridge | 15% | 75 | 11.25 | Clear bridge: "viral crunch, made affordable and snackable." |
-| Creative Feasibility | 15% | 100 | 15.0 | Crack-open, ASMR bite, and limited-drop reveal formats are easy to shoot. |
-| Commercial Intent | 10% | 75 | 7.5 | Food trends drive trial, but baseline lacks measured purchase intent. |
-| Brand Safety | 10% | 75 | 7.5 | Mostly safe, with copycat and authenticity risks. |
-| Timing & Saturation | 10% | 50 | 5.0 | Mature and crowded; needs differentiation beyond "we made Dubai chocolate too." |
-| **Total** | 100% | — | **81** | -> Go (raw 81.25) |
+**建议跟进。** 建议跟进，但适合作为限量上新测试，不适合直接做大规模品牌重塑。这个热点有强视觉和强试吃动机，同时也已经比较拥挤。
 
-## 3. Why it fits (or does not)
-The product belongs naturally in the trend: the whole format is taste, texture, scarcity,
-and a visual reveal. The danger is generic copying. A mid-priced snack brand should not
-pretend to be the original Dubai chocolatier; it should make the trend smaller, easier to
-try, and more transparent.
+- 基准分：**81/100**
+- 基准判断：**建议跟进**
+- 证据门槛后判断：**建议跟进**
+- 证据门槛：**证据不足**
+- 稳定性：**脆弱**
+- 建议动作：**小测试**
 
-## 4. Campaign angle
-**Primary:** "The viral pistachio crunch, made snack-size."
-- Alt A: "Dubai-style crunch without the luxury markup."
-- Alt B: "Crack it. Share it. Try the mini version."
-- Alt C: "Limited drop: pistachio-kunafa crunch bites."
+## 2. 为什么适合或不适合
 
-## 5. Content ideas
-- **Crack-open close-up:** Hook: "Is the crunch worth the hype?" Snap the mini bar on
-  camera and show the filling texture.
-- **Price honesty test:** Compare a premium full-size bar with the bite-size pack and
-  position CrunchCraft as the low-commitment trial.
-- **Limited drop counter:** Show small-batch cartons and invite viewers to vote on the
-  next texture variant.
-- **Creator taste panel:** Let snack creators rank crunch, pistachio intensity, and
-  sweetness.
-- **Convenience-store find:** "I found Dubai-style crunch in a snack pack."
+产品能自然接入这个热点：脆响、夹心、掰开瞬间和限量发售都很适合短视频。主要风险是被看作跟风复制，或因为“迪拜”标签引发产地和真实性误解。
 
-## 6. Risk assessment
-- **Copycat fatigue — Medium.** Many brands are already using pistachio-green Dubai cues.
-  Mitigation: lead with mini format, price accessibility, and texture instead of copying
-  luxury packaging.
-- **Authenticity / origin confusion — Medium.** "Dubai" can imply origin. Mitigation:
-  use "Dubai-style" and explain the pistachio-kataifi inspiration.
-- **Commodity pressure — Medium.** Pistachio and cocoa volatility can hurt margin.
-  Mitigation: limited drop, smaller format, and clear pack sizing.
-- **Sugar / indulgence critique — Low-Medium.** This is a dessert trend, not a health
-  claim. Mitigation: avoid wellness language.
+## 3. 评分明细
 
-## 7. Brand voice guidance
-Playful and sensory, but not fake-luxury. Sound like a snack brand letting people try a
-viral flavor without overpaying or overcommitting.
+评分模型：**默认平衡**；风险偏好：**中等风险偏好**。
 
-## 8. Words to use / Words to avoid
-**Use:** crunch, pistachio, kataifi-style, mini, limited drop, snack-size, crack-open,
-shareable.
-**Avoid:** authentic Dubai, luxury, rare, investment, miracle, healthy, original, rich
-people snack.
+| 维度 | 权重 | 分数 | 判断依据 |
+|------|------|------|----------|
+| 受众重合度 | 20% | 75 | 趋势受众是否和产品目标用户重合？ |
+| 使用场景相关性 | 20% | 100 | 产品加入这个热点是否自然、不牵强？ |
+| 卖点桥接 | 15% | 75 | 热点能否顺畅连接到真实卖点？ |
+| 内容可执行性 | 15% | 100 | 团队是否能产出适合平台语境的内容？ |
+| 商业意图 | 10% | 75 | 受众是否接近购买、试用或咨询心态？ |
+| 品牌安全 | 10% | 75 | 是否存在声誉、价值观或表达风险？ |
+| 时机与饱和度 | 10% | 50 | 现在进入是否仍有差异化空间？ |
 
-## 9. KOL / creator type
-Use snack reviewers, convenience-store find creators, dessert creators, and budget-food
-creators. Avoid luxury lifestyle creators; they push the brand into the wrong price and
-authenticity frame.
+## 4. 营销切入点
 
-## 10. Sample ad copy
-- **Organic caption:** "We made the viral pistachio crunch snack-size. Crack it open and
-  tell us if the hype survives the mini version."
-- **Paid caption:** "Dubai-style pistachio-kunafa crunch in a shareable snack pack.
-  Limited drop, no luxury markup."
+**主切入点：**把爆火开心果脆感做成更容易尝试的小包装。
+- 备选 1：不用高价，也能试试这口开心果脆。
+- 备选 2：掰开、听脆响、尝一口限量新口味。
 
-## 11. Outreach DM
-> Hey {name} — you review snack drops before everyone else finds them. We made a
-> Dubai-style pistachio-kunafa crunch bite: mini format, real crunch, no luxury markup.
-> Want a first box for a crack-open taste test?
+## 5. 内容方向
 
-## 12. Final decision
-**Go, but as a limited test.** Launch a small batch with snack creators, measure sellout
-speed and negative comments about price/authenticity, then decide whether to scale.
+- 拍掰开特写和咬下去的声音，让馅料和脆感成为第一视觉。
+- 做“高价原版 vs 小包装尝鲜”的价格诚实测试。
+- 邀请零食测评创作者按脆度、开心果味、甜度打分。
+- 用限量批次和投票机制测试下一款口味，而不是一次性铺太大。
+
+## 6. 风险与边界
+
+- 不要声称自己是正宗迪拜原版。
+- 包装和文案要用“迪拜风”“开心果脆感”，避免产地误导。
+- 如果评论集中质疑价格和跟风，应强调小包装、低试错成本和真实口感。
+
+## 7. 品牌语气与用词
+
+轻松、感官、直接，不装奢华。像一个零食品牌邀请用户试一口新口味。
+
+- 推荐使用：开心果、脆感、小包装、限量、掰开、尝鲜、分享装
+- 避免使用：正宗迪拜、奢华、稀有、贵族、健康、原版
+
+## 8. 合作人群
+
+优先找零食测评、便利店新品、甜品和预算美食创作者。不要找奢侈生活方式账号。
+
+## 9. 证据状态
+
+- 证据修正后分数：**76/100**
+- 证据修正后建议：**建议跟进**
+- 证据门槛：**证据门槛通过**
+- 仍需补齐：时机与饱和度、品牌安全、受众或使用场景
+- 高分但证据不足的维度：内容可执行性
+
+## 10. 下一步测试
+
+先做小批量限量上新，找零食创作者做开箱和试吃，重点看售罄速度、复购意愿和关于价格/真实性的负面评论。

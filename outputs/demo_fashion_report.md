@@ -1,98 +1,74 @@
-# Trend-Fit GTM Brief — Northbound Supply Co. × "Quiet Luxury / Old Money Outfit"
+# Northbound Supply Co. × 静奢风男装 热点适配简报
 
-> Demo report. Scores are deterministic from `data/demo_fashion.json`. No live metrics
-> were supplied, so every score is justified qualitatively; assumptions are labelled.
+> 这份简报用于判断「Northbound Supply Co.」是否值得跟进「静奢风男装」这个热点，并把结论转成可执行的增长动作。
 
-## 1. Executive recommendation
-**Strong Go** — the trend's audience *is* the brand's audience and the product already
-delivers the "expensive-looking, understated" look the trend rewards. The only real job
-is wording: ride the *look*, never the *class*.
-**Total Fit Score: 90/100**
-> **Gate note (v1.2):** this brief is assumption-based, so the evidence gate is **fail** →
-> gated recommendation is **Go, pending evidence** (a raw 90 is not an earned Strong Go).
-> Stability: **fragile** (Audience & Creative are unsupported-high). The evidenced version
-> improves the case but still remains gated Go until it gets non-proxy audience/use-case evidence:
-> [`demo_fashion_evidence_case.md`](demo_fashion_evidence_case.md).
+## 1. 最终建议
 
-## 2. Score breakdown
-| Dimension | Weight | Score | Weighted | Why this score |
-|-----------|--------|-------|----------|----------------|
-| Audience Overlap | 20% | 100 | 20.0 | Trend audience = style-conscious 20–35 US men — exactly the ICP. |
-| Use-case Relevance | 20% | 100 | 20.0 | "Clean, premium-looking basics" *is* the quiet-luxury aesthetic; no stretch. |
-| Message Bridge | 15% | 100 | 15.0 | One honest line bridges trend → benefit: "look expensive without luxury prices." |
-| Creative Feasibility | 15% | 100 | 15.0 | Outfit/styling UGC is cheap and repeatable with existing product. |
-| Commercial Intent | 10% | 75 | 7.5 | Outfit trends drive "where'd you get that?" shopping behavior. |
-| Brand Safety | 10% | 50 | 5.0 | Classism / "fake rich" risk is real; gated, not blocking. |
-| Timing & Saturation | 10% | 75 | 7.5 | Still active; the affordability angle differentiates from luxury brands. |
-| **Total** | 100% | — | **90** | → Strong Go (raw 90.00) |
+**建议跟进。** 适合跟进，但不要把传播重点放在阶层、old money 身份或“装有钱”上。更稳的打法是强调干净、耐穿、有质感，以及普通预算也能穿出利落感。
 
-## 3. Why it fits (or does not)
-This is close to a textbook fit: the people driving the trend are the exact customers
-Northbound wants, and the product genuinely produces the understated, expensive-*looking*
-result the aesthetic is about — so participation is honest, not a hijack. The single
-biggest reason *against* going all-in is tone: "quiet luxury" carries a wealth-signalling
-undertone, and a mid-range brand that frames itself as "be rich" invites "fake rich"
-mockery and alienates its price-conscious base. Win by owning the gap between *looking*
-premium and *paying* premium.
+- 基准分：**90/100**
+- 基准判断：**强烈建议跟进**
+- 证据门槛后判断：**建议跟进**
+- 证据门槛：**证据不足**
+- 稳定性：**脆弱**
+- 建议动作：**小测试**
 
-## 4. Campaign angle
-**Primary:** "Look expensive without the luxury price tag."
-- Alt A: "Quiet luxury, real-people budget."
-- Alt B: "The $40 piece that reads $400."
+## 2. 为什么适合或不适合
 
-## 5. Content ideas
-- **Styling reveal (GRWM):** Hook — "Building a quiet-luxury fit for under $150." Build
-  the outfit, reveal each affordable piece at the end. → link in bio.
-- **2-look comparison:** "Loud luxury vs. quiet luxury — same vibe, 1/10th the price."
-- **Texture/close-up b-roll:** slow shots of fabric and fit set to calm audio; caption
-  sells "polished, not flashy."
-- **"How it reads" POV:** creator wears the fit to a coffee/work setting; comments react
-  to how expensive it looks.
-- **Capsule guide:** "5 pieces that make any outfit look quiet-luxury."
+产品本身就是干净基础款和中端价位，和静奢风需要的低调、合身、少 logo 很自然地接在一起。主要风险不在产品，而在表达：如果文案太像财富崇拜，会引发阶层感和“假精英”反感。
 
-## 6. Risk assessment
-- **Classism / wealth-signalling — Medium.** Framing the brand as a way to "be rich" or
-  "join the elite" alienates the 20–35 budget-aware audience and invites "fake rich"
-  ridicule. *Mitigation:* sell the polished *look* at an honest price; center
-  accessibility, never status.
-- **Cultural-erasure — Low.** Presenting the aesthetic as universally "tasteful" can read
-  as tone-deaf. *Mitigation:* keep it about personal style, not a class everyone should
-  aspire to.
-- **Saturation — Low.** Luxury brands dominate the tag; the *affordable* angle is the
-  white space. *Mitigation:* always lead with the price contrast.
-- No legal exposure.
+## 3. 评分明细
 
-## 7. Brand voice guidance
-Tasteful, practical, confident — never arrogant. Sound like a sharp friend who knows how
-to look put-together on a normal salary, not a brand selling you a fantasy of being rich.
-Casual, first-person, register matched to TikTok/Reels.
+评分模型：**默认平衡**；风险偏好：**中等风险偏好**。
 
-## 8. Words to use / Words to avoid
-**Use:** clean, polished, timeless, premium-looking, effortless, everyday, sharp,
-understated.
-**Avoid:** rich, elite, old money (as identity), fake luxury, "poor man's luxury",
-flex, status, cosplay rich.
+| 维度 | 权重 | 分数 | 判断依据 |
+|------|------|------|----------|
+| 受众重合度 | 20% | 100 | 趋势受众是否和产品目标用户重合？ |
+| 使用场景相关性 | 20% | 100 | 产品加入这个热点是否自然、不牵强？ |
+| 卖点桥接 | 15% | 100 | 热点能否顺畅连接到真实卖点？ |
+| 内容可执行性 | 15% | 100 | 团队是否能产出适合平台语境的内容？ |
+| 商业意图 | 10% | 75 | 受众是否接近购买、试用或咨询心态？ |
+| 品牌安全 | 10% | 50 | 是否存在声誉、价值观或表达风险？ |
+| 时机与饱和度 | 10% | 75 | 现在进入是否仍有差异化空间？ |
 
-## 9. KOL / creator type
-Mid-tier (10k–150k) **men's-fashion micro-creators**, **office/workwear-outfit creators**,
-and **everyday-lifestyle creators** whose audiences trust "affordable but sharp"
-recommendations. Avoid pure luxury-haul creators — wrong audience, wrong price signal.
+## 4. 营销切入点
 
-## 10. Sample ad copy
-- **Organic caption:** "Quiet luxury fits hit different when they don't cost luxury money.
-  Clean, timeless, everyday. 👇"
-- **Paid caption:** "Look expensive. Spend like a normal person. Premium-looking basics
-  from $30 — link to shop."
-- **Hook bank:** "POV: you look rich for $40." · "Quiet luxury but make it affordable." ·
-  "The most expensive-looking $90 outfit I own."
+**主切入点：**不用奢侈品预算，也能穿得干净有质感。
+- 备选 1：通勤也能穿的高级感基础款。
+- 备选 2：把钱花在版型和面料上，而不是 logo 上。
 
-## 11. Outreach DM
-> Hey {name} — love your everyday-outfit breakdowns, especially the workwear ones. We're
-> Northbound, and we're leaning into the quiet-luxury look right now — affordable pieces
-> that read way more expensive than they are. Felt like a fit for your audience. Could we
-> send you a couple pieces to style? No strings if it's not your thing.
+## 5. 内容方向
 
-## 12. Final decision
-**Go.** Smallest next step: brief 3–5 men's-fashion micro-creators on the "look expensive,
-honest price" angle with the words-to-avoid list attached, ship gifted product, and test
-one paid caption variant against the price-contrast hook before scaling spend.
+- 做一组“150 美元以内通勤穿搭”短视频，展示每件单品价格和上身效果。
+- 拍摄“高调奢华 vs 低调质感”的对比内容，让产品成为自然选择。
+- 用面料、版型、领口和裤型的近景镜头，强化质感而不是炫耀。
+- 邀请男装微型创作者做一周通勤搭配，测试收藏、加购和评论里的购买意图。
+
+## 6. 风险与边界
+
+- 避免使用“富人感”“老钱身份”“阶层跃升”等表达。
+- 不要暗示消费者应该模仿某个阶层，重点放在穿着场景和真实预算。
+- 如果评论区开始讨论“装有钱”，应立刻把文案拉回版型、舒适度和价格透明。
+
+## 7. 品牌语气与用词
+
+克制、实用、笃定，像懂穿搭的朋友给出建议，而不是品牌在贩卖身份幻想。
+
+- 推荐使用：干净、利落、有质感、通勤、耐穿、基础款、真实预算
+- 避免使用：富人感、阶层、精英、装有钱、假奢华、old money 身份
+
+## 8. 合作人群
+
+优先找 1 万到 15 万粉的男装、通勤穿搭、日常生活方式创作者。不要优先找纯奢侈品 haul 创作者，他们的价格信号不匹配。
+
+## 9. 证据状态
+
+- 证据修正后分数：**88/100**
+- 证据修正后建议：**建议跟进**
+- 证据门槛：**证据部分通过**
+- 仍需补齐：时机与饱和度、品牌安全、受众或使用场景
+- 高分但证据不足的维度：受众重合度、内容可执行性
+
+## 10. 下一步测试
+
+先送样给 3 到 5 位男装微型创作者，统一测试“真实预算穿出质感”的表达，观察评论、收藏、站内搜索和加购，再决定是否放大投放。

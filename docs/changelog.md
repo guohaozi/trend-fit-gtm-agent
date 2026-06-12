@@ -6,6 +6,12 @@ one-to-two-line summaries, newest first.
 
 ## 2026-06-12
 
+- **Chinese GTM brief output** — `/report`, `/api/report/[id]`, and
+  `outputs/demo_*_report.md` now produce customer-facing Chinese Markdown for all five demo
+  cases. The copy removes interviewer/AI-internal framing and keeps the brief focused on the
+  recommendation, marketing angle, risk boundary, creator fit, evidence status, and next
+  test. Route smoke tests now guard against English GTM-report headings. Current verification
+  is `npm test` 121/121 and `npm run build` successful.
 - **Workspace Google Trends fixture fallback** — the live "运行 Google Trends（实时）" button now
   falls back to the committed fixture when the server returns 503 (no `SERPAPI_API_KEY`),
   surfacing a "演示数据" notice instead of a setup error. A public deploy stays usable for every
@@ -28,7 +34,7 @@ one-to-two-line summaries, newest first.
   server session is reclaimed, restart with `npm run dev -- -H 127.0.0.1 -p 3000`; sandboxed
   `curl` may not see the host loopback even when the Browser can.
 - **Homepage smoke guard** — route smoke tests now assert the Chinese homepage story and entry
-  points. Current verification is `npm test` 120/120 and `npm run build` successful.
+  points.
 
 ---
 

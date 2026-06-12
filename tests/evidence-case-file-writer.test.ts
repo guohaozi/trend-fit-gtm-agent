@@ -95,8 +95,9 @@ describe("evidence case CLI/file writer", () => {
 
     assert.equal(evidence.case, "fixture_case");
     assert.equal(evidence.expectedAdjustedScores.commercialIntent, 100);
-    assert.match(report, /# Evidence Case: Fixture Product x Fixture Trend/);
-    assert.match(report, /Evidence gate:/);
+    assert.match(report, /# 证据简报：Fixture Product x Fixture Trend/);
+    assert.match(report, /证据门槛：/);
+    assert.doesNotMatch(report, /Evidence Case|Executive Read|Collector Notes|Before \/ After|Evidence Items|Rigor Layer|Next Evidence To Collect|Source:/);
     assert.match(report, /customer-audience/);
   });
 

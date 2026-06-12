@@ -311,11 +311,11 @@ function buildCliInput(input: EvidenceCaseResearchInput, providerResult: Provide
       title,
       productName: input.product,
       trendName: input.trend,
-      recommendation: "This case was generated from research search results. Treat it as an automated first pass, then strengthen it with direct platform exports and local conversion evidence.",
+      recommendation: "这份简报由搜索结果自动生成，只适合作为第一轮判断。后续应继续补充平台原始数据、本地渠道数据和转化证据。",
       nextEvidence: [
-        "Replace broad web results with direct raw user-language exports from Reddit, X, YouTube, TikTok, Xiaohongshu, reviews, or interviews.",
-        "Add Google Trends / SEO keyword exports for demand timing and buying intent.",
-        "Add competitor deployments, local distributor pages, policy documents, and backlash or safety evidence."
+        "用 Reddit、X、YouTube、TikTok、小红书、评价或访谈里的原始用户语言，替换宽泛搜索结果。",
+        "补充 Google Trends、SEO 关键词或站内搜索导出，验证需求时机和购买意图。",
+        "补充竞品部署、本地渠道页、政策文件，以及负面反馈或安全风险证据。"
       ]
     }
   };

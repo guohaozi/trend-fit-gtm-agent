@@ -1,7 +1,16 @@
 import fs from "node:fs";
 import path from "node:path";
+import {
+  BAND_LABELS,
+  CONFIDENCE_LABELS,
+  DECISION_TYPE_LABELS,
+  EVIDENCE_GATE_LABELS,
+  SOURCE_CONFIDENCE_LABELS,
+  SOURCE_TIER_LABELS,
+  STABILITY_LABELS
+} from "./display-labels";
 import { orchestrateEvidenceCase, type OrchestrateEvidenceCaseInput } from "./evidence-case-orchestrator";
-import type { EvidenceAdjustmentCase } from "./evidence-adjustment";
+import type { EvidenceAdjustmentCase, EvidenceDirection, EvidenceMagnitude } from "./evidence-adjustment";
 import type { EvidenceCandidate } from "./evidence-collector";
 import { SCORE_KEYS, type ScoreKey } from "./types";
 
@@ -40,14 +49,35 @@ export type EvidenceCaseFileWriterResult = {
 };
 
 const DIMENSION_LABELS: Record<ScoreKey, string> = {
-  audienceOverlap: "Audience Overlap",
-  useCaseRelevance: "Use-case Relevance",
-  messageBridge: "Message Bridge",
-  creativeFeasibility: "Creative Feasibility",
-  commercialIntent: "Commercial Intent",
-  brandSafety: "Brand Safety",
-  timingSaturation: "Timing & Saturation"
+  audienceOverlap: "受众重合度",
+  useCaseRelevance: "使用场景相关性",
+  messageBridge: "卖点桥接",
+  creativeFeasibility: "内容可执行性",
+  commercialIntent: "商业意图",
+  brandSafety: "品牌安全",
+  timingSaturation: "时机与饱和度"
 };
+
+const DIRECTION_LABELS: Record<EvidenceDirection, string> = {
+  confirm: "确认",
+  up: "上调",
+  down: "下调"
+};
+
+const MAGNITUDE_LABELS: Record<EvidenceMagnitude, string> = {
+  weak: "弱",
+  moderate: "中",
+  strong: "强"
+};
+
+function confidenceLabel(value: string): string {
+  return CONFIDENCE_LABELS[value] ?? SOURCE_CONFIDENCE_LABELS[value] ?? value;
+}
+
+function formatSlots(values: string[] | undefined): string {
+  if (!values || values.length === 0) return "无";
+  return values.map((value) => DIMENSION_LABELS[value as ScoreKey] ?? (value === "audienceOrUseCase" ? "受众或使用场景" : value)).join("、");
+}
 
 function safeBaseName(value: string): string {
   const safe = value.toLowerCase().replace(/[^a-z0-9_-]+/g, "_").replace(/^_+|_+$/g, "");
@@ -76,13 +106,13 @@ function evidenceByDimension(evidenceCase: EvidenceAdjustmentCase): Record<Score
 }
 
 function formatEvidenceBullets(items: EvidenceAdjustmentCase["evidence"]): string {
-  if (items.length === 0) return "- No accepted evidence for this dimension yet.";
+  if (items.length === 0) return "- 这个维度暂时还没有可计入评分的证据。";
   return items
     .map((item) => {
       return [
-        `- **${item.id}** — ${item.sourceTier}, ${item.confidence} confidence, ${item.direction} / ${item.magnitude}.`,
-        `  ${item.note}`,
-        `  Source: ${item.sourceUrl}`
+        `- **${item.id}** — ${SOURCE_TIER_LABELS[item.sourceTier] ?? item.sourceTier}，${SOURCE_CONFIDENCE_LABELS[item.confidence] ?? item.confidence}，${DIRECTION_LABELS[item.direction]} / ${MAGNITUDE_LABELS[item.magnitude]}。`,
+        `  说明：${item.note}`,
+        `  来源：${item.sourceUrl}`
       ].join("\n");
     })
     .join("\n");
@@ -97,51 +127,51 @@ export function renderEvidenceCaseMarkdown(
   const title = defaultReportTitle(input);
   const grouped = evidenceByDimension(evidenceCase);
   const nextEvidence = input.report?.nextEvidence ?? [
-    "Add raw customer-language evidence from Reddit, reviews, comments, or interviews.",
-    "Add SEO / Google Trends exports for timing and buying-intent queries.",
-    "Add competitor campaign, review, pricing, and backlash evidence for saturation and risk."
+    "补充来自评论、评价、访谈或社区讨论的真实用户语言。",
+    "补充 Google Trends、SEO 或站内搜索数据，用来判断时机和购买意图。",
+    "补充竞品营销活动、评价、价格和负面反馈证据，用来判断饱和度与风险。"
   ];
 
   const lines = [
-    `# Evidence Case: ${title}`,
+    `# 证据简报：${title}`,
     "",
-    "## Executive Read",
+    "## 核心结论",
     "",
-    `Profile used: **${evidenceCase.profileUsed ?? "default"}**.`,
-    `Evidence-adjusted read: **${evidenceCase.expectedAdjustedTotal} / ${evidenceCase.expectedAdjustedBand}**.`,
-    `Gated recommendation: **${evidenceCase.expectedGatedBand ?? evidenceCase.expectedAdjustedBand}**, with **${evidenceCase.expectedStability ?? "unknown"}** stability.`,
-    `Decision type: **${evidenceCase.expectedDecisionType ?? "unknown"}**.`,
+    `评分模型：**${evidenceCase.profileUsed ?? "默认"}**。`,
+    `证据修正后判断：**${evidenceCase.expectedAdjustedTotal} / ${BAND_LABELS[evidenceCase.expectedAdjustedBand] ?? evidenceCase.expectedAdjustedBand}**。`,
+    `证据门槛后建议：**${BAND_LABELS[evidenceCase.expectedGatedBand ?? evidenceCase.expectedAdjustedBand] ?? evidenceCase.expectedGatedBand ?? evidenceCase.expectedAdjustedBand}**，稳定性：**${STABILITY_LABELS[evidenceCase.expectedStability ?? ""] ?? "未知"}**。`,
+    `建议动作：**${DECISION_TYPE_LABELS[evidenceCase.expectedDecisionType ?? ""] ?? "未知"}**。`,
     "",
-    input.report?.recommendation ?? "Use this generated case as the first evidence-backed read, then improve it with stronger local and channel-specific evidence.",
+    input.report?.recommendation ?? "先把这份简报作为证据化初判，再用更强的本地和渠道证据继续校准。",
     "",
-    "## Collector Notes",
+    "## 采集概况",
     "",
-    `- Candidates received: **${candidates.length}**`,
-    `- Evidence accepted after source-tier classification: **${evidenceCase.evidence.length}**`,
-    `- Candidates dropped by source-tier guard: **${droppedCount}**`,
-    `- Tooling: ${evidenceCase.tooling}`,
+    `- 候选证据数：**${candidates.length}**`,
+    `- 来源分级后可计入评分的证据：**${evidenceCase.evidence.length}**`,
+    `- 被来源分级规则丢弃的候选：**${droppedCount}**`,
+    `- 使用工具：${evidenceCase.tooling}`,
     "",
-    "## Before / After",
+    "## 评分变化",
     "",
-    "| Dimension | Baseline | Evidence-adjusted | Confidence |",
-    "|-----------|----------|-------------------|------------|",
+    "| 维度 | 基准分 | 证据修正后 | 置信状态 |",
+    "|------|--------|------------|----------|",
     ...SCORE_KEYS.map((key) => {
-      return `| ${DIMENSION_LABELS[key]} | ${evidenceCase.baselineScores[key]} | ${evidenceCase.expectedAdjustedScores[key]} | ${evidenceCase.expectedDimensionConfidence[key]} |`;
+      return `| ${DIMENSION_LABELS[key]} | ${evidenceCase.baselineScores[key]} | ${evidenceCase.expectedAdjustedScores[key]} | ${confidenceLabel(evidenceCase.expectedDimensionConfidence[key])} |`;
     }),
     "",
-    "## Evidence Items",
+    "## 证据明细",
     "",
     ...SCORE_KEYS.flatMap((key) => [`### ${DIMENSION_LABELS[key]}`, "", formatEvidenceBullets(grouped[key]), ""]),
-    "## Rigor Layer",
+    "## 严谨层检查",
     "",
-    `- Evidence gate: **${evidenceCase.expectedEvidenceGate ?? "unknown"}**`,
-    `- Gated band: **${evidenceCase.expectedGatedBand ?? evidenceCase.expectedAdjustedBand}**`,
-    `- Missing gate slots: ${evidenceCase.expectedGateMissing?.length ? evidenceCase.expectedGateMissing.join(", ") : "none"}`,
-    `- Dimension caps: ${evidenceCase.expectedDimensionCaps?.length ? evidenceCase.expectedDimensionCaps.join(", ") : "none"}`,
-    `- Stability: **${evidenceCase.expectedStability ?? "unknown"}**`,
-    `- Decision type: **${evidenceCase.expectedDecisionType ?? "unknown"}**`,
+    `- 证据门槛：**${EVIDENCE_GATE_LABELS[evidenceCase.expectedEvidenceGate ?? ""] ?? "未知"}**`,
+    `- 门槛后档位：**${BAND_LABELS[evidenceCase.expectedGatedBand ?? evidenceCase.expectedAdjustedBand] ?? evidenceCase.expectedGatedBand ?? evidenceCase.expectedAdjustedBand}**`,
+    `- 缺失的门槛证据：${formatSlots(evidenceCase.expectedGateMissing)}`,
+    `- 高分但证据不足的维度：${formatSlots(evidenceCase.expectedDimensionCaps)}`,
+    `- 稳定性：**${STABILITY_LABELS[evidenceCase.expectedStability ?? ""] ?? "未知"}**`,
+    `- 建议动作：**${DECISION_TYPE_LABELS[evidenceCase.expectedDecisionType ?? ""] ?? "未知"}**`,
     "",
-    "## Next Evidence To Collect",
+    "## 下一步要补的证据",
     "",
     ...nextEvidence.map((item, index) => `${index + 1}. ${item}`),
     ""

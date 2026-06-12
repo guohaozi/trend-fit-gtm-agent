@@ -1,100 +1,74 @@
-# Trend-Fit GTM Brief — Snapforge AI × "AI Profile Photo / Product Photo Before-After"
+# Snapforge AI × 图片前后对比 热点适配简报
 
-> Demo report. Scores are deterministic from `data/demo_ai_tool.json`. No live metrics
-> were supplied, so every score is justified qualitatively; assumptions are labelled.
+> 这份简报用于判断「Snapforge AI」是否值得跟进「图片前后对比」这个热点，并把结论转成可执行的增长动作。
 
-## 1. Executive recommendation
-**Strong Go.** The trend's native format — the before/after reveal — is exactly what the
-tool produces, for exactly the people the tool serves. The one real constraint is
-saturation: the AI-edit space is crowded, so differentiation must come from
-speed/workflow and honesty (real, reproducible results), not from the transformation
-alone.
-**Total Fit Score: 89/100**
-> **Gate note (v1.2):** assumption-based brief, so the evidence gate is **fail** → gated
-> recommendation **Go, pending evidence** (raw 89 is not an earned Strong Go). Stability:
-> **fragile** (Audience, Creative, Commercial are unsupported-high). Decision type: **small
-> test** until Timing / Brand Safety / Audience / Commercial evidence is gathered.
+## 1. 最终建议
 
-## 2. Score breakdown
-| Dimension | Weight | Score | Weighted | Why this score |
-|-----------|--------|-------|----------|----------------|
-| Audience Overlap | 20% | 100 | 20.0 | Creators, sellers, photographers = exact ICP and exact trend audience. |
-| Use-case Relevance | 20% | 100 | 20.0 | The tool *produces* the before/after — perfectly native. |
-| Message Bridge | 15% | 75 | 11.25 | Strong bridge: "raw photos → scroll-stopping visuals in seconds." |
-| Creative Feasibility | 15% | 100 | 15.0 | Before/after is the cheapest, most repeatable format for this tool. |
-| Commercial Intent | 10% | 100 | 10.0 | Sellers/creators actively shop for editing tools; "link in bio" is native. |
-| Brand Safety | 10% | 75 | 7.5 | Manageable; main risk is fake-identity / unrealistic-result framing. |
-| Timing & Saturation | 10% | 50 | 5.0 | AI-edit content is crowded; needs a speed/workflow differentiator. |
-| **Total** | 100% | — | **89** | → Strong Go (raw 88.75) |
+**建议跟进。** 适合跟进。产品产出的内容形式和趋势本身高度一致，但需要用真实可复现的工作流来区分，而不是只展示夸张变形。
 
-## 3. Why it fits (or does not)
-This is among the cleanest fits possible: the product makes the exact artifact the trend
-is built on, the audiences are identical, and content is trivial and cheap to produce
-repeatably. The biggest reason for caution is not fit but *crowding* — everyone is
-posting AI before/afters, so a generic reveal blends in. The second is honesty: lean too
-hard into "perfect" and you invite the "fake/AI-slop" backlash. Differentiate on speed
-and real-workflow proof, keep results believable, and this is a high-volume engine.
+- 基准分：**89/100**
+- 基准判断：**强烈建议跟进**
+- 证据门槛后判断：**建议跟进**
+- 证据门槛：**证据不足**
+- 稳定性：**脆弱**
+- 建议动作：**小测试**
 
-## 4. Campaign angle
-**Primary:** "Turn raw photos into scroll-stopping visuals in seconds."
-- Alt A: "Product photos that actually sell — in one tap."
-- Alt B: "My 10-second editing workflow (real results, real photos)."
+## 2. 为什么适合或不适合
 
-## 5. Content ideas
-- **Before/after speed-run:** Hook — "Watch this raw product photo become catalog-ready
-  in 10 seconds." Screen-record the actual workflow. → free-trial CTA.
-- **Seller POV:** "I edited a whole product line before lunch." Batch workflow for
-  e-commerce.
-- **Real-photo honesty cut:** use genuinely imperfect input photos; "no fake studio
-  setup" — counters the slop critique.
-- **Side-by-side vs. doing it manually:** "Photoshop: 20 min. This: 20 seconds."
-- **Creator profile-pic glow-up:** before/after on a real creator headshot (kept
-  realistic).
+前后对比是修图工具最容易理解的表达方式：用户一眼就能看到原图到成片的变化。风险是同类内容已经很多，且用户对过度修饰、虚假头像和 AI 感很敏感，所以要把重点放在速度、批量工作流和真实素材。
 
-## 6. Risk assessment
-- **Deception / fake identity — Low–Medium.** Profile-photo edits can slide into "look
-  like someone else". *Mitigation:* frame as enhancement and workflow, never
-  identity-swap; avoid "perfect face" promises.
-- **Over-promising / unrealistic results — Low.** Showing impossible transformations
-  erodes trust and invites "AI slop" backlash. *Mitigation:* demo on real user photos
-  with reproducible results.
-- **Saturation — Medium.** The format is everywhere. *Mitigation:* differentiate on
-  speed, batch/e-commerce workflow, and honesty; don't rely on the reveal alone.
-- No legal/values exposure beyond standard advertising honesty.
+## 3. 评分明细
 
-## 7. Brand voice guidance
-Creative, practical, maker-oriented — talk like a creator showing a peer a genuinely
-useful shortcut, not a hype machine selling magic. Confidence through demonstration:
-show the workflow, let the speed sell it. Native casual register for TikTok/Reels.
+评分模型：**默认平衡**；风险偏好：**中等风险偏好**。
 
-## 8. Words to use / Words to avoid
-**Use:** before-after, creator workflow, product-ready, edit faster, visual upgrade, in
-seconds, real photos.
-**Avoid:** perfect face, fake identity, unrealistic transformation, effortless wealth,
-flawless, "AI does it all".
+| 维度 | 权重 | 分数 | 判断依据 |
+|------|------|------|----------|
+| 受众重合度 | 20% | 100 | 趋势受众是否和产品目标用户重合？ |
+| 使用场景相关性 | 20% | 100 | 产品加入这个热点是否自然、不牵强？ |
+| 卖点桥接 | 15% | 75 | 热点能否顺畅连接到真实卖点？ |
+| 内容可执行性 | 15% | 100 | 团队是否能产出适合平台语境的内容？ |
+| 商业意图 | 10% | 100 | 受众是否接近购买、试用或咨询心态？ |
+| 品牌安全 | 10% | 75 | 是否存在声誉、价值观或表达风险？ |
+| 时机与饱和度 | 10% | 50 | 现在进入是否仍有差异化空间？ |
 
-## 9. KOL / creator type
-**AI-tool reviewers** (reach + credibility in a crowded field), **e-commerce / Amazon-FBA
-creators** (high commercial intent), **photographers**, and **design educators** who teach
-workflows. Prioritize creators whose audiences are *sellers and makers*, where the
-"saves time / makes money" angle converts.
+## 4. 营销切入点
 
-## 10. Sample ad copy
-- **Organic caption:** "Raw photo → scroll-stopping in seconds. Real photos, real
-  workflow. Try it free 👇"
-- **Paid caption:** "Product photos that actually sell — edited in seconds, not hours.
-  Built for creators and sellers. Start free."
-- **Hook bank:** "This took 10 seconds." · "Watch a messy product photo become
-  catalog-ready." · "Photoshop: 20 min. This: 20 sec."
+**主切入点：**把原始照片快速变成能发布、能售卖的视觉素材。
+- 备选 1：10 秒完成一张产品图。
+- 备选 2：真实照片、真实流程、真实结果。
 
-## 11. Outreach DM
-> Hey {name} — your editing/workflow content is exactly the vibe. We built Snapforge AI:
-> raw photos to product-ready visuals in seconds, made for creators and e-commerce
-> sellers. The before/after trend is everywhere right now and your audience would get
-> real use out of it. Want a free Pro account to try a before/after on your own photos?
+## 5. 内容方向
 
-## 12. Final decision
-**Go.** Smallest next step: ship 3–5 before/after speed-run pieces with AI-tool reviewers
-and e-commerce creators using *real* input photos, lead with the speed/workflow
-differentiator, and measure free-trial sign-ups per piece before scaling paid. Keep all
-results believable to stay clear of the slop backlash.
+- 录屏展示一张普通产品图如何变成可上架图片，并保留完整操作过程。
+- 做“午饭前修完一整组商品图”的批量工作流内容。
+- 用不完美的真实输入图做演示，主动避免过度美化。
+- 对比手动修图与工具修图的时间成本，把节省时间作为卖点。
+
+## 6. 风险与边界
+
+- 避免承诺“完美脸”“换身份”“一键变真人大片”。
+- 不要用不可复现的夸张案例诱导购买。
+- 如果平台或评论区出现“假”“AI 垃圾感”反馈，应转向真实工作流证明。
+
+## 7. 品牌语气与用词
+
+创作者给创作者分享效率工具的语气：直接、实用、少玄学，用结果和流程说服。
+
+- 推荐使用：前后对比、真实照片、创作者工作流、商品图、批量处理、省时间
+- 避免使用：完美脸、换身份、不真实、一键奇迹、完全自动
+
+## 8. 合作人群
+
+优先找工具测评、跨境电商、摄影教学、设计教程和创作者工作流账号；他们的受众更容易转化为注册和付费。
+
+## 9. 证据状态
+
+- 证据修正后分数：**86/100**
+- 证据修正后建议：**强烈建议跟进**
+- 证据门槛：**证据门槛通过**
+- 仍需补齐：时机与饱和度、品牌安全、受众或使用场景
+- 高分但证据不足的维度：受众重合度、内容可执行性、商业意图
+
+## 10. 下一步测试
+
+先投 3 到 5 条真实录屏内容，分别测试商品图、头像、批量处理三个角度，以注册率和付费转化作为放大依据。

@@ -124,7 +124,9 @@ describe("evidence case research runner", () => {
       ]
     );
     assert.match(report, /DJI drones x video creation, security inspection, and tourism enablement in Middle East/);
-    assert.match(report, /Candidates received: \*\*4\*\*/);
+    assert.match(report, /候选证据数：\*\*4\*\*/);
+    assert.match(report, /这份简报由搜索结果自动生成/);
+    assert.doesNotMatch(report, /Candidates received|Next Evidence To Collect|automated first pass/);
   });
 
   it("runs from the command line with a fixture search-results file", () => {

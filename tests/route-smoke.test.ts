@@ -23,7 +23,7 @@ import WorkspacePage from "../app/workspace/page";
 // was missing: it does not render to a DOM, but importing each page module
 // evaluates its whole component/import graph, and calling the page function
 // runs the real demo-data loading path.
-const CASE_IDS = ["demo_fashion", "demo_robotics", "demo_ai_tool", "demo_snack"] as const;
+const CASE_IDS = ["demo_fashion", "demo_robotics", "demo_ai_tool", "demo_snack", "demo_protein_drink"] as const;
 const CASE_INPUTS = [undefined, ...CASE_IDS, "unknown-case"] as const;
 const PROFILE_INPUTS = [undefined, "risk_sensitive", "ecommerce_conversion", "not-a-profile"] as const;
 
@@ -55,6 +55,24 @@ describe("report markdown download API", () => {
     assert.match(response.headers.get("content-type") ?? "", /text\/markdown/);
     assert.match(response.headers.get("content-disposition") ?? "", /attachment; filename=".+"/);
     assert.ok((await response.text()).length > 0, "markdown body should not be empty");
+  });
+
+  it("returns customer-facing Chinese markdown for every GTM brief", async () => {
+    for (const caseId of CASE_IDS) {
+      const response = await reportRouteGet(new Request(`http://test/api/report/${caseId}`), {
+        params: Promise.resolve({ id: caseId })
+      });
+      const markdown = await response.text();
+
+      assert.equal(response.status, 200);
+      assert.match(markdown, /^# .+热点适配简报/m);
+      assert.match(markdown, /## 1\. 最终建议/);
+      assert.match(markdown, /## 4\. 营销切入点/);
+      assert.doesNotMatch(
+        markdown,
+        /GTM Brief|Executive recommendation|Score breakdown|Campaign angle|Content ideas|Risk assessment|Final decision/
+      );
+    }
   });
 
   it("falls back to a default report for an unknown id instead of throwing", async () => {

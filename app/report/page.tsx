@@ -33,7 +33,7 @@ export default async function ReportPage({ searchParams }: PageProps) {
       <PageHeader
         eyebrow="第 4 步"
         title="GTM 简报"
-        description="报告页保留技能层产出的标准 Markdown 简报，同时展示证据修正后的评分闭环。"
+        description="把推荐结论、营销切入点、风险边界和下一步测试整理成一份可下载的中文行动简报。"
         demo={demo}
       />
       <WorkflowNav activePath="/report" caseId={demo.id} />

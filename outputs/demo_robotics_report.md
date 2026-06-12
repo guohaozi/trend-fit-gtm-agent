@@ -1,100 +1,72 @@
-# Trend-Fit GTM Brief — Hearth Robotics Companion × "AI Home Gadgets / Smart Home Setup"
+# Hearth Robotics Companion × 智能家居设备展示 热点适配简报
 
-> Demo report. Scores are deterministic from `data/demo_robotics.json`. No live metrics
-> were supplied, so every score is justified qualitatively; assumptions are labelled.
+> 这份简报用于判断「Hearth Robotics Companion」是否值得跟进「智能家居设备展示」这个热点，并把结论转成可执行的增长动作。
 
-## 1. Executive recommendation
-**Go — with a trust-building angle.** The product is literally a smart-home gadget, so
-it belongs in this trend natively. What holds it back from a "Strong Go" is execution
-risk: hardware content lives or dies on *believable demos*, and the category carries
-privacy and over-promising landmines. Win by showing real, honest, everyday use.
-**Total Fit Score: 74/100**
-> **Gate note (v1.2):** assumption-based brief → evidence gate **fail**, stability
-> **fragile**; gated recommendation stays **Go** but the honest decision type is **small
-> test**, not a push. Gather Timing / Brand Safety / Audience evidence to firm it up.
+## 1. 最终建议
 
-## 2. Score breakdown
-| Dimension | Weight | Score | Weighted | Why this score |
-|-----------|--------|-------|----------|----------------|
-| Audience Overlap | 20% | 75 | 15.0 | Smart-home/gadget-tour audience overlaps the ICP well; not all viewers are buyers. |
-| Use-case Relevance | 20% | 100 | 20.0 | The product *is* a smart-home gadget; it's the native subject of the trend. |
-| Message Bridge | 15% | 75 | 11.25 | One clean line: "a robot that actually helps with the daily routine." |
-| Creative Feasibility | 15% | 50 | 7.5 | Needs real working demos; longer shoots; comments scrutinize "does it work?". |
-| Commercial Intent | 10% | 75 | 7.5 | Considered purchase; people research smart-home gear before buying. |
-| Brand Safety | 10% | 50 | 5.0 | Privacy/surveillance + over-promising risks are inherent to home robots. |
-| Timing & Saturation | 10% | 75 | 7.5 | Smart-home setup content is evergreen-growing; room for a trust angle. |
-| **Total** | 100% | — | **74** | → Go · qualifier: trust-building angle (raw 73.75) |
+**建议跟进。** 建议跟进，但传播重点必须是可信演示，而不是科幻式承诺。家庭机器人用户最在意它到底能做什么、是否可靠、是否侵犯隐私。
 
-## 3. Why it fits (or does not)
-Fit is high because the product is the exact kind of device these videos exist to show,
-to exactly the people who buy it. The argument *against* charging in is trust: viewers
-of home-robot content are primed to be skeptical ("is it watching me?", "does it
-actually do that or is this staged?"). So the opportunity is real, but the format must
-be earned with honest, unedited-feeling demos rather than glossy promises. Treat
-skepticism as the creative brief, not an obstacle.
+- 基准分：**74/100**
+- 基准判断：**建议跟进（信任建设角度）**
+- 证据门槛后判断：**建议跟进**
+- 证据门槛：**证据不足**
+- 稳定性：**脆弱**
+- 建议动作：**小测试**
 
-## 4. Campaign angle
-**Primary:** "I let a robot help run my home for 7 days — here's the honest version."
-- Alt A: "Real life with a home robot (the unglamorous truth)."
-- Alt B: "What a home robot actually does for a busy family."
+## 2. 为什么适合或不适合
 
-## 5. Content ideas
-- **7-day diary:** Hook — "Day 1 with a home robot." Show real wins *and* limitations
-  across a week; honesty builds trust. → consideration CTA.
-- **Morning-routine time-lapse:** the robot handling small recurring tasks; caption
-  "the boring stuff it quietly takes off your plate."
-- **Privacy explainer:** "Here's exactly what it can and can't see" — turns the #1
-  objection into a selling point.
-- **Pet/family reaction:** lighthearted clip of the dog/kids with the robot (warmth +
-  reliability signal).
-- **Setup-in-real-time:** "Unboxing to working in under 10 minutes" — proves "simple
-  setup".
+产品本身就是智能家居设备，天然适合进入家居 setup、真实使用日记和科技测评内容。限制在于硬件信任门槛较高：如果画面太像广告，用户会怀疑是否摆拍；如果承诺太满，又会引发隐私和过度自动化担忧。
 
-## 6. Risk assessment
-- **Privacy / surveillance — Medium.** Cameras/sensors trigger "is it spying on me?".
-  *Mitigation:* lead with user control and on-device/private framing; do a dedicated
-  "what it can't see" piece.
-- **Over-promising / false claims — Medium.** Implying full autonomy ("it runs your
-  home") invites backlash *and* is a false-advertising risk. *Mitigation:* show real,
-  repeatable tasks; caption the conditions; never imply it replaces a person.
-- **Gimmick perception — Low–Medium.** Skeptics assume staged demos. *Mitigation:*
-  unedited, single-take demos; show failures honestly.
-- No classism/vulgarity exposure.
+## 3. 评分明细
 
-## 7. Brand voice guidance
-Warm, trustworthy, practical, lightly futuristic — like a helpful friend who's genuinely
-useful, not a sci-fi pitch. Honesty is the brand's edge here: under-claim and
-over-deliver on camera. Match the casual register of smart-home creators.
+评分模型：**默认平衡**；风险偏好：**中等风险偏好**。
 
-## 8. Words to use / Words to avoid
-**Use:** helpful, reliable, daily routine, family-friendly, simple setup, you stay in
-control, honest, actually works.
-**Avoid:** replace humans, fully autonomous life, set-and-forget, surveillance, sci-fi
-butler, "it does everything", flawless.
+| 维度 | 权重 | 分数 | 判断依据 |
+|------|------|------|----------|
+| 受众重合度 | 20% | 75 | 趋势受众是否和产品目标用户重合？ |
+| 使用场景相关性 | 20% | 100 | 产品加入这个热点是否自然、不牵强？ |
+| 卖点桥接 | 15% | 75 | 热点能否顺畅连接到真实卖点？ |
+| 内容可执行性 | 15% | 50 | 团队是否能产出适合平台语境的内容？ |
+| 商业意图 | 10% | 75 | 受众是否接近购买、试用或咨询心态？ |
+| 品牌安全 | 10% | 50 | 是否存在声誉、价值观或表达风险？ |
+| 时机与饱和度 | 10% | 75 | 现在进入是否仍有差异化空间？ |
 
-## 9. KOL / creator type
-**Smart-home reviewers** (credibility hardware needs), **family-lifestyle creators**,
-**pet-owner creators**, and **tech YouTubers** who do honest long-form reviews. Prioritize
-reviewers known for "I'll tell you the downsides too" — their endorsement defuses the
-gimmick objection.
+## 4. 营销切入点
 
-## 10. Sample ad copy
-- **Organic caption:** "A week with a home robot. Some of it surprised me, some of it
-  didn't. Here's the honest version. 🤖"
-- **Paid caption:** "Less daily busywork, more time. Reliable home help that's simple to
-  set up — and you stay in control. See how it works."
-- **Hook bank:** "I tested a home robot for 7 days." · "Here's exactly what it can (and
-  can't) see." · "Setup to working in under 10 minutes."
+**主切入点：**我让家用机器人帮忙 7 天，这是真实体验。
+- 备选 1：它能做什么，也不能做什么。
+- 备选 2：一个忙碌家庭实际会用到的家用机器人。
 
-## 11. Outreach DM
-> Hey {name} — really like how you review smart-home gear honestly, downsides included.
-> We're Hearth Robotics, and we're leaning into the smart-home-setup trend with a home
-> assistant robot built around real daily routines (not sci-fi promises). Your audience
-> feels like the right crowd. Could we send a unit for an honest review — including the
-> parts that aren't perfect?
+## 5. 内容方向
 
-## 12. Final decision
-**Go.** Smallest next step: produce one honest 7-day diary piece with a trusted
-smart-home reviewer plus the "what it can't see" privacy explainer, and watch comment
-sentiment on trust/privacy before scaling to paid. If comments stay skeptical, fix the
-demo credibility before spending.
+- 做 7 天真实使用日记，展示有用场景，也展示限制和失败片段。
+- 拍“它看得到什么、看不到什么”的隐私解释视频，把最大顾虑变成信任点。
+- 用晨间流程、宠物互动、家庭整理等真实场景做短视频，而不是棚拍大片。
+- 邀请以诚实测评著称的智能家居创作者做长视频和短视频切片。
+
+## 6. 风险与边界
+
+- 不要说“完全替代人”或“自动打理整个家”。
+- 隐私、摄像头、传感器权限必须解释清楚。
+- 演示要可复现，不要只展示理想条件下的一次性效果。
+
+## 7. 品牌语气与用词
+
+温暖、可信、实用，轻微未来感即可。越是硬件产品，越要少夸张、多展示。
+
+- 推荐使用：真实使用、日常帮手、可靠、简单设置、你保持控制、隐私可控
+- 避免使用：替代人类、全自动生活、什么都能做、科幻管家、无懈可击
+
+## 8. 合作人群
+
+优先找智能家居测评、家庭生活方式、宠物家庭和科技 YouTube 创作者，尤其是会讲缺点的测评人。
+
+## 9. 证据状态
+
+- 当前案例还没有结构化证据修正版，建议先用小规模测试补齐证据。
+- 仍需补齐：时机与饱和度、品牌安全、受众或使用场景
+- 高分但证据不足的维度：暂无
+
+## 10. 下一步测试
+
+先做一条 7 天真实体验和一条隐私解释内容，观察评论区对信任、隐私、实用性的反馈，再决定是否进入付费投放。
