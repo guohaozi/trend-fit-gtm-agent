@@ -1,6 +1,6 @@
 # Current State — Trend-Fit GTM Agent
 
-Last updated: 2026-06-11. Main is pushed to origin; run `git log -1` for the exact HEAD
+Last updated: 2026-06-12. Main is pushed to origin; run `git log -1` for the exact HEAD
 (do not hardcode a commit hash here — it goes stale on every commit).
 
 Compact handoff snapshot for the next Codex / Claude conversation. **Full change history
@@ -22,6 +22,28 @@ an outcome-calibrated sales predictor.
 writes a GTM brief. A "product → candidate trends" discovery layer is intentionally out of
 scope for now.
 
+## Latest conversation handoff (2026-06-12)
+
+User compared the project against a classmate's FitFuel Prep portfolio project and asked for
+a stronger resume-ready presentation. The project now has a Chinese-first homepage and a
+Chinese README:
+
+- `/` is a Chinese product showcase page, not a bare technical homepage. It opens with
+  "这个产品该不该追这个热点？", then shows a gated decision panel, proof strip, evidence
+  discipline, workspace preview, and case-study cards.
+- `public/case-studies/` contains four 900x563 PNG case visuals for README/homepage:
+  quiet luxury fashion, AI photo before/after, Dubai chocolate snack, and LEGO F1 shortlist.
+- `README.md` is now Chinese-first with local demo links, product preview images, project
+  positioning, scoring model, API notes, deployment/domain guidance, and current gaps.
+- `tests/route-smoke.test.ts` now asserts the redesigned Chinese homepage story and entry
+  points so the portfolio surface has a cheap regression guard.
+
+Important ops note from the same conversation: `http://127.0.0.1:3000` failed for the user
+because the local `npm run dev` process had been reclaimed. Restarting with
+`npm run dev -- -H 127.0.0.1 -p 3000` restored it. A sandboxed `curl` can fail to reach the
+host loopback even when the Browser and elevated `curl` can; verify local reachability from
+the host context when debugging this symptom.
+
 ## Data flow (product + market + trend → brief)
 
 1. **Input**: product + market + candidate trend + risk tolerance (+ optional competitors).
@@ -41,6 +63,9 @@ scope for now.
 
 ## How it runs (two entry points)
 
+- **Chinese portfolio homepage** (`/`): resume-facing entry with decision preview,
+  evidence discipline, workspace preview, and visual case-study cards. This is now the best
+  page to show first in a portfolio/demo context.
 - **Workspace UI** (`/workspace`, the real entry): edit product/market/3 candidate
   trends/7 anchor scores/evidence rows; single-trend scoring or shortlist ranking; run
   Google Trends or replay a fixture; auto-save to localStorage + JSON import/export.
@@ -99,6 +124,8 @@ capped as proxy), `organic push`; evidence snack raw `76` gate `pass` Go, modera
   draft → case files). `lib/evidence-case-orchestrator.ts` — offline merge of provider findings.
 - `lib/trend-shortlist.ts` — ranks supplied candidate trends. `lib/workspace-evaluator.ts` —
   bridges `/workspace` UI state into scoring/rigor/shortlist.
+- `app/page.tsx` + homepage styles in `app/globals.css` — Chinese portfolio homepage. It uses
+  the same demo/evidence data as the scoring system; no separate fake marketing metrics.
 - `app/api/workspace/google-trends/route.ts` — server-only SerpApi run (key never from
   browser; `fixture:true` replays `examples/google-trends-workspace.fixture.json`).
 - Evidence trust tightening: Google Trends related queries must share a trend token and
@@ -115,20 +142,26 @@ capped as proxy), `organic push`; evidence snack raw `76` gate `pass` Go, modera
 
 Routes: `/`, `/product-profile`, `/trend-input`, `/fit-score`, `/report`, `/workspace`,
 `/api/report/[id]`, `/api/workspace/google-trends`. Query params: `case=demo_fashion|
-demo_robotics|demo_ai_tool|demo_snack` · `profile=default|brand_awareness|
+demo_robotics|demo_ai_tool|demo_snack|demo_protein_drink` · `profile=default|brand_awareness|
 ecommerce_conversion|b2b_pipeline|creator_seeding|risk_sensitive`.
 
-Verification: `npm test` → **119 passing**; `npm run build` succeeds; CI
+Verification: `npm test` → **120 passing**; `npm run build` succeeds; CI
 (`.github/workflows/ci.yml`) runs `npm ci`, `npm test`, `npm run build` on push/PR.
+Browser checks were run for the homepage on desktop and mobile: Chinese H1 renders, no
+horizontal overflow, case images load, no console errors. `/workspace` click-through was also
+verified after restarting the local dev server.
 
 ## Known issues
 
+- No public Vercel deployment or fixed domain is configured yet. Local demo works only while
+  `npm run dev` is running; use `http://127.0.0.1:3000` or `http://localhost:3000`.
 - Trends are manual; no auto-discovery (intentional). Shortlist ranks supplied candidates only.
 - Browser-triggered OpenCLI/GooseWorks/marketplace/social collection not wired into the UI
   (Google Trends is, via the server route + fixture replay). No DB/auth/persistence — only
   localStorage + JSON export.
-- Full browser-screenshot verification not wired (earlier Playwright attempt lacked a browser
-  binary); route-level smoke tests now cover `/workspace` + all pages.
+- Vercel CLI is not installed locally. A sandboxed `npx vercel` could not resolve npm, and an
+  elevated npm download/execute request was blocked by safety review. Recommended deployment
+  path is Vercel web UI + GitHub repo import.
 - Weights are expert priors, not calibrated. **Do not invent a calibration set without real
   campaign outcomes** (violates the evidence rule).
 - `verificationStatus` is source-specific by design. Structured SerpApi Google Trends findings
@@ -137,16 +170,22 @@ Verification: `npm test` → **119 passing**; `npm run build` succeeds; CI
 
 ## Next steps
 
-1. **One real end-to-end through `/workspace`** with a live `SERPAPI_API_KEY` (rotate the key
+1. **Deploy to Vercel via GitHub import**, then update README demo links and the GitHub repo
+   About URL. A stable `*.vercel.app` URL is enough for resume use; a custom domain can be
+   added later without changing the app.
+2. **One real end-to-end through `/workspace`** with a live `SERPAPI_API_KEY` (rotate the key
    first — it was shared in chat): confirm browser → API → classifier → score on real data.
-2. Provider health checks in the workspace panel before live OpenCLI/GooseWorks execution.
-3. Xiaohongshu / TikTok social-language mappers; marketplace/review providers.
-4. Portfolio screenshots / short case-study page.
+3. Provider health checks in the workspace panel before live OpenCLI/GooseWorks execution.
+4. Xiaohongshu / TikTok social-language mappers; marketplace/review providers.
+5. Add a short public case-study page once the Vercel URL exists.
 
 ## Gotchas / ops
 
 - **Do not run `npm run build` while `npm run dev` is active** — both write `.next/` and
   cause stale-chunk runtime errors.
+- Local dev server sessions can be reclaimed between agent turns. If the browser shows
+  `ERR -102` / "无法访问此站点", check `lsof -nP -iTCP:3000 -sTCP:LISTEN` and restart with
+  `npm run dev -- -H 127.0.0.1 -p 3000` if nothing is listening.
 - If `npm test` fails in sandbox with `tsx` pipe `EPERM` (`listen EPERM … tsx-501/*.pipe`),
   rerun with elevated permissions.
 - OpenCLI lives at `/Users/guo/.npm-global/bin/opencli`; not always on the sandbox `PATH`.
@@ -164,5 +203,5 @@ Verification: `npm test` → **119 passing**; `npm run build` succeeds; CI
 cd /Users/guo/gtm/trend-fit-gtm-agent
 git status --short --branch   # expect: ## main...origin/main, clean
 git log -3 --oneline          # newest commit = your starting point
-npm test                      # 119 passing
+npm test                      # 120 passing
 ```

@@ -4,6 +4,24 @@ Condensed milestone log for Codex / Claude handoff. **Full detail for any entry 
 `git log` (commit messages) and in this file's own git history** — entries here are
 one-to-two-line summaries, newest first.
 
+## 2026-06-12
+
+- **Chinese portfolio homepage** — `/` is now a resume-ready Chinese product showcase with a
+  gated decision panel, proof strip, evidence discipline, workspace preview, and visual case
+  cards backed by the real demo/evidence data.
+- **Chinese README + deployment guidance** — README is now Chinese-first and starts with demo
+  links, product preview images, project positioning, fixed-domain/Vercel guidance, scoring,
+  routes, APIs, verification, and current gaps.
+- **Case-study visuals** — added four 900x563 homepage/README images for quiet luxury
+  fashion, AI photo before/after, Dubai chocolate snack, and LEGO F1 shortlist.
+- **Local demo recovery note** — documented the `127.0.0.1:3000` failure mode: if the dev
+  server session is reclaimed, restart with `npm run dev -- -H 127.0.0.1 -p 3000`; sandboxed
+  `curl` may not see the host loopback even when the Browser can.
+- **Homepage smoke guard** — route smoke tests now assert the Chinese homepage story and entry
+  points. Current verification is `npm test` 120/120 and `npm run build` successful.
+
+---
+
 ## 2026-06-11
 
 - **Evidence trust tightening** — Google Trends related queries now require trend-token

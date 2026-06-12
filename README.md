@@ -1,296 +1,270 @@
 # Trend-Fit GTM Agent
 
-**The missing middle layer between trend tools and influencer tools.**
+**一个用来判断“这个产品该不该追这个热点”的 GTM 决策工作台。**
 
-Most trend tools tell you **what** is popular.  
-Most influencer tools tell you **who** is popular.  
-Neither answers the question real GTM teams actually struggle with:
+Trend-Fit GTM Agent 位于“趋势发现工具”和“达人/投放工具”之间：前者告诉你什么正在流行，后者告诉你谁有流量，而这个项目回答更难的问题：产品和热点是否真的适配，有什么证据支持，建议是否强到足以执行。
 
-> *Should this specific product follow this specific trend — and if so, from what angle, with what risk, and how should the brand talk about it?*
+它是一个确定性的决策框架，不是销量预测器，也不是自动爬取全网热点的工具。
 
-Trend-Fit GTM Agent evaluates product-trend fit across seven weighted dimensions, produces a scored decision, and generates a complete campaign brief: angle, risk assessment, brand voice, words to use and avoid, creator type, sample copy, and outreach DM.
+## 演示入口
 
----
+本地开发服务启动后可以打开：
 
-## What problem this solves
+- 官网首页：[http://127.0.0.1:3000](http://127.0.0.1:3000)
+- GTM 工作台：[http://127.0.0.1:3000/workspace](http://127.0.0.1:3000/workspace)
+- 主证据案例：[http://127.0.0.1:3000/report?case=demo_fashion](http://127.0.0.1:3000/report?case=demo_fashion)
 
-A GTM team sees a viral trend. The obvious moves are:
-
-- **Ignore it** → miss a real opportunity
-- **Jump on it** → risk a forced, cringe, or brand-damaging execution
-
-Neither is a strategy. The real work is the judgment in between: is this trend genuinely related to our product? For which segment? What's the honest entry angle? What could go wrong?
-
-This is what the agent produces — not a list of trending topics, not a KOL directory, but a structured decision with a defensible score and an actionable brief.
-
----
-
-## Demo results
-
-Five fully worked demo cases, each with real scoring rationale (no fabricated metrics):
-
-| Product | Trend | Score | Decision |
-|---------|-------|-------|----------|
-| Mid-range men's clothing | Quiet luxury / old money outfit | **90 / 100** | Strong Go |
-| Home robotics brand | AI home gadgets / smart home setup | **74 / 100** | Go — trust-building angle |
-| AI photo editing tool | AI profile photo / product photo before-after | **89 / 100** | Strong Go |
-| Snack / confectionery brand | Dubai-style pistachio kunafa chocolate | **81 / 100** | Go |
-| Convenience-store protein drink | Everyday protein / lifestyle weight management | **78 / 100** | Go |
-
-Demo briefs → [`outputs/`](outputs/)  
-Demo input data → [`data/`](data/)
-
-**Evidence agent in action:** 13 structured evidence cases now live in `data/` and
-`outputs/`, including demo cases, a competitor-layer variant, seven market-expansion
-cases, and one live OpenCLI-backed DJI research proof. The core demo evidence set shows
-how real sources revise or validate the baseline score:
-
-- Fashion / quiet luxury → [`outputs/demo_fashion_evidence_case.md`](outputs/demo_fashion_evidence_case.md):
-  real sources **revised Timing & Saturation from 75 → 50** and hardened the classism risk.
-  Total moved 90 → 88; raw Strong Go, but gated Go because audience/use-case support is
-  still proxy/listicle-based.
-- AI photo tool / before-after → [`outputs/demo_ai_tool_evidence_case.md`](outputs/demo_ai_tool_evidence_case.md):
-  evidence confirmed audience, use case, creative feasibility, and commercial intent, but
-  revised Brand Safety from 75 → 50. Total moved 89 → 86; gate passes, but stability remains
-  fragile because it sits close to the Strong Go threshold.
-- Snack / Dubai-style pistachio kunafa chocolate → [`outputs/demo_snack_evidence_case.md`](outputs/demo_snack_evidence_case.md):
-  project-local skills were used to classify evidence; saturation and copycat risk moved
-  the read from 81 → 76. Gate passes with moderate stability, but price skepticism remains
-  proxy-tier directional caution rather than measured purchase behavior.
-- Protein drink / everyday protein → [`outputs/demo_protein_drink_evidence_case.md`](outputs/demo_protein_drink_evidence_case.md):
-  the new evidence-collector workflow turned candidate sources into typed evidence. China
-  health/fitness and sports-nutrition signals moved the read from 78 → 85, but the result
-  is fragile because it sits exactly on the Strong Go threshold and health-claim risk
-  remains real.
-- AI photo tool competitor layer → [`outputs/demo_ai_tool_competitor_evidence_case.md`](outputs/demo_ai_tool_competitor_evidence_case.md):
-  competitor-profiling / product-swipefile style extracts were normalized into evidence.
-  Photoroom and Picsart confirm the product-photo use case, while Evoto backlash and
-  competitor crowding revise Brand Safety and Timing downward. The read lands at 85 /
-  Strong Go, gate pass, but remains fragile because Audience and Creative stay
-  unsupported-high.
-
-Additional evidence cases include SAVAS China, OBgE China, Anker Europe, Japan service
-robots, POP MART Middle East, Thailand EV, LatAm gaming peripherals, and DJI drones in
-the UAE / Saudi / Middle East.
-
-**Trend shortlist demo:** LEGO now has the first ranked shortlist workflow:
-World Cup fan culture vs. F1 race weekend vs. graduation season gifting. F1 ranks first
-after gated evidence discipline. See [`outputs/lego_trend_shortlist.md`](outputs/lego_trend_shortlist.md).
-
-This is the line between a strategy scaffold and an evidence agent — see below.
-
-The current rigor layer also includes a Strong Go evidence gate, goal-based weight
-profiles, no-evidence caps, recommendation stability labels, and a deterministic
-source-tier classifier so vendor copy, listicles, and unverified sources cannot quietly
-inflate the recommendation.
-
----
-
-## How the scoring works
-
-Seven dimensions, each scored on **{0, 25, 50, 75, 100}** anchors only:
-
-| Dimension | Weight | Core question |
-|-----------|--------|---------------|
-| Audience Overlap | 20% | Does the trend's audience match the target customer? |
-| Use-case Relevance | 20% | Can the product participate naturally, not forced? |
-| Message Bridge | 15% | Is there a clean line from trend to selling point? |
-| Creative Feasibility | 15% | Can we produce good native content for it? |
-| Commercial Intent | 10% | Is the audience in a buying mindset? |
-| Brand Safety | 10% | Any vulgar, political, or values risk? |
-| Timing & Saturation | 10% | Early enough to matter, or already crowded? |
-
-**Total = weighted sum, rounded to one integer** (`floor(raw + 0.5)`).
-
-### Decision bands
-
-| Score | Recommendation |
-|-------|----------------|
-| 85–100 | Strong Go |
-| 70–84 | Go |
-| 55–69 | Cautious test |
-| 40–54 | Weak fit |
-| 0–39 | No-go |
-
-### Override rules (applied after scoring)
-
-Three hard rules override the band regardless of total score:
-
-1. **Brand Safety ≤ 25** → capped at Cautious test
-2. **Low risk tolerance + Brand Safety < 50** → forced No-go
-3. **Audience Overlap ≤ 25 and Use-case Relevance ≤ 25** → capped at Weak fit
-
-A confident "No-go" is as valuable as a "Strong Go."
-
----
-
-## Architecture: six skills
-
-```
-trend-product-fit/          ← core scoring + GTM brief generation
-evidence-collector/         ← verified candidates → typed evidence items
-competitor-evidence/        ← evidence layer (upgrades Assumption → Evidence)
-trend-shortlist/            ← rank several candidate trends for one product
-campaign-generator/         ← angles, content ideas, sample copy
-outreach-copy/              ← creator DMs and email outreach
-```
-
-Each skill is an independent `SKILL.md` with a defined trigger boundary and quality gate. The core skill calls the others; they can also be invoked standalone.
-
-Full skill specs → [`skills/`](skills/)
-
----
-
-## Getting started
+本地运行：
 
 ```bash
 npm install
 npm run dev
-# → http://localhost:3000
 ```
 
-### Pages
+然后打开 `http://127.0.0.1:3000` 或 `http://localhost:3000`。
 
-| Route | What it does |
-|-------|-------------|
-| `/workspace` | Editable product + trend workflow for single-trend scoring, 3-trend shortlist ranking, classifier-owned evidence editing, evidence gaps, server-side Google Trends run, local save/import/export, provider command preview, and Markdown export |
-| `/product-profile` | Review the selected demo product name, category, audience, positioning, brand tone, risk tolerance |
-| `/trend-input` | Review the selected demo trend name, platform, region, description, format, controversy |
-| `/fit-score` | See the seven-dimension score breakdown and the recommendation |
-| `/report` | Full GTM brief: angle, risk, voice, words, KOL type, copy, outreach DM |
+`/workspace` 已内置 Google Trends fixture 回放路径，因此公开演示时可以不暴露 SerpApi key。
 
-For demo mode, load any of the five baseline cases from [`data/`](data/) directly from the homepage.
+## 产品预览
 
-### Tests
+首页已经改成中文展示页：首屏是证据决策中心，下面依次展示可信度条、证据纪律、工作台预览和案例图。
+
+| 中端男装 × 静奢风 | AI 图片工具 × 前后对比 | 零食品牌 × 迪拜巧克力 | LEGO × F1 候选热点 |
+|---|---|---|---|
+| <img src="public/case-studies/quiet-luxury-fashion.png" width="220" alt="中端男装静奢风证据案例缩略图"> | <img src="public/case-studies/ai-photo-before-after.png" width="220" alt="AI 图片前后对比证据案例缩略图"> | <img src="public/case-studies/dubai-chocolate.png" width="220" alt="迪拜巧克力零食证据案例缩略图"> | <img src="public/case-studies/lego-f1-shortlist.png" width="220" alt="LEGO F1 候选热点排序缩略图"> |
+
+## 这个项目解决什么
+
+GTM 团队看到一个热点时，常见选择都很粗糙：
+
+- 不追，可能错过真实机会。
+- 硬追，可能做出尴尬、廉价或伤害品牌的 campaign。
+
+真正有价值的是中间层判断：
+
+- 热点受众是否匹配产品目标客户？
+- 产品能否自然进入热点语境，而不是强行蹭？
+- 卖点和热点之间有没有清晰的信息桥梁？
+- 时机、商业意图和品牌安全有什么证据支撑？
+- 该付费放大、创作者种草、小范围测试，还是直接 No-go？
+
+Trend-Fit 把这套判断显性化、结构化，并保留可审计的证据链。
+
+## 当前能力
+
+- `/workspace` 可编辑产品、市场、候选热点、七维锚点分和证据行。
+- 支持单热点评分，也支持 3 个候选热点排序。
+- 七维评分固定在 `{0, 25, 50, 75, 100}` 锚点上，避免伪精度。
+- 证据只能按锚点整档修正分数，不能随意加减小数。
+- source-tier classifier 决定证据等级，防止品牌自述、榜单软文和未验证搜索结果抬高置信度。
+- Strong Go evidence gate、无证据封顶、推荐稳定性和行动类型都已接入。
+- SerpApi Google Trends 通过服务端 API 调用，浏览器不接收 key。
+- 支持 fixture 回放、JSON 导入导出、本地自动保存、Markdown 报告导出。
+
+当前刻意不做：
+
+- 自动从 TikTok、X、Instagram、小红书抓取全网热点。
+- 抓取达人联系方式。
+- 接入广告平台开户或投放 API。
+- 做登录、数据库、支付或云端持久化。
+- 假装权重已经用真实 campaign 结果校准过。
+
+## 证据纪律
+
+这个项目最强的部分不是“能给高分”，而是“知道什么时候不能过度承诺”。
+
+| 规则 | 防止什么问题 |
+|---|---|
+| **没有数据不等于有证据** | 缺失、近乎为零或互相矛盾的来源不会变成正向结论。 |
+| **证据等级由分类器决定** | Agent 和用户不能把弱来源手动升级成强证据。 |
+| **Strong Go 必须有非代理证据** | 原始高分如果只靠代理指标，会被门槛降级。 |
+| **不伪造校准** | 权重被诚实标注为专家先验，直到有真实 campaign 数据。 |
+
+例子：中端男装 × 静奢风在证据修正后是 `88 / 100`，但因为人群/场景支持仍偏代理指标，门槛后的建议是“建议跟进”，而不是“强烈建议跟进”。
+
+## Demo 案例
+
+| 案例 | 基准分 | 证据修正后 | 门槛后结论 | 说明 |
+|---|---:|---:|---|---|
+| 中端男装 × 静奢风 | 90 | 88 | 建议跟进 | 时机被下修，代理证据阻止 Strong Go。 |
+| AI 图片工具 × 前后对比 | 89 | 86 | 强烈建议跟进 | 场景证据通过，但品牌安全让稳定性偏脆弱。 |
+| 零食品牌 × 迪拜巧克力 | 81 | 76 | 建议跟进 | 饱和与跟风风险降低置信度。 |
+| 即饮蛋白饮料 × 日常蛋白摄入 | 78 | 85 | 强烈建议跟进 | 健康和商业信号抬高分数，但刚过阈值。 |
+| LEGO × F1 比赛周末排序 | 88 | 88 | 强烈建议跟进 | F1 在证据门槛后胜过世界杯和毕业季礼物。 |
+
+报告文件在 [`outputs/`](outputs/)，结构化输入和证据在 [`data/`](data/)。
+
+## 评分模型
+
+每个维度只允许 `0`、`25`、`50`、`75`、`100` 五档锚点。
+
+| 维度 | 权重 | 核心问题 |
+|---|---:|---|
+| 人群重合 | 20% | 热点受众是否匹配目标客户？ |
+| 场景适配 | 20% | 产品能否自然参与热点？ |
+| 信息桥梁 | 15% | 热点和产品价值之间是否有清晰连接？ |
+| 创意可行 | 15% | 团队能否做出符合平台语境的内容？ |
+| 商业意图 | 10% | 受众是否接近购买、试用或咨询心智？ |
+| 品牌安全 | 10% | 是否存在价值观、语气或声誉风险？ |
+| 时机热度 | 10% | 热点是否仍然有窗口期，而不是已经拥挤？ |
+
+展示总分为确定性计算：`floor(weightedRaw + 0.5)`。
+
+决策区间：
+
+| 分数 | 结论 |
+|---:|---|
+| 85-100 | 强烈建议跟进 |
+| 70-84 | 建议跟进 |
+| 55-69 | 谨慎测试 |
+| 40-54 | 弱适配 |
+| 0-39 | 不建议 |
+
+硬性覆盖规则：
+
+1. `brandSafety <= 25` 时，最高只能到“谨慎测试”。
+2. 低风险偏好且 `brandSafety < 50` 时，强制“不建议”。
+3. `audienceOverlap <= 25` 且 `useCaseRelevance <= 25` 时，最高只能到“弱适配”。
+
+## 架构
+
+项目核心是稳定的评分合同，上面叠加证据修正和严谨性门槛。
+
+| 模块 | 主要文件 |
+|---|---|
+| 评分合同 | [`lib/scoring.ts`](lib/scoring.ts)、[`tests/scoring.test.ts`](tests/scoring.test.ts) |
+| 证据修正 | [`lib/evidence-adjustment.ts`](lib/evidence-adjustment.ts)、[`tests/evidence-adjustment.test.ts`](tests/evidence-adjustment.test.ts) |
+| 推荐严谨性门槛 | [`lib/recommendation-rigor.ts`](lib/recommendation-rigor.ts)、[`tests/recommendation-rigor.test.ts`](tests/recommendation-rigor.test.ts) |
+| 来源等级分类器 | [`lib/source-tier-classifier.ts`](lib/source-tier-classifier.ts)、[`tests/source-tier-classifier.test.ts`](tests/source-tier-classifier.test.ts) |
+| 证据收集草稿 | [`lib/evidence-collector.ts`](lib/evidence-collector.ts)、[`lib/evidence-case-research-runner.ts`](lib/evidence-case-research-runner.ts) |
+| Google Trends Provider | [`lib/seo-keyword-provider.ts`](lib/seo-keyword-provider.ts)、[`app/api/workspace/google-trends/route.ts`](app/api/workspace/google-trends/route.ts) |
+| 工作台桥接 | [`lib/workspace-evaluator.ts`](lib/workspace-evaluator.ts)、[`components/WorkspaceClient.tsx`](components/WorkspaceClient.tsx) |
+| 候选热点排序 | [`lib/trend-shortlist.ts`](lib/trend-shortlist.ts)、[`tests/trend-shortlist.test.ts`](tests/trend-shortlist.test.ts) |
+| 报告输出 | [`lib/report-markdown.ts`](lib/report-markdown.ts)、[`app/api/report/[id]/route.ts`](app/api/report/[id]/route.ts) |
+
+本地 strategy skills 在 [`skills/`](skills/) 下：
+
+- `trend-product-fit`
+- `evidence-collector`
+- `competitor-evidence`
+- `trend-shortlist`
+- `campaign-generator`
+- `outreach-copy`
+
+## 路由
+
+| 路由 | 用途 |
+|---|---|
+| `/` | 中文官网首页和项目展示页。 |
+| `/workspace` | 主工作台：评分、排序、证据行、fixture 回放、导入导出、Markdown 导出。 |
+| `/product-profile` | Demo 产品档案页。 |
+| `/trend-input` | Demo 热点输入页。 |
+| `/fit-score` | 七维评分拆解和推荐结果。 |
+| `/report` | 按案例渲染完整 GTM 简报。 |
+| `/api/report/[id]` | 下载已知案例的 Markdown 报告，未知 id 会回退到默认 demo。 |
+| `/api/workspace/google-trends` | 服务端 SerpApi Google Trends 调用，或 fixture 回放。 |
+
+常用 query 参数：
+
+- `case=demo_fashion|demo_robotics|demo_ai_tool|demo_snack|demo_protein_drink`
+- `profile=default|brand_awareness|ecommerce_conversion|b2b_pipeline|creator_seeding|risk_sensitive`
+
+## API 示例
+
+### `GET /api/report/[id]`
+
+下载某个 demo 报告：
+
+```bash
+curl -i http://127.0.0.1:3000/api/report/demo_fashion
+```
+
+### `POST /api/workspace/google-trends`
+
+使用已提交的 fixture 回放，不需要 API key：
+
+```bash
+curl -X POST http://127.0.0.1:3000/api/workspace/google-trends \
+  -H "Content-Type: application/json" \
+  -d '{
+    "product": "LEGO",
+    "market": "Global / Europe",
+    "trend": "F1 race weekend",
+    "fixture": true
+  }'
+```
+
+真实 SerpApi 调用需要服务端环境变量 `SERPAPI_API_KEY`。不要在浏览器输入或公开仓库里放 key。
+
+## 部署与固定域名
+
+当前还没有固定线上域名，只有本地地址。简历项目建议这样处理：
+
+1. 先部署到 Vercel，拿到稳定的 Vercel Production URL，例如 `https://trend-fit-gtm-agent.vercel.app`。如果名称被占用，Vercel 会给可用变体。
+2. 如果要更正式，购买或使用自己的域名，例如 `trendfitgtm.com` 或 `gtm.yourdomain.com`。
+3. 在 Vercel 项目 `Settings -> Domains` 添加域名，按 Vercel 给出的 DNS 记录配置。
+4. 子域名通常用 CNAME 指向 Vercel；根域名按 Vercel 控制台提示配置 A/CNAME 记录。
+5. 公开部署前先轮换任何在聊天或截图里出现过的 SerpApi key；公开 demo 默认走 fixture，不需要暴露 key。
+
+部署完成后，把 README 顶部的“演示入口”替换为固定线上链接，并在 GitHub repo 右侧 About 区域填入同一个 URL。你同学的 FitFuel 项目就是这种展示方式。
+
+## 脚本
+
+| 命令 | 说明 |
+|---|---|
+| `npm run dev` | 启动 Next.js 开发服务。 |
+| `npm run build` | 构建生产版本。 |
+| `npm start` | 运行生产构建。 |
+| `npm test` | 运行所有 Node 测试。 |
+| `npm run evidence:case` | 从显式证据数据生成 evidence case。 |
+| `npm run evidence:case:research` | 运行研究 provider 管线，写入 `data/*_evidence.json` 和 `outputs/*_evidence_case.md`。 |
+
+## 环境变量
+
+| 变量 | 是否必须 | 用途 |
+|---|---|---|
+| `SERPAPI_API_KEY` | 仅真实 Google Trends 调用需要 | 服务端 SerpApi Google Trends key；fixture 回放不需要。 |
+| `OPENCLI_BIN` | 可选 | 覆盖 `opencli` 二进制路径。 |
+
+## 验证
+
+推荐在提交或部署前运行：
 
 ```bash
 npm test
+npm run build
 ```
 
-Current local verification: 106 Node tests pass via `npm test`; `npm run build` produces
-a successful Next.js production build. CI now runs both commands on GitHub Actions.
+CI 通过 [`.github/workflows/ci.yml`](.github/workflows/ci.yml) 在 push 和 pull request 时运行 `npm ci`、`npm test` 和 `npm run build`。
 
-Covers: scoring math, evidence adjustment, recommendation rigor, source-tier
-classification, provider adapters, evidence-case orchestration / file writing, OpenCLI
-research mapping, SerpApi Google Trends mapping, anchor validation, and report Markdown
-parsing.
+本次首页改版还需要浏览器检查：
 
----
+- 桌面视口：首屏能打开，无横向溢出，案例图正常加载。
+- 手机视口：标题、按钮、决策面板和案例卡片不重叠。
 
-## Project scope (v1)
+## 目录结构
 
-**This version does:**
-- Deterministic scoring from manual product + trend input
-- Editable `/workspace` flow for single-trend scoring, 3-trend shortlist ranking,
-  classifier-owned evidence editing, evidence-gap guidance, server-side Google Trends
-  evidence collection, fixture replay, local save/import/export, provider dry-run
-  commands, and Markdown export
-- Full GTM brief output with 12 structured sections
-- Five fully worked baseline demo cases with defensible reasoning
-- 13 structured evidence cases that show how real sources revise or validate the
-  baseline score
-- Evidence gates, source-tier discipline, recommendation stability, and goal-based weight
-  profiles
-- Evidence-case CLI automation, provider normalization, and the first live
-  OpenCLI-backed and SerpApi Google Trends research paths
-- A first trend-shortlist ranking contract and LEGO shortlist demo
-- Skill architecture for extending with real data sources and shortlist workflows
-
-**This version intentionally does not:**
-- Auto-crawl TikTok, X, or Instagram for trends
-- Automatically scrape KOL emails or follower counts
-- Connect to ad platform APIs
-- Require login, payment, or a database
-
-The scoring layer and GTM brief are the core value. The data input is manual for v1 — which also means every claim in the output is either grounded in what you provided or explicitly labelled as `Assumption:`. No fabricated metrics.
-
-The path to a full evidence agent is documented in [`skills/competitor-evidence/SKILL.md`](skills/competitor-evidence/SKILL.md),
-[`skills/trend-product-fit/evidence_model.md`](skills/trend-product-fit/evidence_model.md),
-and [`skills/trend-product-fit/source_tier_classifier.md`](skills/trend-product-fit/source_tier_classifier.md):
-the CLI now has SerpApi Google Trends support for Timing & Saturation and Commercial
-Intent, while GooseWorks / social-platform collectors remain the next step for raw
-user-language Audience evidence.
-
----
-
-## Project structure
-
-```
+```text
 trend-fit-gtm-agent/
-├── app/                          # Next.js pages
-│   ├── page.tsx
-│   ├── product-profile/page.tsx
-│   ├── trend-input/page.tsx
-│   ├── fit-score/page.tsx
-│   ├── report/page.tsx
-│   └── api/report/[id]/route.ts
-├── components/                   # UI components
-├── lib/
-│   ├── types.ts                  # Product, Trend, Scores, Recommendation types
-│   ├── scoring.ts                # calculateTrendFit(), validateScores(), overrides
-│   ├── recommendation-rigor.ts    # evidence gate, profiles, caps, stability
-│   ├── evidence-adjustment.ts     # typed evidence -> anchor-step score adjustment
-│   ├── source-tier-classifier.ts   # verify-first source-tier classifier
-│   ├── evidence-collector.ts       # candidate sources -> typed evidence draft
-│   ├── demo-cases.ts             # demo and evidence case loading
-│   ├── report-sections.ts        # GTM brief section generators
-│   └── report-markdown.ts        # Markdown export
-├── tests/                        # Scoring, rigor, provider, CLI, and parsing tests
-│   ├── scoring.test.ts
-│   ├── evidence-adjustment.test.ts
-│   ├── recommendation-rigor.test.ts
-│   ├── source-tier-classifier.test.ts
-│   ├── evidence-collector.test.ts
-│   ├── evidence-case-orchestrator.test.ts
-│   ├── evidence-case-research-runner.test.ts
-│   ├── opencli-research-source.test.ts
-│   └── report-markdown.test.ts
-├── data/                         # Demo input JSON and structured evidence cases
-│   ├── demo_fashion.json
-│   ├── demo_fashion_evidence.json
-│   ├── demo_ai_tool.json
-│   ├── demo_ai_tool_competitor_evidence.json
-│   ├── latam_gaming_peripherals_evidence.json
-│   └── dji_drones_..._evidence.json
-├── outputs/                      # Pre-generated GTM brief and evidence reports
-│   ├── demo_fashion_report.md
-│   ├── demo_fashion_evidence_case.md
-│   ├── demo_ai_tool_competitor_evidence_case.md
-│   ├── latam_gaming_peripherals_evidence_case.md
-│   └── dji_drones_..._evidence_case.md
-├── docs/
-│   ├── current-state.md          # handoff state for fresh agent sessions
-│   ├── changelog.md              # project-level iteration log
-│   └── evidence-case-research-cli.md
-├── .github/workflows/
-│   └── ci.yml                    # npm ci + npm test + npm run build
-└── skills/                       # Skill definitions (Claude-readable strategy layer)
-    ├── trend-product-fit/
-    │   ├── SKILL.md              ← the core asset: scoring rubric, voice rules, examples
-    │   ├── scoring_rubric.md
-    │   ├── risk_taxonomy.md
-    │   ├── brand_voice_rules.md
-    │   ├── evidence_model.md
-    │   ├── weight_profiles.md
-    │   ├── source_tier_classifier.md
-    │   └── examples.md
-    ├── evidence-collector/SKILL.md
-    ├── competitor-evidence/SKILL.md
-    ├── trend-shortlist/SKILL.md
-    ├── campaign-generator/SKILL.md
-    └── outreach-copy/SKILL.md
+├── app/                         # Next.js 页面和 API routes
+├── components/                  # 共享 UI 组件
+├── data/                        # Demo 案例和结构化证据 JSON
+├── docs/                        # 当前状态、changelog、研究 CLI 说明
+├── examples/                    # 可重复演示的 fixture
+├── lib/                         # 评分、证据、provider、报告和工作台逻辑
+├── outputs/                     # 生成的 Markdown 报告和 evidence cases
+├── public/case-studies/         # 首页案例缩略图
+├── skills/                      # 本地策略 skill 定义
+└── tests/                       # Node 测试套件
 ```
 
----
+## 当前缺口
 
-## Why this matters for GTM work
+- 尚未部署到公开固定域名。
+- 热点仍需要人工输入；产品到热点的自动发现暂不在本版范围内。
+- TikTok、小红书、市场评论、社媒语言等 live provider 还没有接入工作台 UI。
+- 如果旧 SerpApi key 曾在聊天中共享，公开部署前必须轮换。
 
-The hardest part of brand trend-jacking is not knowing what is trending. It is deciding whether it is *actually relevant* — without confusing audience size for audience match, without mistaking creative ease for strategic fit, and without missing the brand risks that only show up once you've already posted.
+## 技术栈
 
-This project attempts to make that judgment legible, scorable, and auditable — so a GTM team can show their reasoning, not just their conclusion.
-
----
-
-## Tech stack
-
-Next.js 15 · React 19 · TypeScript · Tailwind CSS
+Next.js 15 · React 19 · TypeScript · Tailwind CSS · Node test runner

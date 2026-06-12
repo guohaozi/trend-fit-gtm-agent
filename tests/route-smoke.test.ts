@@ -33,6 +33,18 @@ function assertRenderable(node: unknown, label: string): void {
   assert.ok(node && typeof node === "object", `${label} should return a renderable element`);
 }
 
+function collectText(node: unknown): string {
+  if (node == null || typeof node === "boolean") return "";
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(collectText).join(" ");
+  if (typeof node !== "object") return "";
+
+  const props = (node as { props?: { children?: unknown; alt?: unknown; "aria-label"?: unknown } }).props;
+  if (!props) return "";
+
+  return [props.alt, props["aria-label"], props.children].map(collectText).join(" ");
+}
+
 describe("report markdown download API", () => {
   it("returns a markdown attachment for a known case", async () => {
     const response = await reportRouteGet(new Request("http://test/api/report/demo_fashion"), {
@@ -58,6 +70,18 @@ describe("report markdown download API", () => {
 describe("page route smoke tests", () => {
   it("renders the home page", () => {
     assertRenderable(HomePage(), "HomePage");
+  });
+
+  it("surfaces the redesigned homepage story and workspace entry points", () => {
+    const text = collectText(HomePage());
+
+    assert.match(text, /这个产品该不该追这个热点？/);
+    assert.match(text, /打开工作台/);
+    assert.match(text, /回放免 Key Demo/);
+    assert.match(text, /没有数据不等于有证据/);
+    assert.match(text, /证据等级由分类器决定/);
+    assert.match(text, /工作台预览/);
+    assert.match(text, /带证据的案例/);
   });
 
   it("renders the workspace page (and loads the WorkspaceClient module)", () => {
