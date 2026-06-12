@@ -287,6 +287,28 @@ describe("SEO keyword provider", () => {
     );
   });
 
+  it("drops related queries that keep a trend token but pile on unrelated junk tokens", () => {
+    const findings = serpApiKeywordResearchToFindings({
+      idPrefix: "dubai chocolate",
+      sourceUrl: "https://serpapi.com/search?engine=google_trends&q=dubai+chocolate",
+      relatedQueries: {
+        rising: [
+          // real trend tokens but 5 unrelated junk tokens -> spam pileup, dropped
+          { query: "dubai chocolate caramelbbw emerald ebook cashback code", formatted_value: "Breakout" },
+          // real trend token + a couple of on-topic tokens -> kept
+          { query: "dubai chocolate brownie recipe", formatted_value: "Breakout" }
+        ],
+        top: [{ query: "dubai chocolate", value: 100 }]
+      },
+      trend: undefined
+    });
+
+    assert.deepEqual(
+      findings.map((finding) => finding.query),
+      ["dubai chocolate brownie recipe"]
+    );
+  });
+
   it("feeds SEO keyword candidates through draft building and evidence-case generation", () => {
     const candidates = seoKeywordFindingsToCandidates([
       {

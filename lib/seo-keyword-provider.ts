@@ -180,12 +180,20 @@ function queryTokens(value: string): Set<string> {
   );
 }
 
+// A related query can share a real trend token but trail unrelated junk tokens
+// (SEO spam like "dubai chocolate caramelbbw emerald ebook cashback code"). Drop it
+// when it carries more than this many non-trend tokens.
+const MAX_UNRELATED_RELATED_TOKENS = 4;
+
 function isRelevantRelatedQuery(query: string, trendQuery: string): boolean {
   if (RELATED_QUERY_SPAM_PATTERN.test(query)) return false;
   const trendTokens = queryTokens(trendQuery);
   if (trendTokens.size === 0) return true;
   const relatedTokens = queryTokens(query);
-  return [...trendTokens].some((token) => relatedTokens.has(token));
+  const shared = [...relatedTokens].filter((token) => trendTokens.has(token));
+  if (shared.length === 0) return false;
+  const unrelated = relatedTokens.size - shared.length;
+  return unrelated <= MAX_UNRELATED_RELATED_TOKENS;
 }
 
 function formatNote(finding: SeoKeywordFinding): string {
