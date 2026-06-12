@@ -511,10 +511,10 @@ export function WorkspaceClient() {
     <div className="workspace-page">
       <header className="workspace-hero">
         <div>
-          <h1>真实工作台</h1>
+          <p className="workspace-eyebrow">热点适配工作台</p>
+          <h1>评估热点是否值得追</h1>
           <p>
-            输入产品画像和候选趋势，直接运行确定性评分、证据门槛和候选排序。当前版本先使用手动锚点评分，
-            Google Trends 证据会通过服务端接口写入证据编辑区。
+            填入产品和候选热点，立刻得到“跟进 / 测试 / 观望 / 不建议”的裁决，并看到下一步该补的证据。
           </p>
         </div>
         <div className="workspace-hero-actions">
@@ -733,7 +733,7 @@ export function WorkspaceClient() {
           </div>
           {mode === "single" ? (
             <>
-              <div className="result-headline">
+              <div className="result-headline result-verdict">
                 <span>单趋势结果</span>
                 <strong>{singleResult.adjustedResult.total}/100</strong>
                 <small>{formatBand(singleResult.rigor.gatedBand)}</small>
@@ -846,12 +846,15 @@ function EvidenceEditor({
   onUpdate: (rowIndex: number, update: Partial<WorkspaceEvidenceRow>) => void;
 }) {
   return (
-    <section className="evidence-editor" aria-label="证据编辑">
+    <details className="evidence-editor ws-fold" aria-label="证据编辑">
+      <summary className="ws-fold-summary">
+        <span className="ws-fold-eyebrow">证据</span>
+        <span className="ws-fold-title">证据编辑</span>
+        <span className="ws-fold-count">{rows.length} 条</span>
+        <span className="ws-fold-chevron" aria-hidden="true">›</span>
+      </summary>
       <div className="evidence-editor-head">
-        <div className="section-heading compact">
-          <p className="eyebrow">证据</p>
-          <h2>证据编辑</h2>
-        </div>
+        <p className="evidence-editor-hint">来源等级由分类器自动计算，不可手编。</p>
         <button className="secondary-action" type="button" onClick={onAdd}>
           新增证据
         </button>
@@ -977,7 +980,7 @@ function EvidenceEditor({
           ))}
         </div>
       )}
-    </section>
+    </details>
   );
 }
 
@@ -999,12 +1002,13 @@ function ProviderPreviewPanel({
   onRunFixture: () => void;
 }) {
   return (
-    <section className="provider-preview-panel" aria-label="数据源预览">
+    <details className="provider-preview-panel ws-fold" aria-label="数据源预览">
+      <summary className="ws-fold-summary">
+        <span className="ws-fold-eyebrow">数据源</span>
+        <span className="ws-fold-title">命令预览 / 演示回放</span>
+        <span className="ws-fold-chevron" aria-hidden="true">›</span>
+      </summary>
       <div className="provider-preview-head">
-        <div className="section-heading compact">
-          <p className="eyebrow">数据源预览</p>
-          <h2>命令预览 / 演示回放</h2>
-        </div>
         <button className="secondary-action" type="button" onClick={onCopy}>
           复制命令
         </button>
@@ -1065,17 +1069,19 @@ function ProviderPreviewPanel({
       <span className="provider-copy-status" aria-live="polite">
         {copyStatus === "copied" ? "命令已复制" : copyStatus === "failed" ? "复制失败，请手动选择" : " "}
       </span>
-    </section>
+    </details>
   );
 }
 
 function EvidenceGapList({ gaps }: { gaps: WorkspaceEvidenceGap[] }) {
   return (
-    <section className="evidence-gap-panel" aria-label="证据缺口">
-      <div className="section-heading compact">
-        <p className="eyebrow">证据缺口</p>
-        <h2>下一步该补什么证据</h2>
-      </div>
+    <details className="evidence-gap-panel ws-fold" aria-label="证据缺口">
+      <summary className="ws-fold-summary">
+        <span className="ws-fold-eyebrow">证据缺口</span>
+        <span className="ws-fold-title">下一步该补什么证据</span>
+        <span className="ws-fold-count">{gaps.length} 项</span>
+        <span className="ws-fold-chevron" aria-hidden="true">›</span>
+      </summary>
       {gaps.length === 0 ? (
         <p className="gap-empty">当前没有阻塞型证据缺口，下一步可以进入小规模验证。</p>
       ) : (
@@ -1092,6 +1098,6 @@ function EvidenceGapList({ gaps }: { gaps: WorkspaceEvidenceGap[] }) {
           ))}
         </ul>
       )}
-    </section>
+    </details>
   );
 }

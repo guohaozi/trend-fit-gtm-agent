@@ -46,3 +46,6 @@ Thumbs.db
 # ── Misc ──────────────────────────────────────────────────
 *.pem
 *.docx
+
+# ── Claude Code local preview helper ─────────────────────
+.claude/
