@@ -42,7 +42,7 @@ type GoogleTrendsProviderPayload = {
   error?: string;
 };
 
-const WORKSPACE_STORAGE_KEY = "trend-fit-workspace-state-v1";
+const WORKSPACE_STORAGE_KEY = "trend-fit-workspace-state-v2";
 const SCORE_OPTIONS: ScoreValue[] = [0, 25, 50, 75, 100];
 const DIRECTION_OPTIONS = [
   { value: "confirm", label: "确认" },
@@ -67,14 +67,14 @@ const VERIFICATION_OPTIONS: Array<{ value: VerificationStatus; label: string }> 
 const SOURCE_SIGNAL_OPTIONS: Array<{ value: SourceSignal; label: string }> = [
   { value: "raw_platform_data", label: "平台原始数据" },
   { value: "comment_corpus", label: "评论语料" },
-  { value: "direct_competitor_campaign", label: "竞品 campaign" },
+  { value: "direct_competitor_campaign", label: "竞品营销活动" },
   { value: "named_expert_quote", label: "专家引用" },
   { value: "reputable_journalism", label: "可信媒体" },
   { value: "research_report", label: "研究报告" },
   { value: "supplier_category_report", label: "供应商类目报告" },
   { value: "vendor_copy", label: "厂商营销页" },
   { value: "vendor_documentation", label: "厂商文档" },
-  { value: "listicle_affiliate_seo", label: "榜单/SEO" },
+  { value: "listicle_affiliate_seo", label: "搜索榜单" },
   { value: "press_release", label: "新闻稿" },
   { value: "single_social_thread", label: "单条社媒" },
   { value: "single_anecdote", label: "单个轶事" },
@@ -90,15 +90,85 @@ const SCORE_META: Array<{ key: ScoreKey; label: string; hint: string }> = [
   { key: "timingSaturation", label: "时机", hint: "是否仍有进入窗口" }
 ];
 
+const WORKSPACE_TREND_COPY: Record<
+  string,
+  { name: string; description: string; verdict?: string; campaign?: string }
+> = {
+  lego_world_cup_trend: {
+    name: "世界杯球迷文化",
+    description: "围绕 2026 世界杯的观赛派对、国家队身份和收藏时刻。",
+    verdict: "文化表面积大，但需要更清晰的授权或球迷仪式角度，避免变成泛足球内容。",
+    campaign: "围绕比赛日家庭搭建、国家队配色小模型和观赛派对内容做轻量测试。"
+  },
+  lego_f1_race_trend: {
+    name: "F1 比赛周末",
+    description: "F1 车队身份、赛车设计、工程叙事和成年收藏者文化。",
+    verdict: "最佳适配：LEGO 已有直接 F1 产品桥梁、强创意格式和自然的成年收藏者角度。",
+    campaign: "做一组比赛周末搭建内容：桌面赛车展示、亲子排位挑战和工程细节短视频。"
+  },
+  lego_graduation_season_trend: {
+    name: "毕业季礼物",
+    description: "毕业礼物、学年里程碑、桌面装饰和家庭庆祝内容。",
+    verdict: "安全且适合作为礼物，但差异性弱于 F1，因为很多品牌都能参与毕业季。",
+    campaign: "作为季节性礼物方向测试：桌面摆件、花束套装和毕业纪念包装。"
+  }
+};
+
+const WORKSPACE_EVIDENCE_NOTE_COPY: Record<string, string> = {
+  "world-cup-official-timing": "FIFA 官方页面确认 2026 世界杯时间和赛事规模。",
+  "world-cup-lego-sports-fit": "LEGO 运动类目能提供方向性参考，但不是世界杯 campaign 的直接证据。",
+  "f1-lego-category-fit": "LEGO 已有 Formula 1 类目，产品和热点的连接不是强行拼接。",
+  "f1-lego-speed-champions-creative": "LEGO Speed Champions 已提供赛车搭建、比赛周末内容和收藏展示格式。",
+  "f1-official-partnership-timing": "Formula 1 对 LEGO 合作的报道支持当前比赛周末激活的相关性。",
+  "f1-family-safe-brand-fit": "合作语境把活动放在主流娱乐和家庭友好的收藏场景中。",
+  "f1-adult-collector-audience": "Formula 1 类目支持 LEGO 买家、成年收藏者、赛车粉丝和礼物购买者的重合。",
+  "graduation-gift-commercial-fit": "LEGO 礼物导航支持送礼场景，但这仍是宽泛礼物证据，不是毕业季转化证明。",
+  "graduation-brand-safety": "毕业季礼物低风险、家庭友好，但更像季节性零售机会，不是强差异化热点。"
+};
+
+const SOURCE_TIER_LABELS: Record<string, string> = {
+  primary: "一手来源",
+  secondary: "二手来源",
+  proxy: "代理来源"
+};
+
+const CONFIDENCE_LABELS: Record<string, string> = {
+  low: "低",
+  medium: "中",
+  high: "高"
+};
+
+const CLASSIFIER_REASON_LABELS: Record<string, string> = {
+  "invalid URL": "来源链接无效",
+  "claim not present at source URL": "来源链接中没有对应主张",
+  "unverified source; no browse/fetch confirmation": "来源未核验，缺少浏览或抓取确认",
+  "single social thread used only as raw audience/use-case language": "单条社媒帖只作为原始受众/场景语言使用",
+  "verified primary source signal": "已核验的一手来源信号",
+  "supplier-owned category report; useful but bias-capped": "供应商自有类目报告可参考，但会因偏差限制等级",
+  "verified secondary source signal": "已核验的二手来源信号",
+  "forced-proxy source signal": "该来源信号只能作为代理指标",
+  "unknown source type; tie-breaker goes to proxy": "来源类型不明确，保守归为代理指标",
+  "vendor documentation": "厂商文档",
+  "vendor copy": "厂商营销页",
+  "listicle / affiliate / SEO source": "榜单、联盟或 SEO 来源",
+  "press release / sponsored source": "新闻稿或赞助来源",
+  "single anecdote": "单个轶事",
+  "single social thread outside raw audience/use-case language": "单条社媒帖不能支撑这个维度"
+};
+
+function classifierReasonLabel(reason: string): string {
+  return CLASSIFIER_REASON_LABELS[reason] ?? reason;
+}
+
 function initialProduct(): WorkspaceProduct {
   return {
     name: "LEGO",
-    category: "Toy / collectible building system",
-    market: "Global",
-    audience: "Families, kids, adult collectors, gift shoppers",
-    positioning: "Creative play and collectible display",
-    sellingPoints: "Hands-on building, display value, fandom collaborations",
-    brandTone: "Imaginative, precise, family-safe",
+    category: "拼搭玩具 / 收藏模型",
+    market: "全球 / 欧洲",
+    audience: "家庭用户、儿童、成年收藏者、礼物购买者",
+    positioning: "兼具创意拼搭和收藏展示价值",
+    sellingPoints: "动手搭建、展示价值、粉丝文化合作",
+    brandTone: "有想象力、精确、家庭友好",
     riskTolerance: "medium",
     profileUsed: "brand_awareness"
   };
@@ -108,13 +178,16 @@ function initialCandidates(): WorkspaceCandidate[] {
   const input = legoShortlist as TrendShortlistInput;
   return input.candidates.map((candidate) => ({
     id: candidate.id,
-    trendName: candidate.trendName,
-    trendDescription: candidate.trendDescription ?? "",
+    trendName: WORKSPACE_TREND_COPY[candidate.id]?.name ?? candidate.trendName,
+    trendDescription: WORKSPACE_TREND_COPY[candidate.id]?.description ?? candidate.trendDescription ?? "",
     scores: candidate.baselineScores,
     evidence: candidate.evidence,
-    evidenceRows: buildWorkspaceEvidenceRowsFromEvidence(candidate.evidence ?? []),
-    oneLineVerdict: candidate.oneLineVerdict,
-    recommendedCampaign: candidate.recommendedCampaign
+    evidenceRows: buildWorkspaceEvidenceRowsFromEvidence(candidate.evidence ?? []).map((row) => ({
+      ...row,
+      note: WORKSPACE_EVIDENCE_NOTE_COPY[row.id] ?? row.note
+    })),
+    oneLineVerdict: WORKSPACE_TREND_COPY[candidate.id]?.verdict ?? candidate.oneLineVerdict,
+    recommendedCampaign: WORKSPACE_TREND_COPY[candidate.id]?.campaign ?? candidate.recommendedCampaign
   }));
 }
 
@@ -183,7 +256,7 @@ function addEvidenceRow(candidates: WorkspaceCandidate[], candidateIndex: number
         sourceUrl: "https://example.com/source",
         verificationStatus: "unverified",
         sourceSignals: ["unknown"],
-        note: "Describe the source claim before counting it."
+        note: "先写清楚来源主张，再决定是否计入证据。"
       }
     ]
   });
@@ -378,7 +451,7 @@ export function WorkspaceClient() {
     const targetCandidate = candidates[resolvedTargetIndex];
 
     setProviderRunStatus("running");
-    setProviderRunMessage(fixture ? "正在 replay committed Google Trends fixture..." : "正在通过 server API 拉取 Google Trends...");
+    setProviderRunMessage(fixture ? "正在回放内置 Google Trends 演示数据..." : "正在通过服务端接口拉取 Google Trends...");
 
     const requestTrends = async (useFixture: boolean) => {
       const response = await fetch("/api/workspace/google-trends", {
@@ -405,13 +478,13 @@ export function WorkspaceClient() {
       // Replay the committed fixture instead of showing a setup error — the demo keeps working
       // for every visitor, with zero SerpApi quota and no key exposure.
       if (!fixture && response.status === 503) {
-        setProviderRunMessage("服务器未配置 SerpApi key，改用内置 fixture 演示数据回放...");
+        setProviderRunMessage("服务器未配置 SerpApi 密钥，改用内置演示数据回放...");
         ({ response, payload } = await requestTrends(true));
         usedFixtureFallback = true;
       }
 
       if (!response.ok) {
-        throw new Error(payload.error ?? "Google Trends provider failed.");
+        throw new Error(payload.error ?? "Google Trends 数据源运行失败。");
       }
       const rows = payload.rows ?? [];
       setCandidates((currentCandidates) => {
@@ -424,9 +497,9 @@ export function WorkspaceClient() {
       setActiveCandidateIndex(resolvedTargetIndex);
       setProviderRunStatus("succeeded");
       const usedFixture = fixture || usedFixtureFallback;
-      const fallbackPrefix = usedFixtureFallback ? "服务器未配置 key，已用 fixture 演示数据：" : "";
+      const fallbackPrefix = usedFixtureFallback ? "服务器未配置密钥，已用内置演示数据：" : "";
       setProviderRunMessage(
-        `${fallbackPrefix}已追加 ${rows.length} 条 ${usedFixture ? "fixture" : "Google Trends"} 证据；${payload.evidenceCount ?? rows.length} 条可计入评分。`
+        `${fallbackPrefix}已追加 ${rows.length} 条 ${usedFixture ? "演示" : "Google Trends"} 证据；${payload.evidenceCount ?? rows.length} 条可计入评分。`
       );
     } catch (error) {
       setProviderRunStatus("failed");
@@ -440,8 +513,8 @@ export function WorkspaceClient() {
         <div>
           <h1>真实工作台</h1>
           <p>
-            输入产品画像和候选趋势，直接运行确定性评分、严谨层 gate 和 shortlist 排名。当前版本先使用手动锚点评分，
-            Google Trends 证据会通过 server API 写入证据编辑区。
+            输入产品画像和候选趋势，直接运行确定性评分、证据门槛和候选排序。当前版本先使用手动锚点评分，
+            Google Trends 证据会通过服务端接口写入证据编辑区。
           </p>
         </div>
         <div className="workspace-hero-actions">
@@ -450,15 +523,15 @@ export function WorkspaceClient() {
               单趋势
             </button>
             <button className={mode === "shortlist" ? "active" : ""} type="button" onClick={() => setMode("shortlist")}>
-              Shortlist
+              候选排序
             </button>
           </div>
           <div className="workspace-state-actions" aria-label="工作台状态">
             <button className="secondary-action" type="button" onClick={exportWorkspaceState}>
-              导出 JSON
+              导出状态
             </button>
             <button className="secondary-action" type="button" onClick={() => setImportOpen((open) => !open)}>
-              导入 JSON
+              导入状态
             </button>
             <button className="text-action compact-action" type="button" onClick={resetWorkspaceState}>
               重置
@@ -471,7 +544,7 @@ export function WorkspaceClient() {
       {importOpen ? (
         <section className="workspace-import-panel" aria-label="导入工作台状态">
           <label className="field-row wide">
-            <span>粘贴 workspace JSON</span>
+            <span>粘贴工作台状态 JSON</span>
             <textarea
               rows={6}
               value={importValue}
@@ -492,7 +565,7 @@ export function WorkspaceClient() {
       <div className="workspace-grid">
         <section className="workspace-panel" aria-label="输入区">
           <div className="section-heading compact">
-            <p className="eyebrow">Input</p>
+            <p className="eyebrow">输入</p>
             <h2>产品画像</h2>
           </div>
 
@@ -554,7 +627,7 @@ export function WorkspaceClient() {
               />
             </label>
             <label className="field-row">
-              <span>Profile</span>
+              <span>评分模型</span>
               <select
                 value={product.profileUsed}
                 onChange={(event) => setProduct(fieldUpdate(product, "profileUsed", event.target.value as WeightProfile))}
@@ -570,7 +643,7 @@ export function WorkspaceClient() {
 
           <div className="trend-editor-header">
             <div>
-              <p className="eyebrow">Trends</p>
+              <p className="eyebrow">趋势</p>
               <h2>候选趋势</h2>
             </div>
             <div className="candidate-tabs" aria-label="候选趋势">
@@ -652,7 +725,7 @@ export function WorkspaceClient() {
         <aside className="workspace-panel result-panel" aria-label="结果区">
           <div className="result-actions">
             <button className="secondary-action" type="button" onClick={copyMarkdown}>
-              复制 Markdown
+              复制报告
             </button>
             <span aria-live="polite">
               {copyStatus === "copied" ? "已复制" : copyStatus === "failed" ? "复制失败，请手动选择" : " "}
@@ -697,7 +770,7 @@ export function WorkspaceClient() {
           ) : (
             <>
               <div className="result-headline">
-                <span>Shortlist winner</span>
+                <span>排序第一名</span>
                 <strong>{shortlistResult.winner.trendName}</strong>
                 <small>
                   {shortlistResult.winner.adjustedResult.total}/100 · {formatBand(shortlistResult.winner.rigor.gatedBand)}
@@ -707,11 +780,11 @@ export function WorkspaceClient() {
                 <table className="shortlist-table">
                   <thead>
                     <tr>
-                      <th>Rank</th>
-                      <th>Trend</th>
-                      <th>Score</th>
-                      <th>Gate</th>
-                      <th>Action</th>
+                      <th>排名</th>
+                      <th>趋势</th>
+                      <th>分数</th>
+                      <th>门槛</th>
+                      <th>动作</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -773,10 +846,10 @@ function EvidenceEditor({
   onUpdate: (rowIndex: number, update: Partial<WorkspaceEvidenceRow>) => void;
 }) {
   return (
-    <section className="evidence-editor" aria-label="Evidence editor">
+    <section className="evidence-editor" aria-label="证据编辑">
       <div className="evidence-editor-head">
         <div className="section-heading compact">
-          <p className="eyebrow">Evidence</p>
+          <p className="eyebrow">证据</p>
           <h2>证据编辑</h2>
         </div>
         <button className="secondary-action" type="button" onClick={onAdd}>
@@ -784,20 +857,20 @@ function EvidenceEditor({
         </button>
       </div>
       {rows.length === 0 ? (
-        <p className="evidence-editor-empty">还没有证据。新增一条来源后，tier 会由 classifier 自动计算。</p>
+        <p className="evidence-editor-empty">还没有证据。新增一条来源后，来源等级会由分类器自动计算。</p>
       ) : (
         <div className="evidence-row-list">
           {rows.map((row, rowIndex) => (
             <article className="evidence-row-card" key={row.id}>
               <div className="evidence-row-topline">
-                <strong>{row.id}</strong>
+                <strong>证据 {rowIndex + 1}</strong>
                 <button className="text-action compact-action" type="button" onClick={() => onRemove(rowIndex)}>
                   移除
                 </button>
               </div>
               <div className="evidence-edit-grid">
                 <label className="field-row wide">
-                  <span>Source URL</span>
+                  <span>来源链接</span>
                   <input value={row.sourceUrl} onChange={(event) => onUpdate(rowIndex, { sourceUrl: event.target.value })} />
                 </label>
                 <label className="field-row">
@@ -872,7 +945,7 @@ function EvidenceEditor({
                   </select>
                 </label>
                 <label className="field-row">
-                  <span>Source signal</span>
+                  <span>来源信号</span>
                   <select
                     value={row.sourceSignals[0] ?? "unknown"}
                     onChange={(event) => onUpdate(rowIndex, { sourceSignals: [event.target.value as SourceSignal] })}
@@ -885,20 +958,20 @@ function EvidenceEditor({
                   </select>
                 </label>
                 <label className="field-row wide">
-                  <span>Note</span>
+                  <span>说明</span>
                   <textarea rows={2} value={row.note} onChange={(event) => onUpdate(rowIndex, { note: event.target.value })} />
                 </label>
               </div>
               <div className="computed-tier-strip">
                 <div>
-                  <span>Computed tier</span>
-                  <strong>{row.computedSourceTier ?? "dropped"}</strong>
+                  <span>计算来源等级</span>
+                  <strong>{row.computedSourceTier ? SOURCE_TIER_LABELS[row.computedSourceTier] : "已丢弃"}</strong>
                 </div>
                 <div>
-                  <span>Computed confidence</span>
-                  <strong>{row.computedConfidence ?? "none"}</strong>
+                  <span>计算置信度</span>
+                  <strong>{row.computedConfidence ? CONFIDENCE_LABELS[row.computedConfidence] : "无"}</strong>
                 </div>
-                <p>{row.classification.reasons.join("; ")}</p>
+                <p>{row.classification.reasons.map(classifierReasonLabel).join("；")}</p>
               </div>
             </article>
           ))}
@@ -926,17 +999,17 @@ function ProviderPreviewPanel({
   onRunFixture: () => void;
 }) {
   return (
-    <section className="provider-preview-panel" aria-label="Provider dry-run preview">
+    <section className="provider-preview-panel" aria-label="数据源预览">
       <div className="provider-preview-head">
         <div className="section-heading compact">
-          <p className="eyebrow">Provider preview</p>
-          <h2>Dry-run / fixture</h2>
+          <p className="eyebrow">数据源预览</p>
+          <h2>命令预览 / 演示回放</h2>
         </div>
         <button className="secondary-action" type="button" onClick={onCopy}>
           复制命令
         </button>
       </div>
-      <p className="provider-target">Target: {preview.targetTrend}</p>
+      <p className="provider-target">目标趋势：{preview.targetTrend}</p>
       <div className="provider-live-actions">
         <button
           className="primary-action"
@@ -952,23 +1025,26 @@ function ProviderPreviewPanel({
           disabled={runStatus === "running"}
           onClick={onRunFixture}
         >
-          运行 Fixture（演示数据）
+          运行演示数据
         </button>
         <span className={runStatus === "failed" ? "provider-run-error" : ""} aria-live="polite">
           {runMessage || " "}
         </span>
       </div>
-      <div className="provider-command-list">
-        {[preview.dryRunCommand, preview.fixtureCommand].map((command) => (
-          <article key={command.label}>
-            <div>
-              <strong>{command.label}</strong>
-              <span>{command.description}</span>
-            </div>
-            <code>{command.command}</code>
-          </article>
-        ))}
-      </div>
+      <details className="provider-command-details">
+        <summary>查看可复制命令</summary>
+        <div className="provider-command-list">
+          {[preview.dryRunCommand, preview.fixtureCommand].map((command) => (
+            <article key={command.label}>
+              <div>
+                <strong>{command.label}</strong>
+                <span>{command.description}</span>
+              </div>
+              <code>{command.command}</code>
+            </article>
+          ))}
+        </div>
+      </details>
       {preview.targetedSlots.length > 0 ? (
         <ul className="provider-slot-list">
           {preview.targetedSlots.map((slot) => (
@@ -979,7 +1055,7 @@ function ProviderPreviewPanel({
           ))}
         </ul>
       ) : (
-        <p className="provider-empty">No blocking provider gaps for this result. Use the fixture smoke command to verify the pipeline contract.</p>
+        <p className="provider-empty">当前结果没有阻塞型数据源缺口。可以用演示数据回放验证整条证据管线。</p>
       )}
       <div className="provider-notes">
         {preview.notes.map((note) => (
@@ -997,7 +1073,7 @@ function EvidenceGapList({ gaps }: { gaps: WorkspaceEvidenceGap[] }) {
   return (
     <section className="evidence-gap-panel" aria-label="证据缺口">
       <div className="section-heading compact">
-        <p className="eyebrow">Evidence gap</p>
+        <p className="eyebrow">证据缺口</p>
         <h2>下一步该补什么证据</h2>
       </div>
       {gaps.length === 0 ? (

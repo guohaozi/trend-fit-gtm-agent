@@ -75,13 +75,12 @@ describe("page route smoke tests", () => {
   it("surfaces the redesigned homepage story and workspace entry points", () => {
     const text = collectText(HomePage());
 
-    assert.match(text, /这个产品该不该追这个热点？/);
-    assert.match(text, /打开工作台/);
-    assert.match(text, /回放免 Key Demo/);
-    assert.match(text, /没有数据不等于有证据/);
-    assert.match(text, /证据等级由分类器决定/);
-    assert.match(text, /工作台预览/);
-    assert.match(text, /带证据的案例/);
+    assert.match(text, /产品该不该追热点？/);
+    assert.match(text, /体验工作台/);
+    assert.match(text, /查看案例/);
+    assert.match(text, /要不要蹭热点/);
+    assert.match(text, /简单展示，严谨判断。/);
+    assert.match(text, /三个案例，十秒看懂。/);
   });
 
   it("renders the workspace page (and loads the WorkspaceClient module)", () => {

@@ -3,7 +3,7 @@ import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Trend-Fit GTM Agent",
+  title: "Trend-Fit 热点决策",
   description: "用于判断产品是否适合跟进热点的 GTM 策略分析工具。"
 };
 
@@ -16,7 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link className="brand-mark" href="/">
               <span className="brand-symbol">TF</span>
               <span className="brand-copy">
-                <strong>Trend-Fit GTM Agent</strong>
+                <strong>Trend-Fit 热点决策</strong>
                 <span>产品 × 热点适配决策层</span>
               </span>
             </Link>

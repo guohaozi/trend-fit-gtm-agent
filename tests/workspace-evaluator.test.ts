@@ -137,7 +137,7 @@ describe("workspace evaluator", () => {
 
     assert.equal(gaps.some((gap) => gap.slot === "brandSafety"), true);
     assert.equal(gaps.some((gap) => gap.slot === "audienceOrUseCase"), true);
-    assert.match(gaps.map((gap) => gap.providerHint).join(" "), /raw social language/);
+    assert.match(gaps.map((gap) => gap.providerHint).join(" "), /真实用户语言/);
   });
 
   it("renders workspace markdown exports for single trends and shortlists", () => {
@@ -159,11 +159,11 @@ describe("workspace evaluator", () => {
     })));
     const shortlistMarkdown = renderShortlistWorkspaceMarkdown({ product, shortlist });
 
-    assert.match(singleMarkdown, /# Trend-Fit Workspace Memo/);
-    assert.match(singleMarkdown, /Product: LEGO/);
-    assert.match(singleMarkdown, /Trend: F1 race weekend/);
-    assert.match(singleMarkdown, /Evidence gaps/);
-    assert.match(shortlistMarkdown, /# Trend Shortlist Workspace Report/);
+    assert.match(singleMarkdown, /# Trend-Fit 工作台备忘录/);
+    assert.match(singleMarkdown, /产品：LEGO/);
+    assert.match(singleMarkdown, /趋势：F1 race weekend/);
+    assert.match(singleMarkdown, /证据缺口/);
+    assert.match(shortlistMarkdown, /# 趋势候选排序报告/);
     assert.match(shortlistMarkdown, /F1 race weekend/);
     assert.match(shortlistMarkdown, /World Cup fan culture/);
   });
@@ -191,7 +191,7 @@ describe("workspace evaluator", () => {
     assert.match(preview.dryRunCommand.command, /--provider opencli/);
     assert.match(preview.fixtureCommand.command, /--fixture-results examples\/dji-middle-east-search-results\.fixture\.json/);
     assert.equal(preview.commandsText.includes("sourceTier"), false);
-    assert.equal(preview.targetedSlots.some((slot) => slot.plannedSources.some((source) => /policy|backlash/i.test(source))), true);
+    assert.equal(preview.targetedSlots.some((slot) => slot.plannedSources.some((source) => /政策|负面反馈/.test(source))), true);
   });
 
   it("materializes editable evidence rows through the source-tier classifier", () => {
@@ -314,7 +314,7 @@ describe("workspace evaluator", () => {
 
     assert.equal(parsed.ok, false);
     if (!parsed.ok) {
-      assert.match(parsed.error, /risk tolerance/i);
+      assert.match(parsed.error, /风险偏好/);
     }
     assert.equal(parseWorkspaceStateJson("not-json").ok, false);
   });

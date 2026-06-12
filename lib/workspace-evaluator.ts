@@ -122,37 +122,37 @@ export type WorkspaceStateParseResult =
   | { ok: false; error: string };
 
 const DIMENSION_LABELS: Record<string, string> = {
-  audienceOverlap: "Audience overlap",
-  useCaseRelevance: "Use-case relevance",
-  messageBridge: "Message bridge",
-  creativeFeasibility: "Creative feasibility",
-  commercialIntent: "Commercial intent",
-  brandSafety: "Brand safety",
-  timingSaturation: "Timing & saturation",
-  audienceOrUseCase: "Audience or use-case"
+  audienceOverlap: "受众重合",
+  useCaseRelevance: "使用场景",
+  messageBridge: "卖点桥接",
+  creativeFeasibility: "创意可行性",
+  commercialIntent: "商业意图",
+  brandSafety: "品牌安全",
+  timingSaturation: "时机与饱和度",
+  audienceOrUseCase: "受众或使用场景"
 };
 
 const PROVIDER_HINTS: Record<string, string> = {
-  audienceOverlap: "Use raw social language from Reddit, X, TikTok, Xiaohongshu, YouTube comments, reviews, or interviews.",
-  useCaseRelevance: "Use customer comments, creator content examples, reviews, or directly observed competitor campaigns.",
-  audienceOrUseCase: "Use raw social language or direct customer/competitor examples that prove the audience or use case is real.",
-  messageBridge: "Use competitor campaign examples, creator scripts, landing pages, or review language that bridges trend language to the selling point.",
-  creativeFeasibility: "Use creator examples, existing brand assets, platform-native formats, or directly observed competitor content.",
-  commercialIntent: "Use search/gift intent, marketplace queries, where-to-buy comments, reviews, distributor pages, or SEO demand data.",
-  brandSafety: "Use policy checks, safety/news coverage, backlash scans, and platform/community sentiment before upgrading the recommendation.",
-  timingSaturation: "Use Google Trends / SEO timeseries, platform volume, creator saturation, and competitor activity recency."
+  audienceOverlap: "补充 Reddit、X、TikTok、小红书、YouTube 评论、评论区或访谈里的真实用户语言。",
+  useCaseRelevance: "补充用户评论、创作者内容、评价，或真实观察到的竞品 campaign。",
+  audienceOrUseCase: "补充真实用户语言，或能证明受众和使用场景存在的客户/竞品例子。",
+  messageBridge: "补充竞品 campaign、创作者脚本、落地页或评价语言，证明热点语言能接到核心卖点。",
+  creativeFeasibility: "补充创作者案例、现有品牌素材、平台原生格式，或直接观察到的竞品创意。",
+  commercialIntent: "补充搜索/送礼意图、电商查询、where-to-buy 评论、评价、渠道页或 SEO 需求数据。",
+  brandSafety: "升级建议前，先补政策检查、安全/新闻覆盖、舆情和社区情绪扫描。",
+  timingSaturation: "补充 Google Trends / SEO 时间序列、平台声量、创作者饱和度和竞品近期动作。"
 };
 
 const PROVIDER_SOURCES: Record<string, string[]> = {
-  audienceOverlap: ["Reddit / YouTube / X raw language", "Customer reviews or marketplace Q&A"],
-  useCaseRelevance: ["Creator examples and customer comments", "Competitor campaign or product-use examples"],
-  audienceOrUseCase: ["Reddit / YouTube / X raw language", "Customer reviews, marketplace Q&A, or competitor usage examples"],
-  messageBridge: ["Competitor campaign pages", "Creator scripts, landing pages, or review language"],
-  creativeFeasibility: ["Creator content examples", "Existing brand assets or directly observed competitor creative"],
-  commercialIntent: ["Where-to-buy and price queries", "Marketplace reviews, distributor pages, or SEO demand data"],
-  brandSafety: ["Policy, news, and backlash scan via Google", "Reddit / X sentiment and community safety checks"],
-  timingSaturation: ["Google Trends / SEO timeseries", "Recent platform volume, creator saturation, and competitor recency"],
-  stability: ["One high-signal source for the most sensitive unsupported dimension", "Small controlled test result"]
+  audienceOverlap: ["Reddit / YouTube / X 原始用户语言", "用户评价或电商问答"],
+  useCaseRelevance: ["创作者案例和用户评论", "竞品 campaign 或产品使用案例"],
+  audienceOrUseCase: ["Reddit / YouTube / X 原始用户语言", "用户评价、电商问答或竞品使用案例"],
+  messageBridge: ["竞品 campaign 页面", "创作者脚本、落地页或评价语言"],
+  creativeFeasibility: ["创作者内容案例", "现有品牌素材或可观察竞品创意"],
+  commercialIntent: ["购买地点和价格查询", "电商评价、渠道页或 SEO 需求数据"],
+  brandSafety: ["Google 政策、新闻和负面反馈扫描", "Reddit / X 情绪和社区安全检查"],
+  timingSaturation: ["Google Trends / SEO 时间序列", "近期平台声量、创作者饱和度和竞品动作"],
+  stability: ["对最敏感维度补一条高信号来源", "小规模受控测试结果"]
 };
 
 const SLOT_PLATFORMS: Record<string, string[]> = {
@@ -274,10 +274,10 @@ function isWorkspaceProduct(value: unknown): value is WorkspaceProduct {
   ];
   if (!stringFields.every((key) => isNonEmptyString(value[key]))) return false;
   if (!RISK_TOLERANCES.has(value.riskTolerance as RiskTolerance)) {
-    throw new Error("Invalid risk tolerance in workspace state.");
+    throw new Error("工作台状态里的风险偏好无效。");
   }
   if (!WEIGHT_PROFILES.has(value.profileUsed as WeightProfile)) {
-    throw new Error("Invalid weight profile in workspace state.");
+    throw new Error("工作台状态里的评分模型无效。");
   }
   return true;
 }
@@ -342,12 +342,12 @@ export function serializeWorkspaceState(state: WorkspaceStateSnapshot): string {
 export function parseWorkspaceStateJson(json: string): WorkspaceStateParseResult {
   try {
     const parsed = JSON.parse(json) as unknown;
-    if (!isRecord(parsed)) return { ok: false, error: "Workspace state must be a JSON object." };
-    if (parsed.version !== 1) return { ok: false, error: "Unsupported workspace state version." };
-    if (!isWorkspaceMode(parsed.mode)) return { ok: false, error: "Invalid workspace mode." };
-    if (!isWorkspaceProduct(parsed.product)) return { ok: false, error: "Invalid workspace product." };
+    if (!isRecord(parsed)) return { ok: false, error: "工作台状态必须是 JSON 对象。" };
+    if (parsed.version !== 1) return { ok: false, error: "不支持这个工作台状态版本。" };
+    if (!isWorkspaceMode(parsed.mode)) return { ok: false, error: "工作模式无效。" };
+    if (!isWorkspaceProduct(parsed.product)) return { ok: false, error: "产品画像无效。" };
     if (!Array.isArray(parsed.candidates) || parsed.candidates.length === 0 || !parsed.candidates.every(isWorkspaceCandidate)) {
-      return { ok: false, error: "Invalid workspace candidates." };
+      return { ok: false, error: "候选趋势无效。" };
     }
     const activeCandidateIndex = clampActiveCandidateIndex(Number(parsed.activeCandidateIndex), parsed.candidates);
     return {
@@ -364,7 +364,7 @@ export function parseWorkspaceStateJson(json: string): WorkspaceStateParseResult
   } catch (error) {
     return {
       ok: false,
-      error: error instanceof Error ? error.message : "Invalid workspace state JSON."
+      error: error instanceof Error ? error.message : "工作台状态 JSON 无效。"
     };
   }
 }
@@ -426,7 +426,7 @@ function formatScoreBlock(scores: Scores): string {
 }
 
 function providerHintFor(slot: string): string {
-  return PROVIDER_HINTS[slot] ?? "Add non-proxy evidence from a provider before upgrading this recommendation.";
+  return PROVIDER_HINTS[slot] ?? "升级建议前，先从数据源补充一条非代理证据。";
 }
 
 function shellQuote(value: string): string {
@@ -500,14 +500,14 @@ export function buildWorkspaceEvidenceGaps(rigor: GatedRecommendation): Workspac
     slot,
     label: DIMENSION_LABELS[slot] ?? slot,
     severity: "blocking",
-    reason: "Required Strong Go gate evidence is missing.",
+    reason: "强建议所需的证据门槛还没补齐。",
     providerHint: providerHintFor(slot)
   }));
   const caps = rigor.dimensionCaps.map((dimension): WorkspaceEvidenceGap => ({
     slot: dimension,
     label: DIMENSION_LABELS[dimension],
     severity: "advisory",
-    reason: "This dimension is scored above 75 but lacks non-proxy evidence.",
+    reason: "这个维度评分高于 75，但还缺少非代理证据支撑。",
     providerHint: providerHintFor(dimension)
   }));
 
@@ -515,10 +515,10 @@ export function buildWorkspaceEvidenceGaps(rigor: GatedRecommendation): Workspac
     return [
       {
         slot: "stability",
-        label: "Recommendation stability",
+        label: "推荐稳定性",
         severity: "advisory",
-        reason: "The recommendation is near a band edge or sensitive to one unsupported anchor step.",
-        providerHint: "Run a small controlled test or add one high-signal provider result before increasing budget."
+        reason: "推荐接近档位边界，或对一个未支撑的锚点变化过于敏感。",
+        providerHint: "放大预算前，先跑一个小规模受控测试，或补一条高信号数据源结果。"
       }
     ];
   }
@@ -539,18 +539,18 @@ export function buildWorkspaceProviderPreview({
 }): WorkspaceProviderPreview {
   const targetedSlots = gaps.map((gap) => ({
     ...gap,
-    plannedSources: PROVIDER_SOURCES[gap.slot] ?? ["Provider result normalized into EvidenceCandidate[]"]
+    plannedSources: PROVIDER_SOURCES[gap.slot] ?? ["数据源结果会归一化为候选证据"]
   }));
   const platforms = platformsForGaps(gaps);
   const dryRunCommand: WorkspaceProviderCommand = {
-    label: "Dry-run current trend",
+    label: "预览当前趋势命令",
     command: activeResearchCommand({ product, candidate, platforms, dryRun: true }),
-    description: "Prints the OpenCLI commands for this product, market, trend, and evidence-gap set without executing live collection."
+    description: "只打印这个产品、市场、趋势和证据缺口对应的采集命令，不执行实时采集。"
   };
   const fixtureCommand: WorkspaceProviderCommand = {
-    label: "Portable fixture smoke",
+    label: "演示数据回放",
     command: fixtureSmokeCommand(),
-    description: "Runs the committed fixture through the evidence-case pipeline so the provider contract can be demonstrated on any machine."
+    description: "用仓库内置演示数据跑通证据管线，任何机器都能展示数据源契约。"
   };
   const commandsText = [dryRunCommand.command, fixtureCommand.command].join("\n\n");
 
@@ -562,10 +562,10 @@ export function buildWorkspaceProviderPreview({
     commandsText,
     notes: [
       mode === "shortlist"
-        ? "Shortlist mode previews the provider plan for the current winning trend."
-        : "Single-trend mode previews the provider plan for the active trend.",
-      "OpenCLI should be resolved from --opencli-bin, OPENCLI_BIN, or PATH; the runtime no longer depends on a user-specific default path.",
-      "Provider output becomes candidate evidence only. Source tier remains classifier-owned and is not editable in the workspace."
+        ? "候选排序模式会为当前第一名趋势预览数据源计划。"
+        : "单趋势模式会为当前选中的趋势预览数据源计划。",
+      "OpenCLI 会从 --opencli-bin、OPENCLI_BIN 或 PATH 解析，运行时不依赖某个用户机器上的固定路径。",
+      "数据源输出只会成为候选证据；来源等级仍由分类器决定，工作台里不能手动改。"
     ]
   };
 }
@@ -616,14 +616,14 @@ export function evaluateWorkspaceShortlist(
       trendDescription: candidate.trendDescription,
       baselineScores: candidate.scores,
       evidence: evidenceForWorkspaceCandidate(candidate),
-      oneLineVerdict: candidate.oneLineVerdict ?? "Use this row as a working trend-fit hypothesis.",
+      oneLineVerdict: candidate.oneLineVerdict ?? "把这条趋势先当作待验证的适配假设。",
       recommendedCampaign: candidate.recommendedCampaign
     }))
   });
 }
 
 function evidenceGapMarkdown(gaps: WorkspaceEvidenceGap[]): string {
-  if (gaps.length === 0) return "- No immediate evidence gaps.";
+  if (gaps.length === 0) return "- 暂无需要立即补齐的证据缺口。";
   return gaps
     .map((gap) => `- ${gap.label} (${gap.severity}): ${gap.reason} ${gap.providerHint}`)
     .join("\n");
@@ -641,31 +641,31 @@ export function renderSingleWorkspaceMarkdown({
   const gaps = buildWorkspaceEvidenceGaps(result.rigor);
 
   return [
-    "# Trend-Fit Workspace Memo",
+    "# Trend-Fit 工作台备忘录",
     "",
-    `Product: ${product.name}`,
-    `Market: ${product.market}`,
-    `Trend: ${candidate.trendName}`,
-    `Profile: ${product.profileUsed}`,
+    `产品：${product.name}`,
+    `市场：${product.market}`,
+    `趋势：${candidate.trendName}`,
+    `评分模型：${product.profileUsed}`,
     "",
-    "## Recommendation",
+    "## 建议",
     "",
-    `- Baseline score: ${result.baselineResult.total}/100`,
-    `- Evidence-adjusted score: ${result.adjustedResult.total}/100`,
-    `- Gated band: ${result.rigor.gatedBand}`,
-    `- Evidence gate: ${result.rigor.evidenceGate}`,
-    `- Stability: ${result.rigor.recommendationStability}`,
-    `- Decision type: ${result.rigor.decisionType}`,
+    `- 基准分：${result.baselineResult.total}/100`,
+    `- 证据调整后分数：${result.adjustedResult.total}/100`,
+    `- 门槛后档位：${result.rigor.gatedBand}`,
+    `- 证据门槛：${result.rigor.evidenceGate}`,
+    `- 稳定性：${result.rigor.recommendationStability}`,
+    `- 决策类型：${result.rigor.decisionType}`,
     "",
-    "## Scores",
+    "## 评分",
     "",
     formatScoreBlock(result.adjustment.adjusted),
     "",
-    "## Evidence gaps",
+    "## 证据缺口",
     "",
     evidenceGapMarkdown(gaps),
     "",
-    "## Next validation action",
+    "## 下一步验证动作",
     "",
     result.rigor.nextValidationAction
   ].join("\n");
@@ -685,26 +685,26 @@ export function renderShortlistWorkspaceMarkdown({
   const winnerGaps = buildWorkspaceEvidenceGaps(shortlist.winner.rigor);
 
   return [
-    "# Trend Shortlist Workspace Report",
+    "# 趋势候选排序报告",
     "",
-    `Product: ${product.name}`,
-    `Market: ${product.market}`,
-    `Profile: ${product.profileUsed}`,
-    `Winner: ${shortlist.winner.trendName}`,
+    `产品：${product.name}`,
+    `市场：${product.market}`,
+    `评分模型：${product.profileUsed}`,
+    `第一名：${shortlist.winner.trendName}`,
     "",
-    "| Rank | Trend | Adj score | Gated band | Gate | Stability | Decision |",
+    "| 排名 | 趋势 | 调整后分数 | 门槛后档位 | 证据门槛 | 稳定性 | 决策 |",
     "|------|-------|-----------|------------|------|-----------|----------|",
     ...shortlist.rows.map(shortlistRowMarkdown),
     "",
-    "## Why the winner leads",
+    "## 为什么第一名胜出",
     "",
-    `${shortlist.winner.trendName} leads because it has the strongest gated recommendation after the evidence gate and stability checks are applied.`,
+    `${shortlist.winner.trendName} 胜出，是因为经过证据门槛和稳定性检查后，它仍保留最强的推荐档位。`,
     "",
-    "## Evidence gaps for winner",
+    "## 第一名的证据缺口",
     "",
     evidenceGapMarkdown(winnerGaps),
     "",
-    "## Next validation action",
+    "## 下一步验证动作",
     "",
     shortlist.winner.rigor.nextValidationAction
   ].join("\n");
