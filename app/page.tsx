@@ -25,9 +25,9 @@ export default function HomePage() {
   }
 
   const heroStats = [
-    ["案例", "13"],
-    ["测试", "120/120"],
-    ["演示", "免密钥"]
+    ["流程", "3 步"],
+    ["启动", "10 分钟"],
+    ["输出", "行动建议"]
   ];
 
   const cases = [
@@ -37,15 +37,15 @@ export default function HomePage() {
       href: "/report?case=demo_fashion",
       score: `${getDemoResult("demo_fashion").total} → ${fashionEvidence.adjustedResult.total}`,
       decision: bandLabel(fashionEvidence.rigor.gatedBand),
-      note: "高分被证据门槛收敛，避免把代理指标包装成强结论。"
+      note: "适合先做内容测试，再决定是否扩大预算。"
     },
     {
-      title: "AI 图片工具 × 前后对比",
+      title: "图片修图工具 × 前后对比",
       image: "/case-studies/ai-photo-before-after.png",
       href: "/report?case=demo_ai_tool",
       score: `${getDemoResult("demo_ai_tool").total} → ${aiToolEvidence.adjustedResult.total}`,
       decision: bandLabel(aiToolEvidence.rigor.gatedBand),
-      note: "使用场景成立，但品牌安全风险会影响推荐稳定性。"
+      note: "适合验证转化素材，但需要提前检查平台和品牌风险。"
     },
     {
       title: "LEGO × F1 比赛周末",
@@ -53,7 +53,7 @@ export default function HomePage() {
       href: "/workspace",
       score: `${legoWinner.baselineResult.total} → ${legoWinner.adjustedResult.total}`,
       decision: bandLabel(legoWinner.rigor.gatedBand),
-      note: "在多个候选热点中，F1 的产品桥梁和创意格式最清晰。"
+      note: "适合作为比赛周末内容主题，优先做轻量营销动作。"
     }
   ];
 
@@ -71,10 +71,10 @@ export default function HomePage() {
               体验工作台
             </Link>
             <Link className="simple-secondary" href="/report?case=demo_fashion">
-              查看案例
+              查看适用场景
             </Link>
           </div>
-          <div className="simple-stats" aria-label="项目可信度">
+          <div className="simple-stats" aria-label="产品价值">
             {heroStats.map(([label, value]) => (
               <div key={label}>
                 <strong>{value}</strong>
@@ -86,7 +86,7 @@ export default function HomePage() {
 
         <div className="simple-product-preview" aria-label="决策预览">
           <div className="preview-topline">
-            <span>示例案例</span>
+            <span>当前评估</span>
             <strong>中端男装 × 静奢风</strong>
           </div>
           <div className="preview-score">
@@ -104,8 +104,8 @@ export default function HomePage() {
               <strong>{gateLabel(fashionEvidence.rigor.evidenceGate)}</strong>
             </div>
           </div>
-          <p>分数不是结论。只有证据足够，系统才允许强建议。</p>
-          <Link href="/workspace">打开完整演示</Link>
+          <p>先判断是否值得跟进，再决定投内容、达人还是广告预算。</p>
+          <Link href="/workspace">开始一次评估</Link>
         </div>
       </section>
 
@@ -113,7 +113,7 @@ export default function HomePage() {
         <div>
           <h2>它解决的是“要不要蹭热点”的中间判断。</h2>
           <p>
-            热点工具告诉你什么流行，达人工具告诉你谁有流量。这个项目判断的是：产品能不能自然参与，以及证据是否足够支持行动。
+            热点工具告诉你什么流行，达人工具告诉你谁有流量。Trend-Fit 判断的是：你的产品是否适合加入这波话题，以及下一步该怎么试。
           </p>
         </div>
         <ul>
@@ -126,14 +126,14 @@ export default function HomePage() {
 
       <section className="simple-section simple-how" aria-label="判断方式">
         <div className="simple-section-heading">
-          <h2>简单展示，严谨判断。</h2>
-          <p>面试官先看到结果，有兴趣时再进入工作台看完整证据链。</p>
+          <h2>从热点到行动，三步完成。</h2>
+          <p>不用先搭复杂调研流程，先把产品、热点和风险放到同一张判断表里。</p>
         </div>
         <div className="simple-steps">
           {[
-            ["1", "输入产品和热点", "手动给出初始判断，不让系统凭空编造基准分。"],
-            ["2", "加入真实证据", "每条来源先过分类器，榜单软文和未验证搜索不会变成强证据。"],
-            ["3", "输出行动建议", "高分也可能被降级，最终建议更接近可执行决策。"]
+            ["1", "描述你的产品", "输入市场、目标人群、核心卖点和风险偏好。"],
+            ["2", "选择候选热点", "把想追的话题放进来，快速比较哪一个更适合。"],
+            ["3", "拿到下一步动作", "输出跟进、测试、观望或不建议，并给出优先验证方向。"]
           ].map(([index, title, body]) => (
             <article key={index}>
               <span>{index}</span>
@@ -146,8 +146,8 @@ export default function HomePage() {
 
       <section className="simple-section simple-cases" aria-label="案例展示">
         <div className="simple-section-heading">
-          <h2>三个案例，十秒看懂。</h2>
-          <p>保留最适合展示的案例，不把所有模型细节堆在首页。</p>
+          <h2>适合这些增长场景。</h2>
+          <p>当团队拿不准某个热点值不值得做时，先用它把方向排清楚。</p>
         </div>
         <div className="simple-case-grid">
           {cases.map((item) => (

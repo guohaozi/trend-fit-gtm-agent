@@ -77,10 +77,10 @@ describe("page route smoke tests", () => {
 
     assert.match(text, /产品该不该追热点？/);
     assert.match(text, /体验工作台/);
-    assert.match(text, /查看案例/);
+    assert.match(text, /查看适用场景/);
     assert.match(text, /要不要蹭热点/);
-    assert.match(text, /简单展示，严谨判断。/);
-    assert.match(text, /三个案例，十秒看懂。/);
+    assert.match(text, /从热点到行动，三步完成。/);
+    assert.match(text, /适合这些增长场景。/);
   });
 
   it("renders the workspace page (and loads the WorkspaceClient module)", () => {
