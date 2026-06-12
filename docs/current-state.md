@@ -102,9 +102,10 @@ capped as proxy), `organic push`; evidence snack raw `76` gate `pass` Go, modera
 - `app/api/workspace/google-trends/route.ts` — server-only SerpApi run (key never from
   browser; `fixture:true` replays `examples/google-trends-workspace.fixture.json`).
 - Evidence trust tightening: Google Trends related queries must share a trend token and
-  obvious SEO/spam queries are dropped before evidence mapping. OpenCLI Twitter/Google rows
-  and generic fixture/web search hits are `unverified` (`proxy` / `low`); structured SerpApi
-  Trends findings remain `verified`.
+  obvious SEO/spam queries are dropped before evidence mapping. Queries that keep a real
+  trend token but pile on more than 4 unrelated tokens are dropped too. OpenCLI
+  Twitter/Google rows and generic fixture/web search hits are `unverified` (`proxy` /
+  `low`); structured SerpApi Trends findings remain `verified`.
 - `scripts/verify-serpapi.ts` — one-off live SerpApi check; key stays in caller's env.
 - Skills: `skills/trend-product-fit/` (SKILL.md + scoring_rubric, risk_taxonomy,
   brand_voice_rules, examples, evidence_model, weight_profiles, **source_tier_classifier.md**);
@@ -117,7 +118,7 @@ Routes: `/`, `/product-profile`, `/trend-input`, `/fit-score`, `/report`, `/work
 demo_robotics|demo_ai_tool|demo_snack` · `profile=default|brand_awareness|
 ecommerce_conversion|b2b_pipeline|creator_seeding|risk_sensitive`.
 
-Verification: `npm test` → **118 passing**; `npm run build` succeeds; CI
+Verification: `npm test` → **119 passing**; `npm run build` succeeds; CI
 (`.github/workflows/ci.yml`) runs `npm ci`, `npm test`, `npm run build` on push/PR.
 
 ## Known issues
@@ -163,5 +164,5 @@ Verification: `npm test` → **118 passing**; `npm run build` succeeds; CI
 cd /Users/guo/gtm/trend-fit-gtm-agent
 git status --short --branch   # expect: ## main...origin/main, clean
 git log -3 --oneline          # newest commit = your starting point
-npm test                      # 118 passing
+npm test                      # 119 passing
 ```
