@@ -260,7 +260,7 @@ function resultToCandidate(result: ResearchSearchResult, index: number): Evidenc
     magnitude: spec.magnitude,
     desiredConfidence: spec.confidence,
     sourceUrl: result.url,
-    verificationStatus: "verified",
+    verificationStatus: "unverified",
     sourceSignals,
     note: `${result.title}. ${result.snippet} Search query: ${result.query}.`
   };

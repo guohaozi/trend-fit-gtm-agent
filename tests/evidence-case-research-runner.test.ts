@@ -109,7 +109,20 @@ describe("evidence case research runner", () => {
     const report = fs.readFileSync(result.fileResult.reportPath, "utf8");
 
     assert.equal(evidence.profileUsed, "b2b_pipeline");
-    assert.equal(evidence.expectedAdjustedScores.commercialIntent, 100);
+    assert.equal(evidence.expectedAdjustedScores.commercialIntent, 75);
+    assert.deepEqual(
+      evidence.evidence.map((item: { sourceTier: string; confidence: string; note: string }) => [
+        item.sourceTier,
+        item.confidence,
+        item.note.startsWith("UNVERIFIED:")
+      ]),
+      [
+        ["proxy", "low", true],
+        ["proxy", "low", true],
+        ["proxy", "low", true],
+        ["proxy", "low", true]
+      ]
+    );
     assert.match(report, /DJI drones x video creation, security inspection, and tourism enablement in Middle East/);
     assert.match(report, /Candidates received: \*\*4\*\*/);
   });

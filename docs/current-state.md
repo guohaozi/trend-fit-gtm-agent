@@ -101,6 +101,10 @@ capped as proxy), `organic push`; evidence snack raw `76` gate `pass` Go, modera
   bridges `/workspace` UI state into scoring/rigor/shortlist.
 - `app/api/workspace/google-trends/route.ts` — server-only SerpApi run (key never from
   browser; `fixture:true` replays `examples/google-trends-workspace.fixture.json`).
+- Evidence trust tightening: Google Trends related queries must share a trend token and
+  obvious SEO/spam queries are dropped before evidence mapping. OpenCLI Twitter/Google rows
+  and generic fixture/web search hits are `unverified` (`proxy` / `low`); structured SerpApi
+  Trends findings remain `verified`.
 - `scripts/verify-serpapi.ts` — one-off live SerpApi check; key stays in caller's env.
 - Skills: `skills/trend-product-fit/` (SKILL.md + scoring_rubric, risk_taxonomy,
   brand_voice_rules, examples, evidence_model, weight_profiles, **source_tier_classifier.md**);
@@ -113,14 +117,11 @@ Routes: `/`, `/product-profile`, `/trend-input`, `/fit-score`, `/report`, `/work
 demo_robotics|demo_ai_tool|demo_snack` · `profile=default|brand_awareness|
 ecommerce_conversion|b2b_pipeline|creator_seeding|risk_sensitive`.
 
-Verification: `npm test` → **117 passing**; `npm run build` succeeds; CI
+Verification: `npm test` → **118 passing**; `npm run build` succeeds; CI
 (`.github/workflows/ci.yml`) runs `npm ci`, `npm test`, `npm run build` on push/PR.
 
 ## Known issues
 
-- Google Trends `related_queries` can include spam/noise even for a clean trend term
-  ("labubu", SEO-spam strings) that flows through as breakout/buying evidence — **a
-  relevance filter is the top data-quality follow-up.**
 - Trends are manual; no auto-discovery (intentional). Shortlist ranks supplied candidates only.
 - Browser-triggered OpenCLI/GooseWorks/marketplace/social collection not wired into the UI
   (Google Trends is, via the server route + fixture replay). No DB/auth/persistence — only
@@ -129,18 +130,17 @@ Verification: `npm test` → **117 passing**; `npm run build` succeeds; CI
   binary); route-level smoke tests now cover `/workspace` + all pages.
 - Weights are expert priors, not calibrated. **Do not invent a calibration set without real
   campaign outcomes** (violates the evidence rule).
-- `verificationStatus` is still hardcoded `"verified"` for some web/search candidates (the
-  no-data SerpApi path is now guarded; the web path is not).
+- `verificationStatus` is source-specific by design. Structured SerpApi Google Trends findings
+  are `verified`; unread OpenCLI Twitter/Google rows and fixture/web search hits are
+  `unverified`. Future providers should keep this distinction.
 
 ## Next steps
 
-1. **Google Trends related_queries relevance filter** (highest leverage): related query must
-   share a trend token; drop obvious SEO-spam before it becomes evidence.
-2. **One real end-to-end through `/workspace`** with a live `SERPAPI_API_KEY` (rotate the key
+1. **One real end-to-end through `/workspace`** with a live `SERPAPI_API_KEY` (rotate the key
    first — it was shared in chat): confirm browser → API → classifier → score on real data.
-3. Provider health checks in the workspace panel before live OpenCLI/GooseWorks execution.
-4. Xiaohongshu / TikTok social-language mappers; marketplace/review providers.
-5. Portfolio screenshots / short case-study page.
+2. Provider health checks in the workspace panel before live OpenCLI/GooseWorks execution.
+3. Xiaohongshu / TikTok social-language mappers; marketplace/review providers.
+4. Portfolio screenshots / short case-study page.
 
 ## Gotchas / ops
 
@@ -163,5 +163,5 @@ Verification: `npm test` → **117 passing**; `npm run build` succeeds; CI
 cd /Users/guo/gtm/trend-fit-gtm-agent
 git status --short --branch   # expect: ## main...origin/main, clean
 git log -3 --oneline          # newest commit = your starting point
-npm test                      # 117 passing
+npm test                      # 118 passing
 ```

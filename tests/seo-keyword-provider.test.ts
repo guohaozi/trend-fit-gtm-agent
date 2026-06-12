@@ -262,6 +262,31 @@ describe("SEO keyword provider", () => {
     );
   });
 
+  it("filters unrelated or spammy Google Trends related queries before evidence mapping", () => {
+    const findings = serpApiKeywordResearchToFindings({
+      idPrefix: "labubu",
+      sourceUrl: "https://serpapi.com/search?engine=google_trends&q=labubu",
+      relatedQueries: {
+        rising: [
+          { query: "ac repair near me", formatted_value: "Breakout" },
+          { query: "labubu seo traffic service", formatted_value: "Breakout" },
+          { query: "labubu doll", formatted_value: "Breakout" },
+          { query: "where to buy labubu", formatted_value: "+120%" }
+        ],
+        top: [{ query: "labubu", value: 100 }]
+      },
+      trend: undefined
+    });
+
+    assert.deepEqual(
+      findings.map((finding) => [finding.signal, finding.query]),
+      [
+        ["breakout_keyword", "labubu doll"],
+        ["related_buying_query", "where to buy labubu"]
+      ]
+    );
+  });
+
   it("feeds SEO keyword candidates through draft building and evidence-case generation", () => {
     const candidates = seoKeywordFindingsToCandidates([
       {

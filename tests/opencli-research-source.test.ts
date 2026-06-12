@@ -141,8 +141,10 @@ describe("OpenCLI research source", () => {
     assert.equal(candidates.length, 4);
     assert.equal(candidates[0].id, "opencli-twitter-audience-language-tweet123");
     assert.equal(candidates[0].dimension, "audienceOverlap");
+    assert.equal(candidates[0].verificationStatus, "unverified");
     assert.deepEqual(candidates[0].sourceSignals, ["single_social_thread"]);
     assert.equal(candidates.some((candidate) => candidate.id === "opencli-google-audience-language-1"), true);
+    assert.equal(candidates.find((candidate) => candidate.id === "opencli-google-audience-language-1")?.verificationStatus, "unverified");
     assert.equal(candidates[3].dimension, "brandSafety");
   });
 

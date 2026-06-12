@@ -223,7 +223,7 @@ function twitterRowsToCandidates(theme: CustomerResearchTheme, rows: Array<Recor
       id: `opencli-twitter-${theme.replaceAll("_", "-")}-${id}`,
       ...spec,
       sourceUrl: url,
-      verificationStatus: "verified",
+      verificationStatus: "unverified",
       sourceSignals: ["single_social_thread"],
       note: [
         "OpenCLI Twitter/X search hit.",
@@ -254,7 +254,7 @@ function googleRowsToCandidates(theme: CustomerResearchTheme, rows: Array<Record
       id: `opencli-google-${theme.replaceAll("_", "-")}-${index + 1}`,
       ...spec,
       sourceUrl: url,
-      verificationStatus: "verified",
+      verificationStatus: "unverified",
       sourceSignals: lane === "brandSafety" ? ["research_report"] : ["unknown"],
       note: [
         "OpenCLI Google search result.",

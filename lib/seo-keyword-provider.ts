@@ -50,6 +50,22 @@ export type SerpApiKeywordResearchInput = {
 };
 
 const BUYING_QUERY_PATTERN = /\b(buy|price|where to buy|near me|review|reviews|worth it|coupon|discount|best)\b/i;
+const RELATED_QUERY_SPAM_PATTERN = /\b(seo|backlink|traffic service|traffic bot|followers|views|plumbing|hvac)\b/i;
+const RELATED_QUERY_STOP_WORDS = new Set([
+  "and",
+  "best",
+  "buy",
+  "for",
+  "how",
+  "near",
+  "price",
+  "review",
+  "reviews",
+  "the",
+  "to",
+  "where",
+  "with"
+]);
 const DEFAULT_SERPAPI_DATE = "today 12-m";
 const GOOGLE_TRENDS_ENGINE = "google_trends";
 const TREND_RISING_THRESHOLD = 15;
@@ -153,6 +169,23 @@ function parseGrowthPercent(formattedValue: string | undefined): number | null {
   if (!formattedValue?.includes("%")) return null;
   const parsed = Number.parseInt(formattedValue.replace(/[+%,]/g, ""), 10);
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+function queryTokens(value: string): Set<string> {
+  return new Set(
+    value
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter((token) => token.length > 1 && !RELATED_QUERY_STOP_WORDS.has(token))
+  );
+}
+
+function isRelevantRelatedQuery(query: string, trendQuery: string): boolean {
+  if (RELATED_QUERY_SPAM_PATTERN.test(query)) return false;
+  const trendTokens = queryTokens(trendQuery);
+  if (trendTokens.size === 0) return true;
+  const relatedTokens = queryTokens(query);
+  return [...trendTokens].some((token) => relatedTokens.has(token));
 }
 
 function formatNote(finding: SeoKeywordFinding): string {
@@ -419,6 +452,7 @@ export function serpApiKeywordResearchToFindings({
   for (const item of relatedQueries?.rising ?? []) {
     const query = item.query?.trim();
     if (!query) continue;
+    if (!isRelevantRelatedQuery(query, idPrefix)) continue;
 
     const signal = growthSignal(item.formatted_value);
     if (signal === "breakout_keyword") {

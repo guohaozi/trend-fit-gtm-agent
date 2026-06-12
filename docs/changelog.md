@@ -6,6 +6,10 @@ one-to-two-line summaries, newest first.
 
 ## 2026-06-11
 
+- **Evidence trust tightening** — Google Trends related queries now require trend-token
+  overlap and drop obvious SEO/spam before evidence mapping. OpenCLI Twitter/Google rows and
+  fixture/web search hits are now `unverified` (`proxy` / `low`), while structured SerpApi
+  Trends findings stay `verified`.
 - **Handoff docs condensed** — `current-state.md` (972→~180 lines) and `changelog.md`
   trimmed to remove duplicated sections and historical round-by-round detail; full history
   stays in git.
