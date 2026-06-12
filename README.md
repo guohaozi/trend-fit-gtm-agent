@@ -8,11 +8,11 @@ Trend-Fit GTM Agent 位于“趋势发现工具”和“达人/投放工具”�
 
 ## 演示入口
 
-本地开发服务启动后可以打开：
+线上演示（已部署到 Vercel，无需本地环境，公开 demo 默认走 fixture，不暴露 key）：
 
-- 官网首页：[http://127.0.0.1:3000](http://127.0.0.1:3000)
-- GTM 工作台：[http://127.0.0.1:3000/workspace](http://127.0.0.1:3000/workspace)
-- 主证据案例：[http://127.0.0.1:3000/report?case=demo_fashion](http://127.0.0.1:3000/report?case=demo_fashion)
+- 官网首页：[https://trend-fit-seven.vercel.app](https://trend-fit-seven.vercel.app)
+- GTM 工作台：[https://trend-fit-seven.vercel.app/workspace](https://trend-fit-seven.vercel.app/workspace)
+- 主证据案例：[https://trend-fit-seven.vercel.app/report?case=demo_fashion](https://trend-fit-seven.vercel.app/report?case=demo_fashion)
 
 本地运行：
 
@@ -176,7 +176,7 @@ Trend-Fit 把这套判断显性化、结构化，并保留可审计的证据链�
 下载某个 demo 报告：
 
 ```bash
-curl -i http://127.0.0.1:3000/api/report/demo_fashion
+curl -i https://trend-fit-seven.vercel.app/api/report/demo_fashion
 ```
 
 ### `POST /api/workspace/google-trends`
@@ -184,7 +184,7 @@ curl -i http://127.0.0.1:3000/api/report/demo_fashion
 使用已提交的 fixture 回放，不需要 API key：
 
 ```bash
-curl -X POST http://127.0.0.1:3000/api/workspace/google-trends \
+curl -X POST https://trend-fit-seven.vercel.app/api/workspace/google-trends \
   -H "Content-Type: application/json" \
   -d '{
     "product": "LEGO",
@@ -198,15 +198,15 @@ curl -X POST http://127.0.0.1:3000/api/workspace/google-trends \
 
 ## 部署与固定域名
 
-当前还没有固定线上域名，只有本地地址。简历项目建议这样处理：
+已部署到 Vercel，线上地址：**[https://trend-fit-seven.vercel.app](https://trend-fit-seven.vercel.app)**（README 顶部“演示入口”即为此地址；公开 demo 默认走 fixture，不暴露 key）。
 
-1. 先部署到 Vercel，拿到稳定的 Vercel Production URL，例如 `https://trend-fit-gtm-agent.vercel.app`。如果名称被占用，Vercel 会给可用变体。
-2. 如果要更正式，购买或使用自己的域名，例如 `trendfitgtm.com` 或 `gtm.yourdomain.com`。
-3. 在 Vercel 项目 `Settings -> Domains` 添加域名，按 Vercel 给出的 DNS 记录配置。
-4. 子域名通常用 CNAME 指向 Vercel；根域名按 Vercel 控制台提示配置 A/CNAME 记录。
-5. 公开部署前先轮换任何在聊天或截图里出现过的 SerpApi key；公开 demo 默认走 fixture，不需要暴露 key。
+如果之后想用更正式的自定义域名：
 
-部署完成后，把 README 顶部的“演示入口”替换为固定线上链接，并在 GitHub repo 右侧 About 区域填入同一个 URL。你同学的 FitFuel 项目就是这种展示方式。
+1. 购买或使用自己的域名，例如 `trendfitgtm.com` 或 `gtm.yourdomain.com`。
+2. 在 Vercel 项目 `Settings -> Domains` 添加域名，按 Vercel 给出的 DNS 记录配置。
+3. 子域名通常用 CNAME 指向 Vercel；根域名按 Vercel 控制台提示配置 A/CNAME 记录。
+
+注意：公开部署前轮换任何在聊天或截图里出现过的 SerpApi key。真实 SerpApi 调用走服务端环境变量 `SERPAPI_API_KEY`，公开 demo 不依赖它。
 
 ## 脚本
 
@@ -260,7 +260,7 @@ trend-fit-gtm-agent/
 
 ## 当前缺口
 
-- 尚未部署到公开固定域名。
+- 已部署到 Vercel（[trend-fit-seven.vercel.app](https://trend-fit-seven.vercel.app)），暂未绑定自定义域名。
 - 热点仍需要人工输入；产品到热点的自动发现暂不在本版范围内。
 - TikTok、小红书、市场评论、社媒语言等 live provider 还没有接入工作台 UI。
 - 如果旧 SerpApi key 曾在聊天中共享，公开部署前必须轮换。

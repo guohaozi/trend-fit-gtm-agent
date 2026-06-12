@@ -380,7 +380,7 @@ export function WorkspaceClient() {
     setProviderRunStatus("running");
     setProviderRunMessage(fixture ? "正在 replay committed Google Trends fixture..." : "正在通过 server API 拉取 Google Trends...");
 
-    try {
+    const requestTrends = async (useFixture: boolean) => {
       const response = await fetch("/api/workspace/google-trends", {
         method: "POST",
         headers: {
@@ -390,10 +390,25 @@ export function WorkspaceClient() {
           product: product.name,
           market: product.market,
           trend: targetCandidate.trendName,
-          fixture
+          fixture: useFixture
         })
       });
       const payload = await response.json() as GoogleTrendsProviderPayload;
+      return { response, payload };
+    };
+
+    try {
+      let { response, payload } = await requestTrends(fixture);
+      let usedFixtureFallback = false;
+
+      // Graceful fallback: a public deploy has no SERPAPI_API_KEY, so a live run returns 503.
+      // Replay the committed fixture instead of showing a setup error — the demo keeps working
+      // for every visitor, with zero SerpApi quota and no key exposure.
+      if (!fixture && response.status === 503) {
+        setProviderRunMessage("服务器未配置 SerpApi key，改用内置 fixture 演示数据回放...");
+        ({ response, payload } = await requestTrends(true));
+        usedFixtureFallback = true;
+      }
 
       if (!response.ok) {
         throw new Error(payload.error ?? "Google Trends provider failed.");
@@ -408,8 +423,10 @@ export function WorkspaceClient() {
       });
       setActiveCandidateIndex(resolvedTargetIndex);
       setProviderRunStatus("succeeded");
+      const usedFixture = fixture || usedFixtureFallback;
+      const fallbackPrefix = usedFixtureFallback ? "服务器未配置 key，已用 fixture 演示数据：" : "";
       setProviderRunMessage(
-        `已追加 ${rows.length} 条 ${fixture ? "fixture" : "Google Trends"} 证据；${payload.evidenceCount ?? rows.length} 条可计入评分。`
+        `${fallbackPrefix}已追加 ${rows.length} 条 ${usedFixture ? "fixture" : "Google Trends"} 证据；${payload.evidenceCount ?? rows.length} 条可计入评分。`
       );
     } catch (error) {
       setProviderRunStatus("failed");
@@ -927,7 +944,7 @@ function ProviderPreviewPanel({
           disabled={runStatus === "running"}
           onClick={onRunGoogleTrends}
         >
-          {runStatus === "running" ? "运行中..." : "运行 Google Trends"}
+          {runStatus === "running" ? "运行中..." : "运行 Google Trends（实时）"}
         </button>
         <button
           className="secondary-action"
@@ -935,7 +952,7 @@ function ProviderPreviewPanel({
           disabled={runStatus === "running"}
           onClick={onRunFixture}
         >
-          运行 Fixture
+          运行 Fixture（演示数据）
         </button>
         <span className={runStatus === "failed" ? "provider-run-error" : ""} aria-live="polite">
           {runMessage || " "}

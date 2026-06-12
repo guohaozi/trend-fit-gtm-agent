@@ -6,6 +6,16 @@ one-to-two-line summaries, newest first.
 
 ## 2026-06-12
 
+- **Workspace Google Trends fixture fallback** — the live "运行 Google Trends（实时）" button now
+  falls back to the committed fixture when the server returns 503 (no `SERPAPI_API_KEY`),
+  surfacing a "演示数据" notice instead of a setup error. A public deploy stays usable for every
+  visitor at zero SerpApi quota (each live run = 2 SerpApi calls; free tier ~100/mo). Buttons
+  relabeled 实时 / 演示数据. Set `SERPAPI_API_KEY` in Vercel later to serve real data.
+- **Deployed to Vercel + doc sync** — live at https://trend-fit-seven.vercel.app (GitHub
+  About URL already set to it). README demo links / deploy section / "current gaps" and
+  `current-state.md` Known issues + Next steps updated from "not deployed yet" to the live URL;
+  README curl examples now hit the prod host. Remaining: click-through verify prod
+  `/workspace` `/report` `/fit-score` + fixture Trends button; rotate the shared SerpApi key.
 - **Chinese portfolio homepage** — `/` is now a resume-ready Chinese product showcase with a
   gated decision panel, proof strip, evidence discipline, workspace preview, and visual case
   cards backed by the real demo/evidence data.

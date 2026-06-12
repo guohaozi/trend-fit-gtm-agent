@@ -153,15 +153,17 @@ verified after restarting the local dev server.
 
 ## Known issues
 
-- No public Vercel deployment or fixed domain is configured yet. Local demo works only while
-  `npm run dev` is running; use `http://127.0.0.1:3000` or `http://localhost:3000`.
+- Deployed to Vercel: https://trend-fit-seven.vercel.app (homepage verified live). No custom
+  domain yet — the `*.vercel.app` URL is the public demo. Local dev still works via
+  `npm run dev` at `http://127.0.0.1:3000`. Note: `/workspace`, `/report`, `/fit-score` and the
+  fixture Google Trends button were not yet click-through-verified on the prod deploy — do a
+  browser pass to confirm the interactive paths.
 - Trends are manual; no auto-discovery (intentional). Shortlist ranks supplied candidates only.
 - Browser-triggered OpenCLI/GooseWorks/marketplace/social collection not wired into the UI
   (Google Trends is, via the server route + fixture replay). No DB/auth/persistence — only
   localStorage + JSON export.
-- Vercel CLI is not installed locally. A sandboxed `npx vercel` could not resolve npm, and an
-  elevated npm download/execute request was blocked by safety review. Recommended deployment
-  path is Vercel web UI + GitHub repo import.
+- Vercel deploy was done via the Vercel web UI + GitHub repo import (Vercel CLI is not
+  installed locally). Redeploys happen automatically on push to `main`.
 - Weights are expert priors, not calibrated. **Do not invent a calibration set without real
   campaign outcomes** (violates the evidence rule).
 - `verificationStatus` is source-specific by design. Structured SerpApi Google Trends findings
@@ -170,9 +172,9 @@ verified after restarting the local dev server.
 
 ## Next steps
 
-1. **Deploy to Vercel via GitHub import**, then update README demo links and the GitHub repo
-   About URL. A stable `*.vercel.app` URL is enough for resume use; a custom domain can be
-   added later without changing the app.
+1. **Set the GitHub repo About URL** to https://trend-fit-seven.vercel.app, and click-through
+   verify the prod interactive pages (`/workspace`, `/report`, `/fit-score`, fixture Google
+   Trends button, case images). README demo links already point to the live URL.
 2. **One real end-to-end through `/workspace`** with a live `SERPAPI_API_KEY` (rotate the key
    first — it was shared in chat): confirm browser → API → classifier → score on real data.
 3. Provider health checks in the workspace panel before live OpenCLI/GooseWorks execution.
