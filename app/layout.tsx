@@ -46,6 +46,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </header>
           <main>{children}</main>
+          <footer className="site-footer">
+            <span>Trend-Fit · 产品 × 热点适配决策层</span>
+            <nav aria-label="次要导航">
+              <Link href="/cases">案例展示</Link>
+              <Link href="/evaluate">开始评估</Link>
+              <Link href="/workspace">高级 / 引擎视图</Link>
+            </nav>
+          </footer>
         </div>
       </body>
     </html>

@@ -30,9 +30,17 @@ one-to-two-line summaries, newest first.
 - **Chinese localization** — evidence-finding notes (`competitor-research-provider`,
   `seo-keyword-provider`) and `scoring.ts` override reasons are now Chinese;
   `tests/scoring.test.ts` assertions synced.
-- **Verification** — `npm test` 124/124 (added `/evaluate` + `/cases` route smoke tests),
-  `npm run build` 15 pages; browser-verified the homepage, `/cases`, and the full `/evaluate`
-  flow on desktop.
+- **Phase 3 — IA cleanup** — deleted the retired demo-tour pages (`/product-profile`,
+  `/trend-input`, `/fit-score`, `/report`) and the 7 components only they used (`WorkflowNav`,
+  `CaseSwitcher`, `ProfileSwitcher`, `PageHeader`, `ProductProfileForm`, `TrendInputForm`,
+  `RecommendationCard`); `/api/report/[id]` download stays. `/workspace` demoted from a primary
+  CTA to a new site-footer "高级 / 引擎视图" link. Removed a 641-line dead `.home-*` /
+  `.case-study-*` old-homepage CSS block (all classes verified unused). README routes table +
+  demo links point at the new IA. Routes are now `/`, `/evaluate`, `/cases`, `/cases/[id]`,
+  `/workspace` (+ APIs).
+- **Verification** — `npm test` 120/120 (Phase 3 dropped the 4 retired-page smoke tests),
+  `npm run build` clean; browser-verified the homepage, `/cases`, the full `/evaluate` flow,
+  and the new footer on desktop; retired routes return 404.
 
 ---
 

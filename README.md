@@ -11,8 +11,9 @@ Trend-Fit GTM Agent 位于“趋势发现工具”和“达人/投放工具”�
 线上演示（已部署到 Vercel，无需本地环境，公开 demo 默认走 fixture，不暴露 key）：
 
 - 官网首页：[https://trend-fit-seven.vercel.app](https://trend-fit-seven.vercel.app)
-- GTM 工作台：[https://trend-fit-seven.vercel.app/workspace](https://trend-fit-seven.vercel.app/workspace)
-- 主证据案例：[https://trend-fit-seven.vercel.app/report?case=demo_fashion](https://trend-fit-seven.vercel.app/report?case=demo_fashion)
+- 开始评估（分析师式流程）：[https://trend-fit-seven.vercel.app/evaluate](https://trend-fit-seven.vercel.app/evaluate)
+- 案例展示（一页式详情）：[https://trend-fit-seven.vercel.app/cases](https://trend-fit-seven.vercel.app/cases)
+- GTM 工作台（高级 / 引擎视图）：[https://trend-fit-seven.vercel.app/workspace](https://trend-fit-seven.vercel.app/workspace)
 
 本地运行：
 
@@ -155,19 +156,16 @@ Trend-Fit 把这套判断显性化、结构化，并保留可审计的证据链�
 
 | 路由 | 用途 |
 |---|---|
-| `/` | 中文官网首页和项目展示页。 |
-| `/workspace` | 主工作台：评分、排序、证据行、fixture 回放、导入导出、Markdown 导出。 |
-| `/product-profile` | Demo 产品档案页。 |
-| `/trend-input` | Demo 热点输入页。 |
-| `/fit-score` | 七维评分拆解和推荐结果。 |
-| `/report` | 按案例渲染完整 GTM 简报。 |
+| `/` | 中文官网首页：两个主入口「开始评估」「案例展示」。 |
+| `/evaluate` | 分析师式评估：填产品画像 + 候选热点七维打分 → 确定性评分、门槛裁决、证据缺口、可下载 GTM 简报。 |
+| `/cases` | 案例画廊。 |
+| `/cases/[id]` | 一页式案例详情（输入 + 评分 + 证据修正 + 简报，直出无等待，SSG 预渲染 fashion / ai_tool / snack）。 |
+| `/workspace` | 高级 / 引擎视图：评分、排序、证据行、fixture 回放、导入导出、Markdown 导出。 |
 | `/api/report/[id]` | 下载已知案例的 Markdown 报告，未知 id 会回退到默认 demo。 |
 | `/api/workspace/google-trends` | 服务端 SerpApi Google Trends 调用，或 fixture 回放。 |
 
-常用 query 参数：
-
-- `case=demo_fashion|demo_robotics|demo_ai_tool|demo_snack|demo_protein_drink`
-- `profile=default|brand_awareness|ecommerce_conversion|b2b_pipeline|creator_seeding|risk_sensitive`
+`/cases/[id]` 与 `/api/report/[id]` 的有效案例 id：`demo_fashion`、`demo_robotics`、
+`demo_ai_tool`、`demo_snack`、`demo_protein_drink`（未知 id 回退到默认 demo）。
 
 ## API 示例
 

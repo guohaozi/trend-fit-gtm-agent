@@ -15,10 +15,6 @@ import HomePage from "../app/page";
 import EvaluatePage from "../app/evaluate/page";
 import CasesPage from "../app/cases/page";
 import CaseDetailPage from "../app/cases/[id]/page";
-import FitScorePage from "../app/fit-score/page";
-import ReportPage from "../app/report/page";
-import ProductProfilePage from "../app/product-profile/page";
-import TrendInputPage from "../app/trend-input/page";
 import WorkspacePage from "../app/workspace/page";
 
 // Every known demo case plus an unknown id, which must fall back to the default
@@ -27,8 +23,6 @@ import WorkspacePage from "../app/workspace/page";
 // evaluates its whole component/import graph, and calling the page function
 // runs the real demo-data loading path.
 const CASE_IDS = ["demo_fashion", "demo_robotics", "demo_ai_tool", "demo_snack", "demo_protein_drink"] as const;
-const CASE_INPUTS = [undefined, ...CASE_IDS, "unknown-case"] as const;
-const PROFILE_INPUTS = [undefined, "risk_sensitive", "ecommerce_conversion", "not-a-profile"] as const;
 
 function assertRenderable(node: unknown, label: string): void {
   // A React element is a truthy object; we deliberately avoid asserting the
@@ -125,38 +119,6 @@ describe("page route smoke tests", () => {
       const node = await CaseDetailPage({ params: Promise.resolve({ id }) });
       assertRenderable(node, `CaseDetailPage(id=${id})`);
       assert.match(collectText(node), /证据修正后/);
-    }
-  });
-
-  it("renders the product-profile page for every case input", async () => {
-    for (const caseId of CASE_INPUTS) {
-      const node = await ProductProfilePage({ searchParams: Promise.resolve({ case: caseId }) });
-      assertRenderable(node, `ProductProfilePage(case=${caseId})`);
-    }
-  });
-
-  it("renders the trend-input page for every case input", async () => {
-    for (const caseId of CASE_INPUTS) {
-      const node = await TrendInputPage({ searchParams: Promise.resolve({ case: caseId }) });
-      assertRenderable(node, `TrendInputPage(case=${caseId})`);
-    }
-  });
-
-  it("renders the fit-score page across cases and profiles", async () => {
-    for (const caseId of CASE_INPUTS) {
-      for (const profile of PROFILE_INPUTS) {
-        const node = await FitScorePage({ searchParams: Promise.resolve({ case: caseId, profile }) });
-        assertRenderable(node, `FitScorePage(case=${caseId}, profile=${profile})`);
-      }
-    }
-  });
-
-  it("renders the report page across cases and profiles", async () => {
-    for (const caseId of CASE_INPUTS) {
-      for (const profile of PROFILE_INPUTS) {
-        const node = await ReportPage({ searchParams: Promise.resolve({ case: caseId, profile }) });
-        assertRenderable(node, `ReportPage(case=${caseId}, profile=${profile})`);
-      }
     }
   });
 });

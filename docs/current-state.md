@@ -54,10 +54,15 @@ Verification: `npm test` **124/124**, `npm run build` 15 pages. Browser-verified
 end-to-end (example scores 73 → gated 建议跟进, gate 证据不足, 3 blocking evidence gaps,
 4-section brief) and the `/cases` gallery + detail on desktop.
 
-**Still pending — Phase 3 (cleanup):** retire the `/product-profile`, `/trend-input`,
-`/fit-score`, `/report` multi-page tour + `WorkflowNav` (keep `/api/report/[id]`); demote
-`/workspace` to a footer "advanced / engine" link; delete the old dark `.simple-*` dead CSS;
-point the GitHub About URL + any localhost links at the live domain.
+**Phase 3 (cleanup) — done in the same session:** deleted the `/product-profile`,
+`/trend-input`, `/fit-score`, `/report` page routes + the 7 components only they used
+(`WorkflowNav`, `CaseSwitcher`, `ProfileSwitcher`, `PageHeader`, `ProductProfileForm`,
+`TrendInputForm`, `RecommendationCard`); the `/api/report/[id]` download stays. `/workspace`
+is no longer a primary CTA — it now lives in a new site footer ("高级 / 引擎视图"). Deleted a
+641-line dead `.home-*` / `.case-study-*` old-homepage CSS block (every class verified unused
+in TSX; tangled dead-class remnants inside shared `@media` blocks were left — they target no
+live element). README routes table + demo links updated to the new IA. **Remaining loose end:
+set the GitHub About URL to the live domain** (a repo setting, not in-code).
 
 ## Prior handoff (2026-06-12)
 
@@ -118,9 +123,10 @@ the host context when debugging this symptom.
 - **Workspace UI** (`/workspace`, the deep engine): edit product/market/3 candidate trends/7
   anchor scores/evidence rows; single-trend scoring or shortlist ranking; run Google Trends or
   replay a fixture; auto-save to localStorage + JSON import/export. `sourceTier` is read-only
-  (classifier-owned). Kept for the depth story; Phase 3 will demote its nav entry.
-- `/product-profile`, `/trend-input`, `/fit-score`, `/report` are the older read-only demo-tour
-  screens, **pending retirement in Phase 3** (the `/api/report/[id]` download stays).
+  (classifier-owned). Kept for the depth story; reachable from the site footer ("高级 / 引擎视图").
+- The old read-only demo-tour screens (`/product-profile`, `/trend-input`, `/fit-score`,
+  `/report`) were **retired in Phase 3**. The `/api/report/[id]` Markdown download stays (used
+  by `/cases/[id]`).
 - **CLI**: `npm run evidence:case:research -- --product … --market … --trend … --provider
   google-trends|opencli …` → writes `data/*_evidence.json` + `outputs/*_evidence_case.md`.
 
@@ -191,16 +197,18 @@ capped as proxy), `organic push`; evidence snack raw `76` gate `pass` Go, modera
   `outreach-copy` switches to creator discovery when evidence is thin.
 
 Routes: `/`, `/evaluate`, `/cases`, `/cases/[id]` (SSG: demo_fashion / demo_ai_tool /
-demo_snack), `/workspace`, `/product-profile`, `/trend-input`, `/fit-score`, `/report`
-(last four pending Phase 3 retirement), `/api/report/[id]`, `/api/workspace/google-trends`.
-Query params (legacy tour + report): `case=demo_fashion|demo_robotics|demo_ai_tool|demo_snack|
-demo_protein_drink` · `profile=default|brand_awareness|ecommerce_conversion|b2b_pipeline|
-creator_seeding|risk_sensitive`.
+demo_snack), `/workspace`, `/api/report/[id]`, `/api/workspace/google-trends`. Valid case ids
+for `/cases/[id]` + `/api/report/[id]`: `demo_fashion|demo_robotics|demo_ai_tool|demo_snack|
+demo_protein_drink` (unknown → default demo). The `?case=`/`?profile=` query params went away
+with the retired demo tour; weight profiles still exist in code
+(`default|brand_awareness|ecommerce_conversion|b2b_pipeline|creator_seeding|risk_sensitive`,
+default used by `/evaluate` unless changed).
 
-Verification: `npm test` → **124 passing**; `npm run build` succeeds (15 pages); CI
-(`.github/workflows/ci.yml`) runs `npm ci`, `npm test`, `npm run build` on push/PR. Route
-smoke tests now also cover `/evaluate`, `/cases`, and `/cases/[id]`. Browser checks were run
-for the homepage, `/cases` gallery + detail, and the full `/evaluate` flow on desktop.
+Verification: `npm test` → **120 passing** (Phase 3 removed the 4 retired-page smoke tests);
+`npm run build` succeeds; CI (`.github/workflows/ci.yml`) runs `npm ci`, `npm test`,
+`npm run build` on push/PR. Route smoke tests cover `/`, `/evaluate`, `/cases`, `/cases/[id]`,
+`/workspace`, and the `/api/report/[id]` download. Browser checks were run for the homepage,
+`/cases` gallery + detail, and the full `/evaluate` flow on desktop.
 
 ## Known issues
 
@@ -223,17 +231,15 @@ for the homepage, `/cases` gallery + detail, and the full `/evaluate` flow on de
 
 ## Next steps
 
-1. **Phase 3 — IA cleanup**: retire the `/product-profile`, `/trend-input`, `/fit-score`,
-   `/report` multi-page tour + `WorkflowNav` (keep `/api/report/[id]`); demote `/workspace`
-   nav to a footer "advanced / engine" link; delete the old dark `.simple-*` dead CSS in
-   `globals.css`; verify `/evaluate` + `/cases` on mobile.
-2. **Set the GitHub repo About URL** to https://trend-fit-seven.vercel.app and click-through
-   verify the prod interactive pages (`/evaluate`, `/cases`, fixture Google Trends button,
-   case images) after this push redeploys.
-3. **One real end-to-end through `/workspace`** with a live `SERPAPI_API_KEY` (rotate the key
+1. **Set the GitHub repo About URL** to https://trend-fit-seven.vercel.app and click-through
+   verify the prod pages (`/evaluate`, `/cases`, `/cases/[id]`, `/workspace` fixture Google
+   Trends button, case images) after this push redeploys. Mobile pass for `/evaluate` + `/cases`.
+2. **One real end-to-end through `/workspace`** with a live `SERPAPI_API_KEY` (rotate the key
    first — it was shared in chat): confirm browser → API → classifier → score on real data.
-4. Provider health checks in the workspace panel before live OpenCLI/GooseWorks execution.
-5. Xiaohongshu / TikTok social-language mappers; marketplace/review providers.
+3. Provider health checks in the workspace panel before live OpenCLI/GooseWorks execution.
+4. Xiaohongshu / TikTok social-language mappers; marketplace/review providers.
+5. Optional: prune the dead-class remnants still left inside shared `@media` blocks in
+   `globals.css` (harmless — they target no live element).
 
 ## Gotchas / ops
 
