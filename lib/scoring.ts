@@ -68,7 +68,7 @@ export function applyOverrides(
     return {
       rawBand,
       finalBand: "No-go",
-      overrideReason: "Forced No-go because low risk tolerance cannot accept Brand Safety below 50.",
+      overrideReason: "风险偏好为低时无法接受品牌安全低于 50，已强制判为「不建议」。",
       qualifier
     };
   }
@@ -77,7 +77,7 @@ export function applyOverrides(
     return {
       rawBand,
       finalBand: capBand(rawBand, "Cautious test"),
-      overrideReason: "Capped at Cautious test because Brand Safety is 25 or lower.",
+      overrideReason: "品牌安全不高于 25，结果已封顶为「谨慎测试」。",
       qualifier
     };
   }
@@ -86,7 +86,7 @@ export function applyOverrides(
     return {
       rawBand,
       finalBand: capBand(rawBand, "Weak fit"),
-      overrideReason: "Capped at Weak fit because both audience and use-case fit are weak.",
+      overrideReason: "受众匹配与使用场景相关性均偏弱，结果已封顶为「弱适配」。",
       qualifier
     };
   }

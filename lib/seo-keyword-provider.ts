@@ -472,7 +472,7 @@ export function serpApiKeywordResearchToFindings({
         sourceUrl,
         verificationStatus: "verified",
         growthLabel: item.formatted_value,
-        note: "Related query is marked as breakout growth."
+        note: "相关查询被标记为爆发式增长。"
       });
     }
 
@@ -485,7 +485,7 @@ export function serpApiKeywordResearchToFindings({
         sourceUrl,
         verificationStatus: "verified",
         growthLabel: item.formatted_value,
-        note: "Related query contains buying or evaluation language."
+        note: "相关查询包含购买或评估意图的措辞。"
       });
     }
   }
@@ -499,7 +499,7 @@ export function serpApiKeywordResearchToFindings({
       sourceUrl,
       verificationStatus: "verified",
       changePct: trend.change_pct,
-      note: "Timeseries recent average is rising."
+      note: "时间序列近期均值在上升。"
     });
   }
   if (trend?.direction === "DECLINING") {
@@ -510,7 +510,7 @@ export function serpApiKeywordResearchToFindings({
       sourceUrl,
       verificationStatus: "verified",
       changePct: trend.change_pct,
-      note: "Timeseries recent average is declining."
+      note: "时间序列近期均值在下降。"
     });
   }
 

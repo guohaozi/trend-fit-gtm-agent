@@ -166,7 +166,7 @@ export function competitorProfileExtractsToFindings(
         confidence: "medium",
         intensity: "weak",
         quote: extract.targetAudience,
-        note: "Competitor positioning names an audience adjacent to the product's target."
+        note: "竞品定位指向了与本产品目标相邻的受众。"
       });
     }
 
@@ -179,7 +179,7 @@ export function competitorProfileExtractsToFindings(
         confidence: "high",
         intensity: "moderate",
         quote: extract.onTrend,
-        note: "Competitor directly uses the trend or an equivalent campaign format."
+        note: "竞品直接使用了该热点或等效的活动形式。"
       });
     }
 
@@ -192,7 +192,7 @@ export function competitorProfileExtractsToFindings(
         confidence: "high",
         intensity: "moderate",
         quote: extract.contentAngle,
-        note: "Competitor campaign reveals a usable content or message bridge."
+        note: "竞品活动显示出可用的内容或信息桥接。"
       });
     }
 
@@ -205,7 +205,7 @@ export function competitorProfileExtractsToFindings(
         confidence: "high",
         intensity: "strong",
         quote: extract.saturationRead,
-        note: "Competitor activity suggests saturation or crowding risk."
+        note: "竞品动作显示出饱和或拥挤风险。"
       });
     }
 
@@ -218,7 +218,7 @@ export function competitorProfileExtractsToFindings(
         confidence: "medium",
         intensity: "moderate",
         quote: extract.backlashQuote,
-        note: "Competitor coverage or review language shows backlash risk."
+        note: "竞品报道或评价措辞显示出反弹风险。"
       });
     }
 
@@ -231,7 +231,7 @@ export function competitorProfileExtractsToFindings(
         confidence: "medium",
         intensity: "moderate",
         quote: extract.whereToBuyQuote,
-        note: "Competitor comments or reviews show purchase or workflow evaluation intent."
+        note: "竞品评论或评价显示出购买或工作流评估意图。"
       });
     }
   }

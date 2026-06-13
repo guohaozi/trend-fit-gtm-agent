@@ -133,7 +133,7 @@ describe("Trend-Fit scoring contract", () => {
 
     assert.equal(result.recommendation.rawBand, "Strong Go");
     assert.equal(result.recommendation.finalBand, "Cautious test");
-    assert.match(result.recommendation.overrideReason ?? "", /Brand Safety/);
+    assert.match(result.recommendation.overrideReason ?? "", /品牌安全/);
   });
 
   it("forces No-go for low risk tolerance when brand safety is below 50", () => {
@@ -150,7 +150,7 @@ describe("Trend-Fit scoring contract", () => {
     const result = calculateTrendFit(scores, "low");
 
     assert.equal(result.recommendation.finalBand, "No-go");
-    assert.match(result.recommendation.overrideReason ?? "", /low risk tolerance/);
+    assert.match(result.recommendation.overrideReason ?? "", /风险偏好为低/);
   });
 
   it("caps weak audience and use-case fit at Weak fit", () => {
@@ -168,7 +168,7 @@ describe("Trend-Fit scoring contract", () => {
 
     assert.equal(getBand(result.total), "Go");
     assert.equal(result.recommendation.finalBand, "Weak fit");
-    assert.match(result.recommendation.overrideReason ?? "", /audience and use-case/);
+    assert.match(result.recommendation.overrideReason ?? "", /受众匹配与使用场景/);
   });
 
   it("applies the strongest override when more than one rule fires", () => {
@@ -187,6 +187,6 @@ describe("Trend-Fit scoring contract", () => {
     );
 
     assert.equal(result.finalBand, "No-go");
-    assert.match(result.overrideReason ?? "", /low risk tolerance/);
+    assert.match(result.overrideReason ?? "", /风险偏好为低/);
   });
 });
