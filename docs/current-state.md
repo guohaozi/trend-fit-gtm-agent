@@ -1,6 +1,6 @@
 # Current State — Trend-Fit GTM Agent
 
-Last updated: 2026-06-12. Main is pushed to origin; run `git log -1` for the exact HEAD
+Last updated: 2026-06-13. Main is pushed to origin; run `git log -1` for the exact HEAD
 (do not hardcode a commit hash here — it goes stale on every commit).
 
 Compact handoff snapshot for the next Codex / Claude conversation. **Full change history
@@ -22,7 +22,44 @@ an outcome-calibrated sales predictor.
 writes a GTM brief. A "product → candidate trends" discovery layer is intentionally out of
 scope for now.
 
-## Latest conversation handoff (2026-06-12)
+## Latest conversation handoff (2026-06-13)
+
+Customer-facing IA restructure (Claude, Phases 0–2). The user's diagnosis: the site was two
+disconnected apps — a read-only 4-step demo tour (`/product-profile → /trend-input →
+/fit-score → /report`) and the dense `/workspace` — with inconsistent nav verbs. Decision:
+**「开始评估」is an analyst-style flow** (the engine cannot auto-score from free text — the 7
+anchor scores are an *input*, so the user supplies them), and **do a full IA restructure**.
+
+- **Homepage** (`/`): two primary CTAs — `开始评估 → /evaluate`, `案例展示 → /cases`. Topbar
+  verbs unified to the same two. Case cards gained a score legend ("基准分 → 证据修正后") and
+  now link to `/cases/[id]`. Homepage + gallery share `getFeaturedCaseCards()` in
+  `lib/demo-cases.ts` (featured: fashion / ai_tool / snack).
+- **`/evaluate`** (`components/EvaluateClient.tsx`, client): product-profile form + candidate
+  trends with 7-dimension segmented `{0,25,50,75,100}` scoring → click 评估 → ~700ms reveal
+  loading → 1 trend uses `evaluateSingleWorkspaceTrend`, ≥2 uses `evaluateWorkspaceShortlist`
+  → signature score + gated band / gate / stability + `buildWorkspaceEvidenceGaps` +
+  downloadable brief (`render*WorkspaceMarkdown`, rendered via `ReportViewer`). With no
+  evidence the gate fails and the result teaches exactly what evidence to collect — the
+  evidence-discipline differentiator made visible.
+- **`/cases`** gallery + **`/cases/[id]`** one-page detail (SSG, 3 prerendered): input summary
+  + signature verdict + RigorSummary + ScoreBreakdown + EvidenceComparison + ReportViewer, all
+  instant, no submit/spinner. The dark `RecommendationCard` was dropped to keep the page light.
+- **ReportViewer bug fix**: section `key`/`id` was derived from the heading text, but workspace
+  briefs have Chinese-only `##` titles → empty ids → duplicate keys *silently dropped sections*.
+  Keys are now index-based (list/table item keys too).
+- **Chinese localization** of evidence-finding notes (`competitor-research-provider`,
+  `seo-keyword-provider`) and `scoring.ts` override reasons; `tests/scoring.test.ts` synced.
+
+Verification: `npm test` **124/124**, `npm run build` 15 pages. Browser-verified `/evaluate`
+end-to-end (example scores 73 → gated 建议跟进, gate 证据不足, 3 blocking evidence gaps,
+4-section brief) and the `/cases` gallery + detail on desktop.
+
+**Still pending — Phase 3 (cleanup):** retire the `/product-profile`, `/trend-input`,
+`/fit-score`, `/report` multi-page tour + `WorkflowNav` (keep `/api/report/[id]`); demote
+`/workspace` to a footer "advanced / engine" link; delete the old dark `.simple-*` dead CSS;
+point the GitHub About URL + any localhost links at the live domain.
+
+## Prior handoff (2026-06-12)
 
 User compared the project against a classmate's FitFuel Prep portfolio project and asked for
 a stronger resume-ready presentation. The project now has a Chinese-first homepage and a
@@ -68,16 +105,22 @@ the host context when debugging this symptom.
    `outputs/demo_*_report.md` mirror those demo briefs. Evidence collection still writes
    `outputs/*_evidence_case.md` + `data/*_evidence.json`.
 
-## How it runs (two entry points)
+## How it runs (customer-facing entry points)
 
-- **Chinese portfolio homepage** (`/`): resume-facing entry with decision preview,
-  evidence discipline, workspace preview, and visual case-study cards. This is now the best
-  page to show first in a portfolio/demo context.
-- **Workspace UI** (`/workspace`, the real entry): edit product/market/3 candidate
-  trends/7 anchor scores/evidence rows; single-trend scoring or shortlist ranking; run
-  Google Trends or replay a fixture; auto-save to localStorage + JSON import/export.
-  `sourceTier` is read-only (classifier-owned). `/product-profile` and `/trend-input` are
-  older demo-review screens.
+- **Homepage** (`/`): resume-facing entry; opens with the gated decision question and two
+  primary CTAs — `开始评估 → /evaluate` and `案例展示 → /cases`.
+- **`/evaluate`** (analyst-style flow): fill the product profile + candidate trends, score the
+  7 dimensions on `{0,25,50,75,100}`, click 评估 → ~700ms reveal → signature score + gated
+  decision + evidence gaps + downloadable GTM brief. Deterministic + local (no API call); the
+  engine does not invent the 7 anchor scores.
+- **`/cases`** + **`/cases/[id]`**: one-page case detail (input + score + brief, instant) for
+  the featured demos — the "no submit, no spinner" gallery for quick show-and-tell.
+- **Workspace UI** (`/workspace`, the deep engine): edit product/market/3 candidate trends/7
+  anchor scores/evidence rows; single-trend scoring or shortlist ranking; run Google Trends or
+  replay a fixture; auto-save to localStorage + JSON import/export. `sourceTier` is read-only
+  (classifier-owned). Kept for the depth story; Phase 3 will demote its nav entry.
+- `/product-profile`, `/trend-input`, `/fit-score`, `/report` are the older read-only demo-tour
+  screens, **pending retirement in Phase 3** (the `/api/report/[id]` download stays).
 - **CLI**: `npm run evidence:case:research -- --product … --market … --trend … --provider
   google-trends|opencli …` → writes `data/*_evidence.json` + `outputs/*_evidence_case.md`.
 
@@ -147,16 +190,17 @@ capped as proxy), `organic push`; evidence snack raw `76` gate `pass` Go, modera
   `evidence-collector`. `campaign-generator` only emits a full plan after gate pass;
   `outreach-copy` switches to creator discovery when evidence is thin.
 
-Routes: `/`, `/product-profile`, `/trend-input`, `/fit-score`, `/report`, `/workspace`,
-`/api/report/[id]`, `/api/workspace/google-trends`. Query params: `case=demo_fashion|
-demo_robotics|demo_ai_tool|demo_snack|demo_protein_drink` · `profile=default|brand_awareness|
-ecommerce_conversion|b2b_pipeline|creator_seeding|risk_sensitive`.
+Routes: `/`, `/evaluate`, `/cases`, `/cases/[id]` (SSG: demo_fashion / demo_ai_tool /
+demo_snack), `/workspace`, `/product-profile`, `/trend-input`, `/fit-score`, `/report`
+(last four pending Phase 3 retirement), `/api/report/[id]`, `/api/workspace/google-trends`.
+Query params (legacy tour + report): `case=demo_fashion|demo_robotics|demo_ai_tool|demo_snack|
+demo_protein_drink` · `profile=default|brand_awareness|ecommerce_conversion|b2b_pipeline|
+creator_seeding|risk_sensitive`.
 
-Verification: `npm test` → **120 passing**; `npm run build` succeeds; CI
-(`.github/workflows/ci.yml`) runs `npm ci`, `npm test`, `npm run build` on push/PR.
-Browser checks were run for the homepage on desktop and mobile: Chinese H1 renders, no
-horizontal overflow, case images load, no console errors. `/workspace` click-through was also
-verified after restarting the local dev server.
+Verification: `npm test` → **124 passing**; `npm run build` succeeds (15 pages); CI
+(`.github/workflows/ci.yml`) runs `npm ci`, `npm test`, `npm run build` on push/PR. Route
+smoke tests now also cover `/evaluate`, `/cases`, and `/cases/[id]`. Browser checks were run
+for the homepage, `/cases` gallery + detail, and the full `/evaluate` flow on desktop.
 
 ## Known issues
 
@@ -179,14 +223,17 @@ verified after restarting the local dev server.
 
 ## Next steps
 
-1. **Set the GitHub repo About URL** to https://trend-fit-seven.vercel.app, and click-through
-   verify the prod interactive pages (`/workspace`, `/report`, `/fit-score`, fixture Google
-   Trends button, case images). README demo links already point to the live URL.
-2. **One real end-to-end through `/workspace`** with a live `SERPAPI_API_KEY` (rotate the key
+1. **Phase 3 — IA cleanup**: retire the `/product-profile`, `/trend-input`, `/fit-score`,
+   `/report` multi-page tour + `WorkflowNav` (keep `/api/report/[id]`); demote `/workspace`
+   nav to a footer "advanced / engine" link; delete the old dark `.simple-*` dead CSS in
+   `globals.css`; verify `/evaluate` + `/cases` on mobile.
+2. **Set the GitHub repo About URL** to https://trend-fit-seven.vercel.app and click-through
+   verify the prod interactive pages (`/evaluate`, `/cases`, fixture Google Trends button,
+   case images) after this push redeploys.
+3. **One real end-to-end through `/workspace`** with a live `SERPAPI_API_KEY` (rotate the key
    first — it was shared in chat): confirm browser → API → classifier → score on real data.
-3. Provider health checks in the workspace panel before live OpenCLI/GooseWorks execution.
-4. Xiaohongshu / TikTok social-language mappers; marketplace/review providers.
-5. Add a short public case-study page once the Vercel URL exists.
+4. Provider health checks in the workspace panel before live OpenCLI/GooseWorks execution.
+5. Xiaohongshu / TikTok social-language mappers; marketplace/review providers.
 
 ## Gotchas / ops
 
@@ -212,5 +259,5 @@ verified after restarting the local dev server.
 cd /Users/guo/gtm/trend-fit-gtm-agent
 git status --short --branch   # expect: ## main...origin/main, clean
 git log -3 --oneline          # newest commit = your starting point
-npm test                      # 120 passing
+npm test                      # 124 passing
 ```

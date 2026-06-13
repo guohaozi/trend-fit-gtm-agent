@@ -435,3 +435,54 @@ export function getReportFileName(id?: string | null): string {
 export function getCaseLabel(demo: DemoCase): string {
   return `${formatCategory(demo.product.category)} × ${demo.trend.name}`;
 }
+
+export const FEATURED_CASE_META: Array<{
+  id: string;
+  title: string;
+  image: string;
+  note: string;
+}> = [
+  {
+    id: "demo_fashion",
+    title: "中端男装 × 静奢风",
+    image: "/case-studies/quiet-luxury-fashion.png",
+    note: "适合先做内容测试，再决定是否扩大预算。"
+  },
+  {
+    id: "demo_ai_tool",
+    title: "图片修图工具 × 前后对比",
+    image: "/case-studies/ai-photo-before-after.png",
+    note: "适合验证转化素材，但需要提前检查平台和品牌风险。"
+  },
+  {
+    id: "demo_snack",
+    title: "零食 × 迪拜风开心果脆",
+    image: "/case-studies/dubai-chocolate.png",
+    note: "适合限量上新测试，不适合直接做大规模品牌重塑。"
+  }
+];
+
+export type FeaturedCaseCard = (typeof FEATURED_CASE_META)[number] & {
+  baselineTotal: number;
+  adjustedTotal: number;
+  decisionBand: Band;
+};
+
+export function isFeaturedCase(id?: string | null): boolean {
+  return FEATURED_CASE_META.some((meta) => meta.id === id);
+}
+
+export function getFeaturedCaseCards(): FeaturedCaseCard[] {
+  return FEATURED_CASE_META.map((meta) => {
+    const evidence = getEvidenceResult(meta.id);
+    if (!evidence) {
+      throw new Error(`精选案例 ${meta.id} 缺少证据修正结果。`);
+    }
+    return {
+      ...meta,
+      baselineTotal: getDemoResult(meta.id).total,
+      adjustedTotal: evidence.adjustedResult.total,
+      decisionBand: evidence.rigor.gatedBand
+    };
+  });
+}

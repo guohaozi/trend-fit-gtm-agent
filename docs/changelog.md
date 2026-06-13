@@ -4,6 +4,38 @@ Condensed milestone log for Codex / Claude handoff. **Full detail for any entry 
 `git log` (commit messages) and in this file's own git history** — entries here are
 one-to-two-line summaries, newest first.
 
+## 2026-06-13
+
+- **Customer-facing IA restructure** — the homepage now leads with two CTAs, `开始评估 →
+  /evaluate` and `案例展示 → /cases`, and the topbar verbs match. Case cards gained a
+  "基准分 → 证据修正后" score legend and link to the new one-page case details. Homepage +
+  gallery share `getFeaturedCaseCards()` (`lib/demo-cases.ts`; featured fashion / ai_tool /
+  snack).
+- **`/evaluate` analyst flow** — new `components/EvaluateClient.tsx`: product-profile form +
+  candidate trends with 7-dimension segmented `{0,25,50,75,100}` scoring → 评估 → ~700ms reveal
+  → deterministic score + gated band / gate / stability + evidence gaps + downloadable GTM
+  brief. 1 trend → `evaluateSingleWorkspaceTrend`, ≥2 → `evaluateWorkspaceShortlist`. With no
+  evidence the gate fails and the result spells out what evidence to collect — the
+  evidence-discipline differentiator made interactive. The engine still does not invent the 7
+  anchor scores; the analyst supplies them.
+- **`/cases` gallery + `/cases/[id]` one-page detail** — SSG-prerendered case pages that stack
+  input summary + signature verdict + RigorSummary + ScoreBreakdown + EvidenceComparison +
+  ReportViewer with no submit/spinner. Replaces the read-only 4-step demo tour for show-and-tell
+  (old tour pending Phase 3 retirement). Dropped the dark `RecommendationCard` to keep the page
+  light.
+- **ReportViewer dropped-section fix** — section `key`/`id` was derived from the heading text;
+  workspace briefs have Chinese-only `##` titles → empty ids → duplicate keys *silently dropped
+  sections*. Keys are now index-based (list + table item keys too), so the `/evaluate` brief
+  renders all four sections.
+- **Chinese localization** — evidence-finding notes (`competitor-research-provider`,
+  `seo-keyword-provider`) and `scoring.ts` override reasons are now Chinese;
+  `tests/scoring.test.ts` assertions synced.
+- **Verification** — `npm test` 124/124 (added `/evaluate` + `/cases` route smoke tests),
+  `npm run build` 15 pages; browser-verified the homepage, `/cases`, and the full `/evaluate`
+  flow on desktop.
+
+---
+
 ## 2026-06-12
 
 - **Chinese GTM brief output** — `/report`, `/api/report/[id]`, and

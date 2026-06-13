@@ -31,8 +31,8 @@ function renderBody(body: string) {
     if (block.type === "list") {
       return (
         <ul key={`list-${index}`}>
-          {block.items.map((item) => (
-            <li key={item}>{renderInline(item)}</li>
+          {block.items.map((item, itemIndex) => (
+            <li key={itemIndex}>{renderInline(item)}</li>
           ))}
         </ul>
       );
@@ -43,8 +43,8 @@ function renderBody(body: string) {
           <table>
             <thead>
               <tr>
-                {block.head.map((cell) => (
-                  <th key={cell}>{renderInline(cell)}</th>
+                {block.head.map((cell, cellIndex) => (
+                  <th key={cellIndex}>{renderInline(cell)}</th>
                 ))}
               </tr>
             </thead>
@@ -73,8 +73,12 @@ export function ReportViewer({ markdown }: ReportViewerProps) {
         <p className="eyebrow">标准 Markdown 简报</p>
         <h2>{titleLine.replace(/^#\s+/, "")}</h2>
       </header>
-      {sections.map((section) => (
-        <section className="report-section" id={section.id} key={section.id}>
+      {sections.map((section, index) => (
+        <section
+          className="report-section"
+          id={section.id || undefined}
+          key={section.id || `section-${index}`}
+        >
           <h3>{section.title}</h3>
           {renderBody(section.body)}
         </section>

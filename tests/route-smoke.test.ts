@@ -12,6 +12,9 @@ import * as React from "react";
 
 import { GET as reportRouteGet } from "../app/api/report/[id]/route";
 import HomePage from "../app/page";
+import EvaluatePage from "../app/evaluate/page";
+import CasesPage from "../app/cases/page";
+import CaseDetailPage from "../app/cases/[id]/page";
 import FitScorePage from "../app/fit-score/page";
 import ReportPage from "../app/report/page";
 import ProductProfilePage from "../app/product-profile/page";
@@ -90,12 +93,12 @@ describe("page route smoke tests", () => {
     assertRenderable(HomePage(), "HomePage");
   });
 
-  it("surfaces the redesigned homepage story and workspace entry points", () => {
+  it("surfaces the redesigned homepage story and primary entry points", () => {
     const text = collectText(HomePage());
 
     assert.match(text, /产品该不该追热点？/);
-    assert.match(text, /体验工作台/);
-    assert.match(text, /查看适用场景/);
+    assert.match(text, /开始评估/);
+    assert.match(text, /案例展示/);
     assert.match(text, /要不要蹭热点/);
     assert.match(text, /从热点到行动，三步完成。/);
     assert.match(text, /适合这些增长场景。/);
@@ -103,6 +106,26 @@ describe("page route smoke tests", () => {
 
   it("renders the workspace page (and loads the WorkspaceClient module)", () => {
     assertRenderable(WorkspacePage(), "WorkspacePage");
+  });
+
+  it("renders the evaluate page (and loads the EvaluateClient module)", () => {
+    assertRenderable(EvaluatePage(), "EvaluatePage");
+  });
+
+  it("renders the cases gallery with the evidence legend and featured cards", () => {
+    const text = collectText(CasesPage());
+
+    assert.match(text, /案例展示/);
+    assert.match(text, /基准分 → 证据修正后/);
+    assert.match(text, /中端男装 × 静奢风/);
+  });
+
+  it("renders a one-page case detail for every featured case", async () => {
+    for (const id of ["demo_fashion", "demo_ai_tool", "demo_snack"]) {
+      const node = await CaseDetailPage({ params: Promise.resolve({ id }) });
+      assertRenderable(node, `CaseDetailPage(id=${id})`);
+      assert.match(collectText(node), /证据修正后/);
+    }
   });
 
   it("renders the product-profile page for every case input", async () => {

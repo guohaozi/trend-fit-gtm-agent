@@ -1,8 +1,6 @@
 import Link from "next/link";
-import { getDemoResult, getEvidenceResult } from "@/lib/demo-cases";
+import { getEvidenceResult, getFeaturedCaseCards } from "@/lib/demo-cases";
 import { BAND_LABELS, EVIDENCE_GATE_LABELS } from "@/lib/display-labels";
-import { buildTrendShortlist, type TrendShortlistInput } from "@/lib/trend-shortlist";
-import legoShortlistFixture from "@/data/lego_trend_shortlist.json";
 import type { Band } from "@/lib/types";
 
 function bandLabel(band: Band): string {
@@ -15,12 +13,8 @@ function gateLabel(gate: string): string {
 
 export default function HomePage() {
   const fashionEvidence = getEvidenceResult("demo_fashion");
-  const aiToolEvidence = getEvidenceResult("demo_ai_tool");
-  const snackEvidence = getEvidenceResult("demo_snack");
-  const legoShortlist = buildTrendShortlist(legoShortlistFixture as TrendShortlistInput);
-  const legoWinner = legoShortlist.winner;
 
-  if (!fashionEvidence || !aiToolEvidence || !snackEvidence) {
+  if (!fashionEvidence) {
     throw new Error("Homepage evidence cases are missing.");
   }
 
@@ -30,32 +24,14 @@ export default function HomePage() {
     ["输出", "行动建议"]
   ];
 
-  const cases = [
-    {
-      title: "中端男装 × 静奢风",
-      image: "/case-studies/quiet-luxury-fashion.png",
-      href: "/report?case=demo_fashion",
-      score: `${getDemoResult("demo_fashion").total} → ${fashionEvidence.adjustedResult.total}`,
-      decision: bandLabel(fashionEvidence.rigor.gatedBand),
-      note: "适合先做内容测试，再决定是否扩大预算。"
-    },
-    {
-      title: "图片修图工具 × 前后对比",
-      image: "/case-studies/ai-photo-before-after.png",
-      href: "/report?case=demo_ai_tool",
-      score: `${getDemoResult("demo_ai_tool").total} → ${aiToolEvidence.adjustedResult.total}`,
-      decision: bandLabel(aiToolEvidence.rigor.gatedBand),
-      note: "适合验证转化素材，但需要提前检查平台和品牌风险。"
-    },
-    {
-      title: "LEGO × F1 比赛周末",
-      image: "/case-studies/lego-f1-shortlist.png",
-      href: "/workspace",
-      score: `${legoWinner.baselineResult.total} → ${legoWinner.adjustedResult.total}`,
-      decision: bandLabel(legoWinner.rigor.gatedBand),
-      note: "适合作为比赛周末内容主题，优先做轻量营销动作。"
-    }
-  ];
+  const cases = getFeaturedCaseCards().map((card) => ({
+    title: card.title,
+    image: card.image,
+    href: `/cases/${card.id}`,
+    score: `${card.baselineTotal} → ${card.adjustedTotal}`,
+    decision: bandLabel(card.decisionBand),
+    note: card.note
+  }));
 
   return (
     <div className="simple-home">
@@ -67,11 +43,11 @@ export default function HomePage() {
             输入产品、市场和候选热点，系统用评分、证据和门槛规则给出“跟进、测试、观望或不建议”的判断。
           </p>
           <div className="simple-actions">
-            <Link className="simple-primary" href="/workspace">
-              体验工作台
+            <Link className="simple-primary" href="/evaluate">
+              开始评估
             </Link>
-            <Link className="simple-secondary" href="/report?case=demo_fashion">
-              查看适用场景
+            <Link className="simple-secondary" href="/cases">
+              案例展示
             </Link>
           </div>
           <div className="simple-stats" aria-label="产品价值">
@@ -105,7 +81,7 @@ export default function HomePage() {
             </div>
           </div>
           <p>先判断是否值得跟进，再决定投内容、达人还是广告预算。</p>
-          <Link href="/workspace">开始一次评估</Link>
+          <Link href="/evaluate">开始一次评估</Link>
         </div>
       </section>
 
@@ -148,6 +124,9 @@ export default function HomePage() {
         <div className="simple-section-heading">
           <h2>适合这些增长场景。</h2>
           <p>当团队拿不准某个热点值不值得做时，先用它把方向排清楚。</p>
+          <p className="simple-cases-legend">
+            分数读作「<strong>基准分 → 证据修正后</strong>」：证据会把缺乏支撑的虚高分拉回真实区间。
+          </p>
         </div>
         <div className="simple-case-grid">
           {cases.map((item) => (
