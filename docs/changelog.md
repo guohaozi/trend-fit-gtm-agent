@@ -6,6 +6,16 @@ one-to-two-line summaries, newest first.
 
 ## 2026-06-13
 
+- **LLM auto baseline scoring (removes the manual-scoring step)** — new
+  `POST /api/evaluate/baseline` (`lib/baseline-scorer.ts`, `@anthropic-ai/sdk`,
+  `claude-opus-4-8`, forced strict tool use → 7 enum-constrained anchor scores `{0,25,50,75,100}`
+  + per-dimension rationale). `/evaluate` candidates gained a "✨ 用 Claude 评分" button that
+  fills the 7 scores so the analyst no longer has to enter them by hand; manual sliders remain as
+  an override. Narrative: Claude proposes a *baseline hypothesis* (never evidence, forbidden from
+  fabricating metrics/URLs); the deterministic engine + source-tier classifier + evidence gate
+  still discipline it. Missing `ANTHROPIC_API_KEY` → graceful `503` and the UI falls back to manual
+  scoring (verified); the real model call needs the key set (locally in `.env.local`, on Vercel).
+  `npm test` 127/127 (added pure-helper + route 503/400 tests).
 - **Customer-facing IA restructure** — the homepage now leads with two CTAs, `开始评估 →
   /evaluate` and `案例展示 → /cases`, and the topbar verbs match. Case cards gained a
   "基准分 → 证据修正后" score legend and link to the new one-page case details. Homepage +

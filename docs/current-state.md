@@ -94,9 +94,11 @@ the host context when debugging this symptom.
 ## Data flow (product + market + trend → brief)
 
 1. **Input**: product + market + candidate trend + risk tolerance (+ optional competitors).
-2. **Baseline scores**: 7 dimensions, each an anchor score `{0,25,50,75,100}` — a *human's*
-   initial judgment (demo JSON, or hand-edited in `/workspace`). The system does not invent
-   the baseline.
+2. **Baseline scores**: 7 dimensions, each an anchor score `{0,25,50,75,100}` — an initial
+   judgment from a human (demo JSON, hand-edited in `/workspace`/`/evaluate`) **or proposed by
+   Claude** via `/api/evaluate/baseline` (labeled a hypothesis, gated by evidence — see the LLM
+   baseline scoring section below). The engine still doesn't *invent* a trustworthy score: the
+   baseline is an assumption until evidence moves and the gate clears it.
 3. **Evidence collection**: `buildResearchQueries` splits the input into 7 lanes
    (audience / useCase / commercial / timingSaturation / brandSafety / competitor) across
    web/reddit/x/xiaohongshu/youtube, plus SerpApi Google Trends for Timing.
@@ -197,18 +199,35 @@ capped as proxy), `organic push`; evidence snack raw `76` gate `pass` Go, modera
   `outreach-copy` switches to creator discovery when evidence is thin.
 
 Routes: `/`, `/evaluate`, `/cases`, `/cases/[id]` (SSG: demo_fashion / demo_ai_tool /
-demo_snack), `/workspace`, `/api/report/[id]`, `/api/workspace/google-trends`. Valid case ids
+demo_snack), `/workspace`, `/api/report/[id]`, `/api/workspace/google-trends`,
+`/api/evaluate/baseline` (LLM baseline scoring). Valid case ids
 for `/cases/[id]` + `/api/report/[id]`: `demo_fashion|demo_robotics|demo_ai_tool|demo_snack|
 demo_protein_drink` (unknown → default demo). The `?case=`/`?profile=` query params went away
 with the retired demo tour; weight profiles still exist in code
 (`default|brand_awareness|ecommerce_conversion|b2b_pipeline|creator_seeding|risk_sensitive`,
 default used by `/evaluate` unless changed).
 
-Verification: `npm test` → **120 passing** (Phase 3 removed the 4 retired-page smoke tests);
-`npm run build` succeeds; CI (`.github/workflows/ci.yml`) runs `npm ci`, `npm test`,
-`npm run build` on push/PR. Route smoke tests cover `/`, `/evaluate`, `/cases`, `/cases/[id]`,
-`/workspace`, and the `/api/report/[id]` download. Browser checks were run for the homepage,
-`/cases` gallery + detail, and the full `/evaluate` flow on desktop.
+Verification: `npm test` → **127 passing**; `npm run build` succeeds; CI
+(`.github/workflows/ci.yml`) runs `npm ci`, `npm test`, `npm run build` on push/PR. Route smoke
+tests cover `/`, `/evaluate`, `/cases`, `/cases/[id]`, `/workspace`, the `/api/report/[id]`
+download, and `/api/evaluate/baseline` (503 no-key + 400 bad-input paths). Browser checks were run
+for the homepage, `/cases` gallery + detail, the full `/evaluate` flow, and the AI-scoring 503
+fallback on desktop. **Not yet end-to-end tested: the real Claude baseline call** — needs
+`ANTHROPIC_API_KEY` set (no key available in this environment).
+
+## LLM baseline scoring (2026-06-13) — answers "do users have to score manually?"
+
+The 7 anchor scores were always an *input* (the engine can't derive them from free text). `/evaluate`
+now offers a "✨ 用 Claude 评分" button per candidate that calls `POST /api/evaluate/baseline`
+(`lib/baseline-scorer.ts`, `@anthropic-ai/sdk` ^0.104, `claude-opus-4-8`, forced **strict tool use**
+with an `enum`-constrained schema → 7 anchor scores + per-dimension rationale; `snapToAnchor` guards
+the anchors). The model is instructed these are **reasoned baseline hypotheses, not evidence** (no
+fabricated metrics/URLs); the deterministic engine + source-tier classifier + evidence gate still
+discipline whatever it proposes — a Claude-proposed 90 is gated until evidence exists. Manual sliders
+remain as an override. **Graceful degradation:** no `ANTHROPIC_API_KEY` → `503` and the UI shows a
+setup notice + keeps manual scoring (mirrors the SerpApi fixture pattern). To enable real scoring, set
+`ANTHROPIC_API_KEY` locally in `.env.local` and on Vercel. This is also the first real LLM call in the
+project (deps were previously next/react only).
 
 ## Known issues
 
@@ -265,5 +284,5 @@ Verification: `npm test` → **120 passing** (Phase 3 removed the 4 retired-page
 cd /Users/guo/gtm/trend-fit-gtm-agent
 git status --short --branch   # expect: ## main...origin/main, clean
 git log -3 --oneline          # newest commit = your starting point
-npm test                      # 124 passing
+npm test                      # 127 passing
 ```

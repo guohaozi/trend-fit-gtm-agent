@@ -48,7 +48,11 @@ type EvaluateCandidate = {
   trendName: string;
   trendDescription: string;
   scores: Scores;
+  aiRationales?: Partial<Record<ScoreKey, string>>;
+  aiOverall?: string;
 };
+
+type AiScoreState = { status: "loading" | "setup" | "error"; message?: string };
 
 type EvalRow = {
   rank: number | null;
@@ -205,6 +209,7 @@ export function EvaluateClient() {
   const [phase, setPhase] = useState<"editing" | "loading" | "done">("editing");
   const [outcome, setOutcome] = useState<EvalOutcome | null>(null);
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
+  const [aiState, setAiState] = useState<Record<string, AiScoreState>>({});
   const resultRef = useRef<HTMLDivElement | null>(null);
 
   const canEvaluate =
@@ -232,6 +237,72 @@ export function EvaluateClient() {
 
   function removeCandidate(index: number) {
     setCandidates((prev) => (prev.length <= 1 ? prev : prev.filter((_, i) => i !== index)));
+  }
+
+  async function runAiScoring(index: number) {
+    const candidate = candidates[index];
+    if (!product.name.trim() || !candidate.trendName.trim()) return;
+
+    setAiState((prev) => ({ ...prev, [candidate.id]: { status: "loading" } }));
+    try {
+      const response = await fetch("/api/evaluate/baseline", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          product: {
+            name: product.name,
+            category: product.category,
+            market: product.market,
+            audience: product.audience,
+            positioning: product.positioning,
+            sellingPoints: product.sellingPoints,
+            brandTone: product.brandTone,
+            riskTolerance: product.riskTolerance
+          },
+          trend: { trendName: candidate.trendName, trendDescription: candidate.trendDescription }
+        })
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (response.status === 503) {
+        setAiState((prev) => ({
+          ...prev,
+          [candidate.id]: { status: "setup", message: data?.error ?? "需要配置 ANTHROPIC_API_KEY。" }
+        }));
+        return;
+      }
+      if (!response.ok || !data?.scores) {
+        setAiState((prev) => ({
+          ...prev,
+          [candidate.id]: { status: "error", message: data?.error ?? "自动评分失败。" }
+        }));
+        return;
+      }
+
+      setCandidates((prev) =>
+        prev.map((item, i) =>
+          i === index
+            ? {
+                ...item,
+                scores: data.scores as Scores,
+                aiRationales: data.rationales as Partial<Record<ScoreKey, string>>,
+                aiOverall: typeof data.overallRationale === "string" ? data.overallRationale : undefined
+              }
+            : item
+        )
+      );
+      setAiState((prev) => {
+        const next = { ...prev };
+        delete next[candidate.id];
+        return next;
+      });
+    } catch {
+      setAiState((prev) => ({
+        ...prev,
+        [candidate.id]: { status: "error", message: "网络错误，自动评分失败。" }
+      }));
+    }
   }
 
   function loadExample() {
@@ -299,6 +370,10 @@ export function EvaluateClient() {
           <strong>这是确定性、可审计的评分</strong>
           ——七维各取 0/25/50/75/100，固定权重加权，再叠加门槛与 override
           规则。没有证据支撑时，引擎会拒绝把高分升级成「强烈建议」，并直接告诉你还缺什么证据。
+          <span>
+            不想逐维打分？点每个热点上的「✨ 用 Claude 评分」，让 Claude 先提一版基线假设，你再微调——AI
+            负责提出，证据门槛负责约束。
+          </span>
         </div>
       </header>
 
@@ -417,11 +492,26 @@ export function EvaluateClient() {
               <article className="eval-candidate" key={candidate.id}>
                 <div className="eval-candidate-head">
                   <span className="eval-candidate-index">热点 {index + 1}</span>
-                  {candidates.length > 1 ? (
-                    <button type="button" className="eval-remove" onClick={() => removeCandidate(index)}>
-                      移除
+                  <div className="eval-candidate-tools">
+                    <button
+                      type="button"
+                      className="eval-ai-btn"
+                      onClick={() => runAiScoring(index)}
+                      disabled={
+                        aiState[candidate.id]?.status === "loading" ||
+                        product.name.trim().length === 0 ||
+                        candidate.trendName.trim().length === 0
+                      }
+                      title="让 Claude 先提一版七维基线分，你再微调"
+                    >
+                      {aiState[candidate.id]?.status === "loading" ? "Claude 评分中…" : "✨ 用 Claude 评分"}
                     </button>
-                  ) : null}
+                    {candidates.length > 1 ? (
+                      <button type="button" className="eval-remove" onClick={() => removeCandidate(index)}>
+                        移除
+                      </button>
+                    ) : null}
+                  </div>
                 </div>
 
                 <label className="eval-field eval-field-wide">
@@ -442,12 +532,28 @@ export function EvaluateClient() {
                   />
                 </label>
 
+                {aiState[candidate.id]?.status === "setup" ? (
+                  <p className="eval-ai-note setup">{aiState[candidate.id]?.message}</p>
+                ) : null}
+                {aiState[candidate.id]?.status === "error" ? (
+                  <p className="eval-ai-note error">{aiState[candidate.id]?.message}</p>
+                ) : null}
+                {candidate.aiOverall ? (
+                  <p className="eval-ai-note done">
+                    Claude 基线判断：{candidate.aiOverall}
+                    <span>（这是 AI 提出的假设，没有证据支撑；评估时会被门槛约束。你可以直接微调下面的分数。）</span>
+                  </p>
+                ) : null}
+
                 <div className="eval-scores">
                   {SCORE_META.map((dimension) => (
                     <div className="eval-score-row" key={dimension.key}>
                       <div className="eval-score-copy">
                         <strong>{dimension.label}</strong>
                         <small>{dimension.hint}</small>
+                        {candidate.aiRationales?.[dimension.key] ? (
+                          <small className="eval-ai-rationale">✨ {candidate.aiRationales[dimension.key]}</small>
+                        ) : null}
                       </div>
                       <div className="eval-score-options" role="radiogroup" aria-label={dimension.label}>
                         {SCORE_OPTIONS.map((value) => (

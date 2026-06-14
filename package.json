@@ -12,6 +12,7 @@
     "evidence:case:research": "node --import tsx scripts/evidence-case-research.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.104.1",
     "next": "^15.3.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

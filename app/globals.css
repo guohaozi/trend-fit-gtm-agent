@@ -3204,3 +3204,79 @@ th {
 .site-footer a:hover {
   color: var(--hl-pine);
 }
+
+/* ============================================================
+   /evaluate — Claude 自动基线评分 (AI score button + rationale)
+   ============================================================ */
+.eval-method span {
+  display: block;
+  margin-top: 8px;
+  color: var(--hl-muted);
+}
+
+.eval-candidate-tools {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.eval-ai-btn {
+  appearance: none;
+  border: 1px solid var(--hl-pine);
+  background: var(--hl-pine-wash);
+  color: var(--hl-pine-deep);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 6px 13px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease, opacity 150ms ease;
+}
+
+.eval-ai-btn:hover:not(:disabled) {
+  background: var(--hl-pine);
+  color: #ffffff;
+}
+
+.eval-ai-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.eval-ai-note {
+  margin: 0 0 4px;
+  padding: 10px 13px;
+  border-radius: 9px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.eval-ai-note.done {
+  background: var(--hl-pine-wash);
+  border: 1px solid var(--hl-line);
+  border-left: 3px solid var(--hl-pine);
+  color: var(--hl-ink);
+}
+
+.eval-ai-note.done span {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--hl-muted);
+}
+
+.eval-ai-note.setup {
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+.eval-ai-note.error {
+  background: var(--rose-soft);
+  color: var(--rose);
+}
+
+.eval-ai-rationale {
+  color: var(--hl-pine-deep) !important;
+  line-height: 1.5;
+}
