@@ -7,15 +7,22 @@ one-to-two-line summaries, newest first.
 ## 2026-06-13
 
 - **LLM auto baseline scoring (removes the manual-scoring step)** — new
-  `POST /api/evaluate/baseline` (`lib/baseline-scorer.ts`, `@anthropic-ai/sdk`,
-  `claude-opus-4-8`, forced strict tool use → 7 enum-constrained anchor scores `{0,25,50,75,100}`
-  + per-dimension rationale). `/evaluate` candidates gained a "✨ 用 Claude 评分" button that
-  fills the 7 scores so the analyst no longer has to enter them by hand; manual sliders remain as
-  an override. Narrative: Claude proposes a *baseline hypothesis* (never evidence, forbidden from
-  fabricating metrics/URLs); the deterministic engine + source-tier classifier + evidence gate
-  still discipline it. Missing `ANTHROPIC_API_KEY` → graceful `503` and the UI falls back to manual
-  scoring (verified); the real model call needs the key set (locally in `.env.local`, on Vercel).
-  `npm test` 127/127 (added pure-helper + route 503/400 tests).
+  `POST /api/evaluate/baseline` (`lib/baseline-scorer.ts`, **`@google/genai`**, **Gemini Flash**
+  `gemini-2.5-flash` via `GEMINI_MODEL`, structured `responseSchema` → 7 anchor scores
+  `{0,25,50,75,100}` + per-dimension rationale; `snapToAnchor` guards the anchors). `/evaluate`
+  candidates gained a "✨ 用 AI 评分" button that fills the 7 scores so the analyst no longer has
+  to enter them by hand; manual sliders remain as an override. Narrative: the model proposes a
+  *baseline hypothesis* (never evidence, forbidden from fabricating metrics/URLs); the
+  deterministic engine + source-tier classifier + evidence gate still discipline it. Runs on the
+  Gemini AI Studio **free tier**. Missing `GEMINI_API_KEY` → graceful `503` and the UI falls back
+  to manual scoring (verified); the real model call needs the key set (locally in `.env.local`, on
+  Vercel). *(Originally built on Anthropic; swapped to Gemini for the free tier.)*
+- **Cost-control gate** — new `lib/access-gate.ts`: registration code + per-code use quota (Upstash
+  Redis KV) + per-IP rate limit, wired into `/api/evaluate/baseline`. `/evaluate` gained a 注册码
+  input (localStorage, sent as `x-access-code`); the route consumes one use only on success and
+  returns `remaining`. **Graceful:** gating is disabled (open) until you set `ACCESS_CODES` +
+  `UPSTASH_REDIS_REST_URL`/`UPSTASH_REDIS_REST_TOKEN`. `npm test` 130/130 (added access-gate +
+  route tests); build passes.
 - **Customer-facing IA restructure** — the homepage now leads with two CTAs, `开始评估 →
   /evaluate` and `案例展示 → /cases`, and the topbar verbs match. Case cards gained a
   "基准分 → 证据修正后" score legend and link to the new one-page case details. Homepage +

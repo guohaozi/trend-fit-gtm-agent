@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { afterEach, describe, it } from "node:test";
 import { parseBaselinePayload, snapToAnchor } from "../lib/baseline-scorer";
 import { POST as baselineRoutePost } from "../app/api/evaluate/baseline/route";
+import { checkAccess, clientIp, gatingEnabled } from "../lib/access-gate";
 import { SCORE_KEYS } from "../lib/types";
 
 describe("baseline scorer — pure helpers", () => {
@@ -57,14 +58,14 @@ describe("baseline scorer — pure helpers", () => {
 });
 
 describe("baseline scorer — API route graceful degradation", () => {
-  const originalKey = process.env.ANTHROPIC_API_KEY;
+  const originalKey = process.env.GEMINI_API_KEY;
   afterEach(() => {
-    if (originalKey === undefined) delete process.env.ANTHROPIC_API_KEY;
-    else process.env.ANTHROPIC_API_KEY = originalKey;
+    if (originalKey === undefined) delete process.env.GEMINI_API_KEY;
+    else process.env.GEMINI_API_KEY = originalKey;
   });
 
-  it("returns 503 with setupRequired when ANTHROPIC_API_KEY is absent", async () => {
-    delete process.env.ANTHROPIC_API_KEY;
+  it("returns 503 with setupRequired when GEMINI_API_KEY is absent", async () => {
+    delete process.env.GEMINI_API_KEY;
     const response = await baselineRoutePost(
       new Request("http://test/api/evaluate/baseline", {
         method: "POST",
@@ -78,7 +79,7 @@ describe("baseline scorer — API route graceful degradation", () => {
   });
 
   it("returns 400 for missing product/trend names (no model call)", async () => {
-    process.env.ANTHROPIC_API_KEY = "test-key-not-used";
+    process.env.GEMINI_API_KEY = "test-key-not-used";
     const response = await baselineRoutePost(
       new Request("http://test/api/evaluate/baseline", {
         method: "POST",
@@ -87,5 +88,24 @@ describe("baseline scorer — API route graceful degradation", () => {
       })
     );
     assert.equal(response.status, 400);
+  });
+});
+
+describe("access gate — disabled / parsing paths (no Redis needed)", () => {
+  it("is disabled (open) when ACCESS_CODES is not configured", async () => {
+    assert.equal(gatingEnabled(), false);
+    const result = await checkAccess({ code: "", ip: "1.2.3.4" });
+    assert.deepEqual(result, { ok: true, gated: false, remaining: null });
+  });
+
+  it("parses the caller IP from x-forwarded-for (first hop)", () => {
+    const request = new Request("http://test/", {
+      headers: { "x-forwarded-for": "203.0.113.7, 70.41.3.18, 150.172.238.178" }
+    });
+    assert.equal(clientIp(request), "203.0.113.7");
+  });
+
+  it("returns empty IP when no proxy headers are present", () => {
+    assert.equal(clientIp(new Request("http://test/")), "");
   });
 });

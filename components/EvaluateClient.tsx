@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ReportViewer } from "@/components/ReportViewer";
 import {
   buildWorkspaceEvidenceGaps,
@@ -210,7 +210,23 @@ export function EvaluateClient() {
   const [outcome, setOutcome] = useState<EvalOutcome | null>(null);
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
   const [aiState, setAiState] = useState<Record<string, AiScoreState>>({});
+  const [accessCode, setAccessCode] = useState("");
+  const [accessRemaining, setAccessRemaining] = useState<number | null>(null);
   const resultRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem("tf-access-code");
+    if (saved) setAccessCode(saved);
+  }, []);
+
+  function updateAccessCode(value: string) {
+    setAccessCode(value);
+    try {
+      window.localStorage.setItem("tf-access-code", value);
+    } catch {
+      /* ignore storage failures (private mode) */
+    }
+  }
 
   const canEvaluate =
     product.name.trim().length > 0 && candidates.every((candidate) => candidate.trendName.trim().length > 0);
@@ -247,7 +263,7 @@ export function EvaluateClient() {
     try {
       const response = await fetch("/api/evaluate/baseline", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-access-code": accessCode },
         body: JSON.stringify({
           product: {
             name: product.name,
@@ -268,7 +284,7 @@ export function EvaluateClient() {
       if (response.status === 503) {
         setAiState((prev) => ({
           ...prev,
-          [candidate.id]: { status: "setup", message: data?.error ?? "需要配置 ANTHROPIC_API_KEY。" }
+          [candidate.id]: { status: "setup", message: data?.error ?? "需要配置 GEMINI_API_KEY。" }
         }));
         return;
       }
@@ -297,6 +313,7 @@ export function EvaluateClient() {
         delete next[candidate.id];
         return next;
       });
+      if (typeof data.remaining === "number") setAccessRemaining(data.remaining);
     } catch {
       setAiState((prev) => ({
         ...prev,
@@ -371,9 +388,22 @@ export function EvaluateClient() {
           ——七维各取 0/25/50/75/100，固定权重加权，再叠加门槛与 override
           规则。没有证据支撑时，引擎会拒绝把高分升级成「强烈建议」，并直接告诉你还缺什么证据。
           <span>
-            不想逐维打分？点每个热点上的「✨ 用 Claude 评分」，让 Claude 先提一版基线假设，你再微调——AI
+            不想逐维打分？点每个热点上的「✨ 用 AI 评分」，让 AI 先提一版基线假设，你再微调——AI
             负责提出，证据门槛负责约束。
           </span>
+        </div>
+        <div className="eval-access">
+          <label className="eval-field">
+            <span>注册码</span>
+            <input
+              value={accessCode}
+              onChange={(event) => updateAccessCode(event.target.value)}
+              placeholder="输入注册码后才能用 AI 评分（demo 限次）"
+            />
+          </label>
+          {accessRemaining !== null ? (
+            <span className="eval-access-remaining">本注册码剩余 {accessRemaining} 次</span>
+          ) : null}
         </div>
       </header>
 
@@ -502,9 +532,9 @@ export function EvaluateClient() {
                         product.name.trim().length === 0 ||
                         candidate.trendName.trim().length === 0
                       }
-                      title="让 Claude 先提一版七维基线分，你再微调"
+                      title="让 AI 先提一版七维基线分，你再微调"
                     >
-                      {aiState[candidate.id]?.status === "loading" ? "Claude 评分中…" : "✨ 用 Claude 评分"}
+                      {aiState[candidate.id]?.status === "loading" ? "AI 评分中…" : "✨ 用 AI 评分"}
                     </button>
                     {candidates.length > 1 ? (
                       <button type="button" className="eval-remove" onClick={() => removeCandidate(index)}>
@@ -540,7 +570,7 @@ export function EvaluateClient() {
                 ) : null}
                 {candidate.aiOverall ? (
                   <p className="eval-ai-note done">
-                    Claude 基线判断：{candidate.aiOverall}
+                    AI 基线判断：{candidate.aiOverall}
                     <span>（这是 AI 提出的假设，没有证据支撑；评估时会被门槛约束。你可以直接微调下面的分数。）</span>
                   </p>
                 ) : null}

@@ -1,16 +1,15 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI, Type } from "@google/genai";
 import { SCORE_KEYS, type ScoreKey, type ScoreValue, type Scores } from "./types";
 
-// Claude proposes the *baseline hypothesis* — the 7 anchor scores a human analyst
+// The model proposes the *baseline hypothesis* — the 7 anchor scores a human analyst
 // would otherwise enter by hand. The deterministic engine + source-tier classifier +
-// evidence gate then constrain it: a Claude-proposed 90 is still capped to a gated
-// band until real evidence exists. The model is told these are reasoned assumptions,
-// never evidence, and is forbidden from inventing metrics/URLs — preserving the
-// project's "evidence-backed, never fabricate" rule.
+// evidence gate then constrain it: a proposed 90 is still capped to a gated band until
+// real evidence exists. The model is told these are reasoned assumptions, never evidence,
+// and is forbidden from inventing metrics/URLs — preserving the project's
+// "evidence-backed, never fabricate" rule. Runs on Gemini (AI Studio free tier).
 
-export const BASELINE_MODEL = "claude-opus-4-8";
-
-const ANCHORS: readonly ScoreValue[] = [0, 25, 50, 75, 100];
+// Override with GEMINI_MODEL if a newer free-tier Flash ships (e.g. gemini-3-flash).
+export const BASELINE_MODEL = process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
 
 export type BaselineProductInput = {
   name: string;
@@ -52,32 +51,31 @@ export function snapToAnchor(value: unknown): ScoreValue {
   return Math.min(100, Math.max(0, snapped)) as ScoreValue;
 }
 
-const TOOL_NAME = "submit_fit_scores";
+function buildResponseSchema() {
+  const dimensionSchema = {
+    type: Type.OBJECT,
+    properties: {
+      score: { type: Type.INTEGER, description: "锚点分，必须是 0 / 25 / 50 / 75 / 100 之一" },
+      rationale: { type: Type.STRING, description: "一句话中文理由（你的推理，不是证据）" }
+    },
+    required: ["score", "rationale"],
+    propertyOrdering: ["score", "rationale"]
+  };
 
-const DIMENSION_SCHEMA = {
-  type: "object",
-  additionalProperties: false,
-  properties: {
-    score: { type: "integer", enum: [0, 25, 50, 75, 100] },
-    rationale: { type: "string", description: "一句话中文理由（你的推理，不是证据）" }
-  },
-  required: ["score", "rationale"]
-} as const;
-
-function buildToolSchema() {
-  const properties: Record<string, unknown> = {};
+  const properties: Record<string, object> = {};
   for (const dim of DIMENSIONS) {
-    properties[dim.key] = DIMENSION_SCHEMA;
+    properties[dim.key] = dimensionSchema;
   }
   properties.overallRationale = {
-    type: "string",
+    type: Type.STRING,
     description: "一句话总体判断（基线假设，待证据验证）"
   };
+
   return {
-    type: "object",
-    additionalProperties: false,
+    type: Type.OBJECT,
     properties,
-    required: [...SCORE_KEYS, "overallRationale"]
+    required: [...SCORE_KEYS, "overallRationale"],
+    propertyOrdering: [...SCORE_KEYS, "overallRationale"]
   };
 }
 
@@ -93,8 +91,7 @@ function buildSystemPrompt(): string {
     rubric,
     "",
     "铁律：你给出的是【基于推理的基线假设】，不是证据。严禁编造任何指标、数据、百分比、URL、报告或引用。",
-    "理由只能是你对所给文本的推理，每条一句话。信息不足时给中性分 50 并说明不确定。",
-    "只通过 submit_fit_scores 工具提交结果。"
+    "理由只能是你对所给文本的推理，每条一句话。信息不足时给中性分 50 并说明不确定。"
   ].join("\n");
 }
 
@@ -120,10 +117,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
-/** Validate + normalize the tool payload into engine-ready scores. Pure + testable. */
+/** Validate + normalize the model payload into engine-ready scores. Pure + testable. */
 export function parseBaselinePayload(payload: unknown): BaselineResult {
   if (!isRecord(payload)) {
-    throw new Error("Claude 返回的评分结构无效。");
+    throw new Error("模型返回的评分结构无效。");
   }
 
   const scores = {} as Scores;
@@ -150,32 +147,24 @@ export async function generateBaselineScores(
   product: BaselineProductInput,
   trend: BaselineTrendInput
 ): Promise<BaselineResult> {
-  // new Anthropic() reads ANTHROPIC_API_KEY from the environment.
-  const client = new Anthropic();
+  // GoogleGenAI reads GEMINI_API_KEY when apiKey is passed explicitly.
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-  const response = await client.messages.create({
+  const response = await ai.models.generateContent({
     model: BASELINE_MODEL,
-    max_tokens: 2048,
-    system: buildSystemPrompt(),
-    tools: [
-      {
-        name: TOOL_NAME,
-        description: "提交 7 维基线适配评分及每维理由。",
-        // strict: true guarantees the params validate against the schema (anchor enums).
-        strict: true,
-        input_schema: buildToolSchema() as Anthropic.Tool.InputSchema
-      }
-    ],
-    tool_choice: { type: "tool", name: TOOL_NAME },
-    messages: [{ role: "user", content: buildUserPrompt(product, trend) }]
+    contents: buildUserPrompt(product, trend),
+    config: {
+      systemInstruction: buildSystemPrompt(),
+      responseMimeType: "application/json",
+      responseSchema: buildResponseSchema(),
+      temperature: 0.3
+    }
   });
 
-  const toolBlock = response.content.find(
-    (block): block is Anthropic.ToolUseBlock => block.type === "tool_use"
-  );
-  if (!toolBlock) {
-    throw new Error("Claude 没有返回评分工具调用。");
+  const text = response.text;
+  if (!text) {
+    throw new Error("Gemini 没有返回内容。");
   }
 
-  return parseBaselinePayload(toolBlock.input);
+  return parseBaselinePayload(JSON.parse(text));
 }

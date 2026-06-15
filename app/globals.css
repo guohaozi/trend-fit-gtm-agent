@@ -3280,3 +3280,23 @@ th {
   color: var(--hl-pine-deep) !important;
   line-height: 1.5;
 }
+
+.eval-access {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.eval-access .eval-field {
+  max-width: 280px;
+  flex: 1 1 220px;
+}
+
+.eval-access-remaining {
+  font-family: var(--font-data);
+  font-size: 12.5px;
+  color: var(--hl-pine-deep);
+  padding-bottom: 11px;
+}

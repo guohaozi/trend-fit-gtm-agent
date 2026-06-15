@@ -96,7 +96,7 @@ the host context when debugging this symptom.
 1. **Input**: product + market + candidate trend + risk tolerance (+ optional competitors).
 2. **Baseline scores**: 7 dimensions, each an anchor score `{0,25,50,75,100}` — an initial
    judgment from a human (demo JSON, hand-edited in `/workspace`/`/evaluate`) **or proposed by
-   Claude** via `/api/evaluate/baseline` (labeled a hypothesis, gated by evidence — see the LLM
+   an LLM (Gemini)** via `/api/evaluate/baseline` (labeled a hypothesis, gated by evidence — see the LLM
    baseline scoring section below). The engine still doesn't *invent* a trustworthy score: the
    baseline is an assumption until evidence moves and the gate clears it.
 3. **Evidence collection**: `buildResearchQueries` splits the input into 7 lanes
@@ -207,27 +207,43 @@ with the retired demo tour; weight profiles still exist in code
 (`default|brand_awareness|ecommerce_conversion|b2b_pipeline|creator_seeding|risk_sensitive`,
 default used by `/evaluate` unless changed).
 
-Verification: `npm test` → **127 passing**; `npm run build` succeeds; CI
+Verification: `npm test` → **130 passing**; `npm run build` succeeds; CI
 (`.github/workflows/ci.yml`) runs `npm ci`, `npm test`, `npm run build` on push/PR. Route smoke
 tests cover `/`, `/evaluate`, `/cases`, `/cases/[id]`, `/workspace`, the `/api/report/[id]`
-download, and `/api/evaluate/baseline` (503 no-key + 400 bad-input paths). Browser checks were run
-for the homepage, `/cases` gallery + detail, the full `/evaluate` flow, and the AI-scoring 503
-fallback on desktop. **Not yet end-to-end tested: the real Claude baseline call** — needs
-`ANTHROPIC_API_KEY` set (no key available in this environment).
+download, and `/api/evaluate/baseline` (503 no-key + 400 bad-input + access-gate paths). Browser
+checks were run for the homepage, `/cases`, the full `/evaluate` flow, the AI-scoring 503 fallback,
+and the 注册码 input rendering on desktop. **Not yet end-to-end tested: the real Gemini baseline call
+and the gated path** — need `GEMINI_API_KEY` (and, for the gate, Upstash + `ACCESS_CODES`) set; none
+available in this environment.
 
 ## LLM baseline scoring (2026-06-13) — answers "do users have to score manually?"
 
 The 7 anchor scores were always an *input* (the engine can't derive them from free text). `/evaluate`
-now offers a "✨ 用 Claude 评分" button per candidate that calls `POST /api/evaluate/baseline`
-(`lib/baseline-scorer.ts`, `@anthropic-ai/sdk` ^0.104, `claude-opus-4-8`, forced **strict tool use**
-with an `enum`-constrained schema → 7 anchor scores + per-dimension rationale; `snapToAnchor` guards
-the anchors). The model is instructed these are **reasoned baseline hypotheses, not evidence** (no
+offers a "✨ 用 AI 评分" button per candidate that calls `POST /api/evaluate/baseline`
+(`lib/baseline-scorer.ts`, **`@google/genai`**, **Gemini Flash** `gemini-2.5-flash` via `GEMINI_MODEL`,
+structured `responseSchema` → 7 anchor scores + per-dimension rationale; `snapToAnchor` guards the
+anchors). The model is instructed these are **reasoned baseline hypotheses, not evidence** (no
 fabricated metrics/URLs); the deterministic engine + source-tier classifier + evidence gate still
-discipline whatever it proposes — a Claude-proposed 90 is gated until evidence exists. Manual sliders
-remain as an override. **Graceful degradation:** no `ANTHROPIC_API_KEY` → `503` and the UI shows a
-setup notice + keeps manual scoring (mirrors the SerpApi fixture pattern). To enable real scoring, set
-`ANTHROPIC_API_KEY` locally in `.env.local` and on Vercel. This is also the first real LLM call in the
-project (deps were previously next/react only).
+discipline whatever it proposes — a proposed 90 is gated until evidence exists. Manual sliders remain
+as an override. Runs on the Gemini AI Studio **free tier**. **Graceful degradation:** no
+`GEMINI_API_KEY` → `503`, UI keeps manual scoring. Set `GEMINI_API_KEY` in `.env.local` + Vercel to
+enable. *(Originally built on Anthropic `claude-opus-4-8`; swapped to Gemini for the free tier — the
+route/frontend/JSON contract were provider-agnostic, so only `baseline-scorer.ts` changed.)*
+
+**Calibration stays LLM-free (the moat):** the LLM only proposes the *baseline*. Evidence → mapping →
+source-tier classifier → `adjustScores` → gate/rigor is all deterministic TypeScript. AI must never
+grade evidence tier or compute the adjusted score — that would break "采集者不能兼裁判 / auditable".
+
+## Cost-control gate (`lib/access-gate.ts`, 2026-06-13)
+
+Registration code + per-code use quota (Upstash Redis KV) + per-IP rate limit, wired into
+`/api/evaluate/baseline` (and reusable by future paid routes). Order: `503` no-key → `400` bad input →
+`checkAccess` (rate-limit + validate code + quota, **no consume**) → call → `consumeAccess` on success
+→ returns `remaining`. `/evaluate` has a 注册码 input (localStorage → `x-access-code` header). **Env
+vars:** `ACCESS_CODES` (comma-separated), `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN`,
+optional `ACCESS_CODE_LIMIT` (default 5) / `ACCESS_RATE_PER_MIN` (default 20). **Graceful:** if
+`ACCESS_CODES` empty or Upstash unset → gating disabled (open) — that's why local dev needs nothing.
+This is the cost/abuse answer: the API key lives server-side, the gate caps usage per code + per IP.
 
 ## Known issues
 
@@ -284,5 +300,5 @@ project (deps were previously next/react only).
 cd /Users/guo/gtm/trend-fit-gtm-agent
 git status --short --branch   # expect: ## main...origin/main, clean
 git log -3 --oneline          # newest commit = your starting point
-npm test                      # 127 passing
+npm test                      # 130 passing
 ```
