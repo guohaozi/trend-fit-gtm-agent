@@ -23,6 +23,20 @@ one-to-two-line summaries, newest first.
   returns `remaining`. **Graceful:** gating is disabled (open) until you set `ACCESS_CODES` +
   `UPSTASH_REDIS_REST_URL`/`UPSTASH_REDIS_REST_TOKEN`. `npm test` 130/130 (added access-gate +
   route tests); build passes.
+- **Free evidence providers (first real runtime evidence)** — new `lib/free-evidence-providers.ts`
+  (Reddit / Hacker News Algolia / GDELT) with pure `map*ToCandidates` + thin `fetch*`, and
+  `POST /api/evidence/collect` that runs them in parallel, grades each candidate through the
+  deterministic `classifySourceTier` (providers never assign tier), and returns tiered evidence +
+  drops + per-source counts. Honesty guards: `verificationStatus` + a `desiredConfidence` cap keep
+  aggregate web signals at their proper level (Reddit raw audience/use-case → primary/medium; HN
+  comment_corpus capped to medium; GDELT unverified → proxy/low; negative GDELT tone → brandSafety
+  down). **Live findings (verified by hitting the route):** HN works from datacenter (10 real items,
+  graded primary/medium); GDELT works but is rate-limited ~1 req/5s (best-effort); **Reddit
+  public JSON returns 403 from datacenter IPs**, so it needs OAuth on Vercel — provider uses
+  `REDDIT_CLIENT_ID`/`REDDIT_CLIENT_SECRET` (free "script" app) when set, else best-effort public
+  JSON. Gated + per-IP rate-limited but does NOT consume a code use (evidence is free). `npm test`
+  138/138 (added 8 mapper + classifier tests). *Not yet wired into `/evaluate` scoring — that's the
+  evidence-first step.*
 - **Customer-facing IA restructure** — the homepage now leads with two CTAs, `开始评估 →
   /evaluate` and `案例展示 → /cases`, and the topbar verbs match. Case cards gained a
   "基准分 → 证据修正后" score legend and link to the new one-page case details. Homepage +

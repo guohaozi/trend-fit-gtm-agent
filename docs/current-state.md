@@ -200,14 +200,15 @@ capped as proxy), `organic push`; evidence snack raw `76` gate `pass` Go, modera
 
 Routes: `/`, `/evaluate`, `/cases`, `/cases/[id]` (SSG: demo_fashion / demo_ai_tool /
 demo_snack), `/workspace`, `/api/report/[id]`, `/api/workspace/google-trends`,
-`/api/evaluate/baseline` (LLM baseline scoring). Valid case ids
+`/api/evaluate/baseline` (LLM baseline scoring), `/api/evidence/collect` (free Reddit/HN/GDELT
+evidence). Valid case ids
 for `/cases/[id]` + `/api/report/[id]`: `demo_fashion|demo_robotics|demo_ai_tool|demo_snack|
 demo_protein_drink` (unknown → default demo). The `?case=`/`?profile=` query params went away
 with the retired demo tour; weight profiles still exist in code
 (`default|brand_awareness|ecommerce_conversion|b2b_pipeline|creator_seeding|risk_sensitive`,
 default used by `/evaluate` unless changed).
 
-Verification: `npm test` → **130 passing**; `npm run build` succeeds; CI
+Verification: `npm test` → **138 passing**; `npm run build` succeeds; CI
 (`.github/workflows/ci.yml`) runs `npm ci`, `npm test`, `npm run build` on push/PR. Route smoke
 tests cover `/`, `/evaluate`, `/cases`, `/cases/[id]`, `/workspace`, the `/api/report/[id]`
 download, and `/api/evaluate/baseline` (503 no-key + 400 bad-input + access-gate paths). Browser
@@ -244,6 +245,32 @@ vars:** `ACCESS_CODES` (comma-separated), `UPSTASH_REDIS_REST_URL` + `UPSTASH_RE
 optional `ACCESS_CODE_LIMIT` (default 5) / `ACCESS_RATE_PER_MIN` (default 20). **Graceful:** if
 `ACCESS_CODES` empty or Upstash unset → gating disabled (open) — that's why local dev needs nothing.
 This is the cost/abuse answer: the API key lives server-side, the gate caps usage per code + per IP.
+
+## Free evidence providers (`lib/free-evidence-providers.ts`, 2026-06-13)
+
+First real *runtime* evidence (the live app previously only had SerpApi-fixture + offline OpenCLI).
+`POST /api/evidence/collect` runs three free providers in parallel and grades each candidate through
+the deterministic `classifySourceTier` (providers never assign tier), returning tiered evidence +
+drops + per-source counts. Pure `map*ToCandidates` are unit-tested with fixtures. Honesty guards:
+`verificationStatus` + a `desiredConfidence` cap keep aggregate web signals at their proper level.
+
+- **Hacker News (Algolia)** — reliable from datacenter. Maps to audience/use-case as `comment_corpus`
+  → primary, **capped to medium** via `desiredConfidence`. *Verified live: 10 real items, graded
+  primary/medium.*
+- **GDELT** — global news. Single `artlist` call → `timingSaturation` (coverage volume), unverified →
+  proxy/low. `mapGdeltToCandidates(..., avgTone)` also supports a negative-tone → `brandSafety` down
+  signal, but the `tonechart` call is left out of the live path because GDELT **rate-limits ~1 req/5s**
+  (best-effort). *Verified live in isolation (3 real articles).*
+- **Reddit** — raw audience/use-case language; reddit `/comments/` raw-language → primary/medium. **The
+  public `search.json` returns 403 from datacenter IPs**, so on Vercel it needs OAuth: provider uses
+  `REDDIT_CLIENT_ID`/`REDDIT_CLIENT_SECRET` (free "script" app, client-credentials grant, token cached)
+  when set, else best-effort public JSON (returns `[]` from datacenter). *(Corrects the earlier
+  assumption that Reddit JSON "just works" on Vercel — it does not without OAuth.)*
+
+The route is gated + per-IP rate-limited but does **not** consume a registration-code use (evidence is
+free). **Next step (not done): wire collected evidence into `/evaluate` scoring** — feed it through
+`adjustScores` so the gated band reflects real signal, i.e. the evidence-first scoring path. Apify
+(TikTok/IG/LinkedIn, paid) intentionally deferred.
 
 ## Known issues
 
@@ -300,5 +327,5 @@ This is the cost/abuse answer: the API key lives server-side, the gate caps usag
 cd /Users/guo/gtm/trend-fit-gtm-agent
 git status --short --branch   # expect: ## main...origin/main, clean
 git log -3 --oneline          # newest commit = your starting point
-npm test                      # 130 passing
+npm test                      # 138 passing
 ```
