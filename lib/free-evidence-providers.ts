@@ -1,8 +1,10 @@
 import type { EvidenceCandidate } from "./evidence-collector";
 import type { EvidenceMagnitude } from "./evidence-adjustment";
+import { collectTikhubEvidence } from "./tikhub-provider";
 
-// Free, key-free, Vercel-runnable evidence providers: Reddit public JSON, Hacker News
-// (Algolia), and GDELT. Each provider has a pure `map*ToCandidates` (raw JSON -> candidates,
+// Free, key-free, Vercel-runnable evidence providers: Hacker News (Algolia) and GDELT.
+// (Reddit + the other social platforms moved to the paid TikHub provider.) Each provider has
+// a pure `map*ToCandidates` (raw JSON -> candidates,
 // testable with fixtures) and a thin `fetch*` (network). Candidates are graded by the
 // deterministic source-tier classifier downstream — providers never assign a tier. Honesty
 // guards: `verificationStatus` + a conservative `desiredConfidence` cap keep aggregate web
@@ -33,83 +35,6 @@ function magnitudeForCount(count: number): EvidenceMagnitude {
 
 function clean(text: unknown, max = 160): string {
   return typeof text === "string" ? text.replace(/\s+/g, " ").trim().slice(0, max) : "";
-}
-
-// ============================================================
-// Reddit public JSON — raw audience/use-case language.
-// ============================================================
-export type RedditChild = {
-  data?: { title?: string; permalink?: string; subreddit?: string; num_comments?: number };
-};
-export type RedditListing = { data?: { children?: RedditChild[] } };
-
-export function mapRedditToCandidates(listing: RedditListing, limit = 5): EvidenceCandidate[] {
-  const posts = (listing?.data?.children ?? []).filter((c) => c?.data?.permalink).slice(0, limit);
-  const mag = magnitudeForCount(posts.length);
-  // A reddit /comments/ thread is forced-proxy EXCEPT for audience/use-case raw language,
-  // where the classifier grants primary/medium. So we only map those two dimensions.
-  return posts.flatMap((child, index) => {
-    const data = child.data!;
-    const url = `https://www.reddit.com${data.permalink}`;
-    const note = `Reddit r/${data.subreddit ?? "?"}：${clean(data.title)}`;
-    return (["audienceOverlap", "useCaseRelevance"] as const).map((dimension) => ({
-      id: `reddit-${index}-${dimension}`,
-      dimension,
-      direction: "confirm" as const,
-      magnitude: mag,
-      desiredConfidence: "medium" as const,
-      sourceUrl: url,
-      verificationStatus: "verified" as const,
-      note
-    }));
-  });
-}
-
-// Reddit blocks the public /search.json from datacenter IPs (403) — so on Vercel it only
-// works via OAuth. Set REDDIT_CLIENT_ID + REDDIT_CLIENT_SECRET (free "script" app) to enable
-// the OAuth path; otherwise we best-effort the public JSON (works from residential IPs only).
-let cachedRedditToken: { token: string; expiresAt: number } | null = null;
-
-async function redditAccessToken(): Promise<string | null> {
-  const id = process.env.REDDIT_CLIENT_ID;
-  const secret = process.env.REDDIT_CLIENT_SECRET;
-  if (!id || !secret) return null;
-  if (cachedRedditToken && cachedRedditToken.expiresAt > Date.now()) return cachedRedditToken.token;
-  try {
-    const response = await fetch("https://www.reddit.com/api/v1/access_token", {
-      method: "POST",
-      headers: {
-        Authorization: `Basic ${Buffer.from(`${id}:${secret}`).toString("base64")}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-        "User-Agent": USER_AGENT
-      },
-      body: "grant_type=client_credentials"
-    });
-    if (!response.ok) return null;
-    const data = (await response.json()) as { access_token?: string; expires_in?: number };
-    if (!data.access_token) return null;
-    cachedRedditToken = {
-      token: data.access_token,
-      expiresAt: Date.now() + (data.expires_in ?? 3600) * 1000 - 60_000
-    };
-    return cachedRedditToken.token;
-  } catch {
-    return null;
-  }
-}
-
-export async function fetchRedditEvidence(query: string, limit = 5): Promise<EvidenceCandidate[]> {
-  try {
-    const token = await redditAccessToken();
-    const q = encodeURIComponent(query);
-    const url = token
-      ? `https://oauth.reddit.com/search?q=${q}&limit=${limit}&sort=relevance&type=link`
-      : `https://www.reddit.com/search.json?q=${q}&limit=${limit}&sort=relevance&type=link`;
-    const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
-    return mapRedditToCandidates((await fetchJson(url, headers)) as RedditListing, limit);
-  } catch {
-    return [];
-  }
 }
 
 // ============================================================
@@ -229,7 +154,7 @@ export async function fetchGdeltEvidence(query: string, limit = 5): Promise<Evid
 // ============================================================
 export type FreeEvidenceResult = {
   candidates: EvidenceCandidate[];
-  bySource: { reddit: number; hackernews: number; gdelt: number };
+  bySource: Record<string, number>;
 };
 
 export async function collectFreeEvidence({
@@ -240,13 +165,19 @@ export async function collectFreeEvidence({
   product?: string;
 }): Promise<FreeEvidenceResult> {
   const query = [trend, product].filter(Boolean).join(" ").trim() || trend;
-  const [reddit, hackernews, gdelt] = await Promise.all([
-    fetchRedditEvidence(query),
+  // Free providers (HN / GDELT) + TikHub (paid, only when TIKHUB_API_KEY set; covers
+  // 小红书 / TikTok / Instagram / X / Reddit) — all in parallel, all graceful.
+  const [hackernews, gdelt, tikhub] = await Promise.all([
     fetchHnEvidence(query),
-    fetchGdeltEvidence(trend)
+    fetchGdeltEvidence(trend),
+    collectTikhubEvidence({ trend, product })
   ]);
   return {
-    candidates: [...reddit, ...hackernews, ...gdelt],
-    bySource: { reddit: reddit.length, hackernews: hackernews.length, gdelt: gdelt.length }
+    candidates: [...hackernews, ...gdelt, ...tikhub.candidates],
+    bySource: {
+      hackernews: hackernews.length,
+      gdelt: gdelt.length,
+      ...tikhub.bySource
+    }
   };
 }

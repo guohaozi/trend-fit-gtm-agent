@@ -47,7 +47,7 @@ export async function POST(request: Request) {
       id: "live-free-evidence",
       case: "live",
       researchDate: new Date().toISOString().slice(0, 10),
-      tooling: "Reddit JSON + HN Algolia + GDELT (free, no key)",
+      tooling: "HN Algolia + GDELT (free) + TikHub (小红书/TikTok/IG/X/Reddit, needs key)",
       baselineScores: neutralScores(),
       candidates: collected.candidates
     });

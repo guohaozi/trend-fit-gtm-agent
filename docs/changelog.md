@@ -4,6 +4,24 @@ Condensed milestone log for Codex / Claude handoff. **Full detail for any entry 
 `git log` (commit messages) and in this file's own git history** — entries here are
 one-to-two-line summaries, newest first.
 
+## 2026-06-15
+
+- **Evidence-first loop closed** — `/evaluate` 评估 is now async: it collects real evidence per
+  candidate via `/api/evidence/collect`, attaches the tiered `EvidenceItem[]` to the candidate, and
+  the deterministic `adjustScores` + gate run on it. Result shows an "采集到的真实证据" block (counts +
+  tier breakdown + per-source). Collection failures degrade to baseline-only.
+- **TikHub multi-platform provider** — new `lib/tikhub-provider.ts` covers the social platforms:
+  小红书 / TikTok / Instagram / X(Twitter) / **Reddit**, one paid key (`TIKHUB_API_KEY`,
+  pay-per-request). Search endpoints + keyword params were verified from the TikHub Python SDK source
+  (all GET, Bearer auth). Response shapes are deeply nested + per-platform, so a defensive deep-text
+  extractor pulls real snippets (title/desc/caption/content/…) → audience/use-case raw-language
+  candidates (`comment_corpus`, capped to medium) → the same classifier. Wired into
+  `collectFreeEvidence` (parallel, graceful); `bySource` is now a dynamic `Record`. Activates only
+  when `TIKHUB_API_KEY` is set; **not yet live-tested (no key in this env)** — response field
+  extraction may need tuning once run against the real API. **Reddit moved here from the free OAuth
+  provider** (the `REDDIT_CLIENT_ID/SECRET` path was removed) so all social is one key. Source split:
+  TikHub = social, SerpApi = Google Trends, HN/GDELT = free.
+
 ## 2026-06-13
 
 - **LLM auto baseline scoring (removes the manual-scoring step)** — new
@@ -35,8 +53,7 @@ one-to-two-line summaries, newest first.
   public JSON returns 403 from datacenter IPs**, so it needs OAuth on Vercel — provider uses
   `REDDIT_CLIENT_ID`/`REDDIT_CLIENT_SECRET` (free "script" app) when set, else best-effort public
   JSON. Gated + per-IP rate-limited but does NOT consume a code use (evidence is free). `npm test`
-  138/138 (added 8 mapper + classifier tests). *Not yet wired into `/evaluate` scoring — that's the
-  evidence-first step.*
+  138/138 (added 8 mapper + classifier tests).
 - **Customer-facing IA restructure** — the homepage now leads with two CTAs, `开始评估 →
   /evaluate` and `案例展示 → /cases`, and the topbar verbs match. Case cards gained a
   "基准分 → 证据修正后" score legend and link to the new one-page case details. Homepage +

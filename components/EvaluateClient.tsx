@@ -16,6 +16,7 @@ import {
   PROFILE_OPTIONS,
   type GatedRecommendation
 } from "@/lib/recommendation-rigor";
+import type { EvidenceItem } from "@/lib/evidence-adjustment";
 import {
   BAND_LABELS,
   DECISION_TYPE_LABELS,
@@ -63,6 +64,24 @@ type EvalRow = {
   stability: string;
 };
 
+type EvidenceSummary = {
+  collected: number;
+  kept: number;
+  tierCounts: Record<string, number>;
+  bySource: Record<string, number>;
+  failed: boolean;
+};
+
+const SOURCE_LABELS: Record<string, string> = {
+  hackernews: "HN",
+  reddit: "Reddit",
+  gdelt: "GDELT",
+  xiaohongshu: "小红书",
+  tiktok: "TikTok",
+  instagram: "IG",
+  twitter: "X"
+};
+
 type EvalOutcome = {
   multiple: boolean;
   headlineTrend: string;
@@ -74,6 +93,21 @@ type EvalOutcome = {
   rows: EvalRow[];
   markdown: string;
   reportFileName: string;
+  evidenceSummary: EvidenceSummary;
+};
+
+const EMPTY_EVIDENCE_SUMMARY: EvidenceSummary = {
+  collected: 0,
+  kept: 0,
+  tierCounts: {},
+  bySource: {},
+  failed: true
+};
+
+const SOURCE_TIER_LABELS: Record<string, string> = {
+  primary: "一手 / 强证据",
+  secondary: "二手 / 方向性",
+  proxy: "代理指标"
 };
 
 function makeScores(value: ScoreValue): Scores {
@@ -142,17 +176,28 @@ function blankCandidate(index: number): EvaluateCandidate {
   };
 }
 
-function toWorkspaceCandidate(candidate: EvaluateCandidate): WorkspaceCandidate {
+function toWorkspaceCandidate(
+  candidate: EvaluateCandidate,
+  evidence: EvidenceItem[] = []
+): WorkspaceCandidate {
   return {
     id: candidate.id,
     trendName: candidate.trendName.trim() || "未命名热点",
     trendDescription: candidate.trendDescription,
-    scores: candidate.scores
+    scores: candidate.scores,
+    evidence
   };
 }
 
-function computeOutcome(product: WorkspaceProduct, candidates: EvaluateCandidate[]): EvalOutcome {
-  const wsCandidates = candidates.map(toWorkspaceCandidate);
+function computeOutcome(
+  product: WorkspaceProduct,
+  candidates: EvaluateCandidate[],
+  evidenceByIndex: EvidenceItem[][],
+  evidenceSummary: EvidenceSummary
+): EvalOutcome {
+  const wsCandidates = candidates.map((candidate, index) =>
+    toWorkspaceCandidate(candidate, evidenceByIndex[index] ?? [])
+  );
 
   if (wsCandidates.length === 1) {
     const candidate = wsCandidates[0];
@@ -176,7 +221,8 @@ function computeOutcome(product: WorkspaceProduct, candidates: EvaluateCandidate
         }
       ],
       markdown: renderSingleWorkspaceMarkdown({ product, candidate, result: single }),
-      reportFileName: "trend-fit-single-evaluation.md"
+      reportFileName: "trend-fit-single-evaluation.md",
+      evidenceSummary
     };
   }
 
@@ -199,8 +245,37 @@ function computeOutcome(product: WorkspaceProduct, candidates: EvaluateCandidate
       stability: STABILITY_LABELS[row.rigor.recommendationStability] ?? row.rigor.recommendationStability
     })),
     markdown: renderShortlistWorkspaceMarkdown({ product, shortlist }),
-    reportFileName: "trend-fit-shortlist-evaluation.md"
+    reportFileName: "trend-fit-shortlist-evaluation.md",
+    evidenceSummary
   };
+}
+
+type CollectedEvidence = {
+  evidence: EvidenceItem[];
+  data: { collected?: number; kept?: number; tierCounts?: Record<string, number>; bySource?: Record<string, number> } | null;
+};
+
+function aggregateEvidenceSummary(results: CollectedEvidence[]): EvidenceSummary {
+  const summary: EvidenceSummary = {
+    collected: 0,
+    kept: 0,
+    tierCounts: {},
+    bySource: {},
+    failed: true
+  };
+  for (const result of results) {
+    if (!result.data) continue;
+    summary.failed = false;
+    summary.collected += result.data.collected ?? 0;
+    summary.kept += result.data.kept ?? 0;
+    for (const [tier, count] of Object.entries(result.data.tierCounts ?? {})) {
+      summary.tierCounts[tier] = (summary.tierCounts[tier] ?? 0) + count;
+    }
+    for (const [source, count] of Object.entries(result.data.bySource ?? {})) {
+      summary.bySource[source] = (summary.bySource[source] ?? 0) + count;
+    }
+  }
+  return summary;
 }
 
 export function EvaluateClient() {
@@ -336,17 +411,39 @@ export function EvaluateClient() {
     setPhase("editing");
   }
 
-  function runEvaluation() {
-    if (!canEvaluate) return;
+  async function collectEvidenceFor(candidate: EvaluateCandidate): Promise<CollectedEvidence> {
+    try {
+      const response = await fetch("/api/evidence/collect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-access-code": accessCode },
+        body: JSON.stringify({
+          product: { name: product.name },
+          trend: { trendName: candidate.trendName }
+        })
+      });
+      if (!response.ok) return { evidence: [], data: null };
+      const data = await response.json();
+      const evidence = Array.isArray(data.evidence) ? (data.evidence as EvidenceItem[]) : [];
+      return { evidence, data };
+    } catch {
+      return { evidence: [], data: null };
+    }
+  }
+
+  async function runEvaluation() {
+    if (!canEvaluate || phase === "loading") return;
     setPhase("loading");
     setCopyStatus("idle");
-    window.setTimeout(() => {
-      setOutcome(computeOutcome(product, candidates));
-      setPhase("done");
-      window.requestAnimationFrame(() => {
-        resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    }, 700);
+    // Collect real evidence per candidate (server-side, free providers), then let the
+    // deterministic engine adjust the baseline + gate against it.
+    const collected = await Promise.all(candidates.map((candidate) => collectEvidenceFor(candidate)));
+    const evidenceByIndex = collected.map((item) => item.evidence);
+    const summary = aggregateEvidenceSummary(collected);
+    setOutcome(computeOutcome(product, candidates, evidenceByIndex, summary));
+    setPhase("done");
+    window.requestAnimationFrame(() => {
+      resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   }
 
   async function copyBrief() {
@@ -628,7 +725,7 @@ export function EvaluateClient() {
         {phase === "loading" ? (
           <section className="eval-loading" aria-live="polite">
             <span className="eval-spinner" aria-hidden="true" />
-            <p>正在用固定权重和门槛规则计算确定性结论…</p>
+            <p>正在采集真实证据（HN / GDELT / TikHub 社媒）并用门槛规则计算确定性结论…</p>
           </section>
         ) : null}
 
@@ -667,6 +764,35 @@ export function EvaluateClient() {
                   · 风险偏好 {RISK_LABELS[product.riskTolerance]}
                 </p>
               </aside>
+            </div>
+
+            <div className="eval-evidence">
+              <h3>采集到的真实证据</h3>
+              {outcome.evidenceSummary.failed || outcome.evidenceSummary.kept === 0 ? (
+                <p className="eval-evidence-empty">
+                  本次未采集到可用的实时证据（免费源被限流、或未配置 TIKHUB_API_KEY），结论按你的基线分给出。
+                </p>
+              ) : (
+                <>
+                  <p>
+                    采集 <strong>{outcome.evidenceSummary.collected}</strong> 条信号，
+                    经来源分级后纳入 <strong>{outcome.evidenceSummary.kept}</strong> 条证据：
+                    {Object.entries(outcome.evidenceSummary.tierCounts).map(([tier, count]) => (
+                      <span className="eval-evidence-tier" key={tier}>
+                        {SOURCE_TIER_LABELS[tier] ?? tier} {count}
+                      </span>
+                    ))}
+                  </p>
+                  <p className="eval-evidence-sources">
+                    来源：
+                    {Object.entries(outcome.evidenceSummary.bySource)
+                      .filter(([, count]) => count > 0)
+                      .map(([source, count]) => `${SOURCE_LABELS[source] ?? source} ${count}`)
+                      .join(" · ") || "—"}
+                    。这些真实证据已喂进确定性引擎——上面的门槛后分就是基线被证据校正后的结果。
+                  </p>
+                </>
+              )}
             </div>
 
             <div className="eval-why">

@@ -3,50 +3,12 @@ import { describe, it } from "node:test";
 import {
   averageTone,
   mapGdeltToCandidates,
-  mapHnToCandidates,
-  mapRedditToCandidates
+  mapHnToCandidates
 } from "../lib/free-evidence-providers";
 import { buildEvidenceDraft } from "../lib/evidence-collector";
-import { classifySourceTier } from "../lib/source-tier-classifier";
 import { SCORE_KEYS, type Scores } from "../lib/types";
 
 const neutral = Object.fromEntries(SCORE_KEYS.map((k) => [k, 50])) as Scores;
-
-describe("free evidence providers — Reddit", () => {
-  const listing = {
-    data: {
-      children: [
-        { data: { title: "Why everyone is into quiet luxury now", permalink: "/r/malefashion/comments/abc/x/", subreddit: "malefashion" } },
-        { data: { title: "Old money aesthetic on a budget", permalink: "/r/frugalmalefashion/comments/def/y/", subreddit: "frugalmalefashion" } }
-      ]
-    }
-  };
-
-  it("maps each post to audience + use-case candidates only (raw-language lanes)", () => {
-    const candidates = mapRedditToCandidates(listing);
-    assert.equal(candidates.length, 4); // 2 posts x 2 dimensions
-    const dims = new Set(candidates.map((c) => c.dimension));
-    assert.deepEqual([...dims].sort(), ["audienceOverlap", "useCaseRelevance"]);
-    assert.ok(candidates.every((c) => c.verificationStatus === "verified"));
-    assert.match(candidates[0].note, /Reddit r\/malefashion/);
-  });
-
-  it("classifier grades a Reddit raw-language candidate as primary/medium", () => {
-    const c = mapRedditToCandidates(listing)[0];
-    const cls = classifySourceTier({
-      sourceUrl: c.sourceUrl,
-      dimension: c.dimension,
-      verificationStatus: c.verificationStatus,
-      sourceSignals: c.sourceSignals
-    });
-    assert.equal(cls.sourceTier, "primary");
-    assert.equal(cls.maxConfidence, "medium");
-  });
-
-  it("returns nothing for an empty listing", () => {
-    assert.equal(mapRedditToCandidates({ data: { children: [] } }).length, 0);
-  });
-});
 
 describe("free evidence providers — Hacker News", () => {
   const hn = {

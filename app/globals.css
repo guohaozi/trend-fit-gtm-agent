@@ -3300,3 +3300,45 @@ th {
   color: var(--hl-pine-deep);
   padding-bottom: 11px;
 }
+
+.eval-evidence {
+  padding: clamp(18px, 2.6vw, 26px);
+  border: 1px solid var(--hl-line);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: var(--shadow-soft);
+}
+
+.eval-evidence h3 {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--hl-pine-deep);
+}
+
+.eval-evidence p {
+  margin: 0 0 8px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--hl-ink);
+}
+
+.eval-evidence-sources {
+  color: var(--hl-muted) !important;
+  font-size: 13px !important;
+}
+
+.eval-evidence-empty {
+  color: var(--hl-muted) !important;
+}
+
+.eval-evidence-tier {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--hl-pine-wash);
+  color: var(--hl-pine-deep);
+  font-family: var(--font-data);
+  font-size: 12px;
+}

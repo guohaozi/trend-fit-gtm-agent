@@ -1,6 +1,6 @@
 # Current State — Trend-Fit GTM Agent
 
-Last updated: 2026-06-13. Main is pushed to origin; run `git log -1` for the exact HEAD
+Last updated: 2026-06-15. Main is pushed to origin; run `git log -1` for the exact HEAD
 (do not hardcode a commit hash here — it goes stale on every commit).
 
 Compact handoff snapshot for the next Codex / Claude conversation. **Full change history
@@ -22,7 +22,32 @@ an outcome-calibrated sales predictor.
 writes a GTM brief. A "product → candidate trends" discovery layer is intentionally out of
 scope for now.
 
-## Latest conversation handoff (2026-06-13)
+## Latest conversation handoff (2026-06-15)
+
+The latest work closed the evidence-first loop and simplified runtime evidence sources.
+
+- **`/evaluate` now collects live evidence during evaluation.** Clicking 评估 calls
+  `POST /api/evidence/collect` per candidate, attaches the returned tiered `EvidenceItem[]`
+  to the `WorkspaceCandidate`, then runs the existing deterministic `adjustScores` +
+  recommendation gate. The result page now shows a "采集到的真实证据" block with collected/kept
+  counts, source-tier counts, and per-source counts. If collection fails or returns nothing,
+  the UI falls back to baseline-only scoring.
+- **TikHub replaced the short-lived Reddit OAuth path.** `lib/tikhub-provider.ts` uses one
+  `TIKHUB_API_KEY` for 小红书 / TikTok / Instagram / X / Reddit social evidence. The provider
+  is defensive because each platform response shape differs: it extracts snippets from
+  title/desc/caption/content-style keys and maps them to audience/use-case raw-language
+  candidates capped to medium confidence. It is wired into `collectFreeEvidence` and activates
+  only when the key is set. It has unit coverage but has **not** been live-tested in this
+  environment because no TikHub key is available.
+- **Free runtime providers are now HN Algolia + GDELT only.** HN remains reliable for tech
+  audience/use-case signals; GDELT remains best-effort for news coverage/timing. Google Trends
+  stays on SerpApi. Apify remains deferred.
+- **Vercel env vars after this change:** `GEMINI_API_KEY` for AI baseline scoring,
+  `TIKHUB_API_KEY` for social evidence, optional `SERPAPI_API_KEY` for Google Trends, and
+  `ACCESS_CODES` + `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` for registration-code
+  limits. `REDDIT_CLIENT_ID` / `REDDIT_CLIENT_SECRET` are no longer used.
+
+## Prior conversation handoff (2026-06-13)
 
 Customer-facing IA restructure (Claude, Phases 0–2). The user's diagnosis: the site was two
 disconnected apps — a read-only 4-step demo tour (`/product-profile → /trend-input →
@@ -208,7 +233,7 @@ with the retired demo tour; weight profiles still exist in code
 (`default|brand_awareness|ecommerce_conversion|b2b_pipeline|creator_seeding|risk_sensitive`,
 default used by `/evaluate` unless changed).
 
-Verification: `npm test` → **138 passing**; `npm run build` succeeds; CI
+Verification: `npm test` → **140 passing**; `npm run build` succeeds; CI
 (`.github/workflows/ci.yml`) runs `npm ci`, `npm test`, `npm run build` on push/PR. Route smoke
 tests cover `/`, `/evaluate`, `/cases`, `/cases/[id]`, `/workspace`, the `/api/report/[id]`
 download, and `/api/evaluate/baseline` (503 no-key + 400 bad-input + access-gate paths). Browser
@@ -261,16 +286,30 @@ drops + per-source counts. Pure `map*ToCandidates` are unit-tested with fixtures
   proxy/low. `mapGdeltToCandidates(..., avgTone)` also supports a negative-tone → `brandSafety` down
   signal, but the `tonechart` call is left out of the live path because GDELT **rate-limits ~1 req/5s**
   (best-effort). *Verified live in isolation (3 real articles).*
-- **Reddit** — raw audience/use-case language; reddit `/comments/` raw-language → primary/medium. **The
-  public `search.json` returns 403 from datacenter IPs**, so on Vercel it needs OAuth: provider uses
-  `REDDIT_CLIENT_ID`/`REDDIT_CLIENT_SECRET` (free "script" app, client-credentials grant, token cached)
-  when set, else best-effort public JSON (returns `[]` from datacenter). *(Corrects the earlier
-  assumption that Reddit JSON "just works" on Vercel — it does not without OAuth.)*
+(Reddit was briefly on a free OAuth provider but **moved to TikHub** — see below — so the free
+providers are now just HN + GDELT. The `REDDIT_CLIENT_ID`/`REDDIT_CLIENT_SECRET` path was removed.)
 
 The route is gated + per-IP rate-limited but does **not** consume a registration-code use (evidence is
-free). **Next step (not done): wire collected evidence into `/evaluate` scoring** — feed it through
-`adjustScores` so the gated band reflects real signal, i.e. the evidence-first scoring path. Apify
-(TikTok/IG/LinkedIn, paid) intentionally deferred.
+free). Apify (LinkedIn etc., paid) intentionally deferred.
+
+- **TikHub** (`lib/tikhub-provider.ts`, paid) — covers the social platforms:
+  **小红书 / TikTok / Instagram / X / Reddit**. One key `TIKHUB_API_KEY` (pay-per-request, prepaid
+  balance — *don't enable auto-recharge* = hard cost cap, on top of the registration gate). Search
+  endpoints + keyword params verified from the TikHub Python SDK source (all GET, `Authorization:
+  Bearer`). Response shapes are deeply nested + per-platform, so a **defensive deep-text extractor**
+  (`extractSnippets`) pulls real snippets → audience/use-case raw-language candidates (`comment_corpus`,
+  capped medium) → same classifier. Activates only when the key is set; otherwise returns nothing.
+  **Not yet live-tested (no key in this env)** — if a platform returns junk/empty against the real API,
+  tune `TEXT_KEYS` / the endpoint path in `tikhub-provider.ts`. Google stays on SerpApi (no free
+  official Trends API). `bySource` is now a dynamic `Record`.
+
+**Wired into `/evaluate` scoring (evidence-first loop closed, 2026-06-13):** clicking 评估 now (async)
+calls `/api/evidence/collect` per candidate, attaches the returned `EvidenceItem[]` to the
+`WorkspaceCandidate`, and the existing deterministic `adjustScores` + gate run on it. The result shows
+an "采集到的真实证据" block (collected/kept counts, tier breakdown, per-source counts) and the
+门槛后分 is the baseline corrected by real evidence. *Verified live: trend "AI agents" → 10 real HN
+items (一手 ×10) fed in; the gate moved from 证据不足 → 证据部分通过.* Note: the collect call adds
+~8s (GDELT's 8s timeout dominates); failures degrade gracefully to baseline-only scoring.
 
 ## Known issues
 
@@ -327,5 +366,5 @@ free). **Next step (not done): wire collected evidence into `/evaluate` scoring*
 cd /Users/guo/gtm/trend-fit-gtm-agent
 git status --short --branch   # expect: ## main...origin/main, clean
 git log -3 --oneline          # newest commit = your starting point
-npm test                      # 138 passing
+npm test                      # 140 passing
 ```
