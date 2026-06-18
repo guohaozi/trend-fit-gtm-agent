@@ -346,8 +346,9 @@ export function getReportMarkdown(id?: string | null): string {
   const demo = getDemoCase(id);
   const copy = REPORT_COPY[demo.id];
   const baseline = getDemoResult(demo.id, demo.profileUsed);
-  const rigor = getDemoRigorResult(demo.id, demo.profileUsed).rigor;
   const evidenceResult = getEvidenceResult(demo.id, demo.profileUsed);
+  const rigor = evidenceResult?.rigor ?? getDemoRigorResult(demo.id, demo.profileUsed).rigor;
+  const reportScores = evidenceResult?.adjustment.adjusted ?? demo.scores;
   const titleProduct = copy?.productName ?? demo.product.name.replace(" (demo)", "");
   const titleTrend = copy?.trendName ?? demo.trend.name;
   const evidenceSummary = evidenceResult
@@ -385,7 +386,7 @@ export function getReportMarkdown(id?: string | null): string {
     "| 维度 | 权重 | 分数 | 判断依据 |",
     "|------|------|------|----------|",
     ...DIMENSION_META.map((dimension) => {
-      return `| ${dimension.label} | ${dimension.weightLabel} | ${demo.scores[dimension.key]} | ${dimension.question} |`;
+      return `| ${dimension.label} | ${dimension.weightLabel} | ${reportScores[dimension.key]} | ${dimension.question} |`;
     }),
     "",
     "## 4. 营销切入点",
@@ -461,6 +462,8 @@ export const FEATURED_CASE_META: Array<{
     note: "适合限量上新测试，不适合直接做大规模品牌重塑。"
   }
 ];
+
+export const INTERVIEW_DEMO_ID = "demo_ai_tool";
 
 export type FeaturedCaseCard = (typeof FEATURED_CASE_META)[number] & {
   baselineTotal: number;

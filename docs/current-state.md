@@ -1,6 +1,6 @@
 # Current State — Trend-Fit GTM Agent
 
-Last updated: 2026-06-15. Main is pushed to origin; run `git log -1` for the exact HEAD
+Last updated: 2026-06-18. Main is pushed to origin; run `git log -1` for the exact HEAD
 (do not hardcode a commit hash here — it goes stale on every commit).
 
 Compact handoff snapshot for the next Codex / Claude conversation. **Full change history
@@ -22,7 +22,52 @@ an outcome-calibrated sales predictor.
 writes a GTM brief. A "product → candidate trends" discovery layer is intentionally out of
 scope for now.
 
-## Latest conversation handoff (2026-06-15)
+## Latest conversation handoff (2026-06-18) — evidence-bias audit (analysis only, no code shipped)
+
+Two findings from an audit pass; both are also folded into Known issues + Next steps below.
+
+**1. Structural evidence bias — live evidence can't move the score at all, and one-sidedly inflates the
+gate.** (Corrects an earlier claim in this doc that confirm evidence "raises" the score — it does not.)
+`evidencePressure` returns **0 for `direction: "confirm"`** (`evidence-adjustment.ts:82`), and every
+runtime provider (HN in `free-evidence-providers.ts`, all 5 platforms in `tikhub-provider.ts`)
+hard-codes `confirm`. So **live-collected evidence moves the 7 scores ≈ 0** — after 评估 the scores are
+still the AI baseline. The only live source that could emit `down` is GDELT negative tone → brandSafety,
+and it's switched off. (The demo "81→76" correction comes from **hand-written `down` rows in
+`data/demo_*_evidence.json`** — 4 confirm + 3 down in snack — which live collection never reproduces.)
+The real defect is on the gate/confidence side, which only checks whether non-proxy evidence *exists*,
+not its direction: a `comment_corpus` snippet is graded **primary** (`source-tier-classifier.ts:174`),
+so any returned text (a) satisfies the `audienceOrUseCase` gate slot (`recommendation-rigor.ts:192`),
+(b) lifts the 100-cap (`:172`), and (c) drops out of the fragility flip (`:219`). Net: "trend heat"
+reads as "fit evidence" at the gate/confidence layer (never the score), and only ever one-way (no `down`
+source) — which still undercuts "evidence-constrained, auditable, 采集者不能兼裁判". An evidence layer
+that can only confirm = no judgment. **Why the overall band hasn't blown up: luck, not discipline** —
+the Strong-Go gate also needs non-proxy `timingSaturation` + `brandSafety`, which the live path happens
+not to produce (GDELT `unverified`→proxy; brandSafety has no live source), so the gate stalls at
+`partial`. Fix = the AI-stance layer in Next steps (AI judges stance per snippet → deterministic rules
+map to up/down; gate bound to ≥N `supports` rows). Decided 2026-06-18 with Codex's plan; see Next steps
+for the interview-week split.
+
+**2. API-cost model verified (answers "会不会爆" — no).** `/evaluate` 评估 calls
+`/api/evidence/collect` **once per candidate trend**; each collect fans out to HN (free) + GDELT
+(free) + TikHub (**5 platform calls**: 小红书/TikTok/IG/X/Reddit, `tikhub-provider.ts:161`). So
+**TikHub = 5 requests per trend per 评估**; **SerpApi = 0 in the /evaluate path** (SerpApi/Google
+Trends only runs from the `/workspace` manual button, 1 search/click). TikHub is prepaid +
+auto-recharge-off = a hard cap (can't overspend; on empty it returns `[]`). Caveat: a 200-with-empty
+result still bills. SerpApi free tier is 100/mo and is untouched by evaluations.
+
+**3. Interview MVP narrowed to one case and verified.** The visible homepage and `/cases` gallery now
+feature only `demo_ai_tool` (Snapforge AI × image before/after), and the homepage primary CTA goes
+straight to `/cases/demo_ai_tool`. The case keeps the existing curated evidence fixture: baseline 89 →
+evidence-adjusted 86, with `brandSafety` revised 75 → 50. The generated Markdown brief now uses the
+same evidence-adjusted scores/rigor as the page (previously it mixed the baseline gate with the evidence
+summary). `scripts/collect-and-judge.ts` was live-tried once: collection returned 3 TikTok snippets but
+Gemini correctly judged all irrelevant, so the existing fixture was restored. A new fail-closed guard
+now refuses to overwrite a demo fixture unless directional evidence exists and actually moves a score.
+Fresh verification: 144/144 tests and `npm run build` pass; desktop `/` → full demo click-through passes
+with no browser console errors. Mobile visual QA remains pending because the browser viewport override
+did not apply in the verification environment.
+
+## Prior conversation handoff (2026-06-15)
 
 The latest work closed the evidence-first loop and simplified runtime evidence sources.
 
@@ -313,6 +358,14 @@ items (一手 ×10) fed in; the gate moved from 证据不足 → 证据部分通
 
 ## Known issues
 
+- **Live evidence never moves the score; it only one-sidedly inflates the gate (structural bias, P0).**
+  All runtime providers (HN + TikHub) emit `direction: "confirm"`, and `evidencePressure` treats confirm
+  as 0 pressure (`evidence-adjustment.ts:82`) — so live evidence moves the 7 scores ≈ 0 (no live `down`
+  source either). The damage is at the gate/confidence layer: `comment_corpus` → primary, and the gate
+  slot / 100-cap / fragility checks only test whether non-proxy evidence *exists*, not its direction, so
+  any returned text passes them. Overall band is held only by the live path lacking non-proxy
+  timing/brandSafety (luck, not design). Details in the 2026-06-18 handoff; fix = the AI-stance layer in
+  Next steps. **Demo cases keep their curated fixtures — that's where the real up/down comes from.**
 - Deployed to Vercel: https://trend-fit-seven.vercel.app (homepage verified live). No custom
   domain yet — the `*.vercel.app` URL is the public demo. Local dev still works via
   `npm run dev` at `http://127.0.0.1:3000`. Note: `/workspace`, `/report`, `/fit-score` and the
@@ -331,6 +384,49 @@ items (一手 ×10) fed in; the gate moved from 证据不足 → 证据部分通
   `unverified`. Future providers should keep this distinction.
 
 ## Next steps
+
+> Reframed 2026-06-18 around an interview deadline (demo must be showable next week). The full AI-stance
+> rebuild is correct but moved to P1 — the existing engine already supports `up`/`down` pressure, it just
+> never had a provider emit them, so the *demo* needs a fixture with AI-judged up/down, not an engine change.
+
+**P0 — interview-week minimal demo path (implemented; core engine/gate unchanged):**
+
+- **Stable interview path:** `/` and `/cases` expose only `demo_ai_tool`; the primary CTA lands directly on
+  `/cases/demo_ai_tool`. The detail page shows input → seven dimensions → curated evidence → 89→86 score
+  movement → gate verdict → aligned downloadable brief. Keep `/evaluate` out of the stage flow.
+- **Offline AI-stance script is experimental, not demo truth:** it enforces per-dimension impacts, verbatim
+  quotes, no baseline score in the stance prompt, and deterministic stance→direction mapping. The first
+  real run found no usable directional evidence (HN/GDELT 0; TikTok snippets all irrelevant), so do not
+  claim the current fixture was AI-judged. The script now fails closed unless evidence moves a score.
+- **Verification:** `npm test` (144/144) and `npm run build` pass; desktop browser click-through has zero
+  console warnings/errors. Complete a real mobile-device pass before the interview; automated viewport
+  override did not take effect in the current browser session.
+- **Interview narrative:** demo the curated `/cases` story; surface the AI stance `quote`/`claim` as the
+  auditability highlight. Do NOT live-run `/evaluate` collection on stage (8s+, external deps, and the
+  confirm-only defect). It is fine to *name* the live defect as a known gap with a designed fix — "I know
+  where my evidence layer is weak and how I'd fix it without handing the verdict to an LLM" is a strength.
+
+**P1 — full AI-stance architecture (after the interview; touches the core engine + tests):**
+
+- **AI stance layer in live `/evaluate`** via an injectable fetcher (so tests mock it, like the SerpApi
+  fetcher). Batch 10–15 snippets/candidate in one Gemini call. AI emits only `{dimension, stance, quote,
+  claim}`; deterministic rules map `supports→up` / `contradicts→down` / `irrelevant→context (no score,
+  no gate)`. AI never emits score/tier/confidence/magnitude/verdict. `quote` verbatim-checked; dedupe
+  same URL/repost/text to one independent source.
+- **Gate bound to stance (the real bypass fix — do it WITH the stance layer, not before):** change
+  `hasNonProxyEvidence` (`recommendation-rigor.ts:166`) so a slot needs ≥N non-proxy **supports** rows,
+  not merely "non-proxy evidence exists". Start the bar LOW (decision ①: e.g. 1 strong supports or 2
+  independent). Bumping the count on confirm-only rows (1→2) without stance is a fake fix.
+- **Pressure mapping:** AI-judged rows use `weak` magnitude so existing thresholds form consensus (1
+  primary/medium = pressure 2, no move; 2 independent same-direction = 4, one step — verified against
+  `evidence-adjustment.ts`). `audience_match: no` ≠ down; only an explicit contradicting quote lowers a
+  dim. Optional: same dim with both supports + contradicts → flag "conflicted", lower stability.
+- **Re-wire GDELT negative-tone → brandSafety down** (already coded, off for rate-limit) as best-effort.
+- **Connect SerpApi to /evaluate** (deterministic Timing/Commercial, no AI; explicit-enable or cached to
+  respect the 100/mo free tier) — only AFTER the gate is stance-bound, else it widens the bypass.
+- **Full live end-to-end** on real keys once the above lands; then refresh demo fixtures if desired.
+
+**P2 — prior backlog:**
 
 1. **Set the GitHub repo About URL** to https://trend-fit-seven.vercel.app and click-through
    verify the prod pages (`/evaluate`, `/cases`, `/cases/[id]`, `/workspace` fixture Google

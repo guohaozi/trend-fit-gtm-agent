@@ -4,6 +4,31 @@ Condensed milestone log for Codex / Claude handoff. **Full detail for any entry 
 `git log` (commit messages) and in this file's own git history** — entries here are
 one-to-two-line summaries, newest first.
 
+## 2026-06-18
+
+- **Single-case interview MVP.** Homepage + `/cases` now feature only `demo_ai_tool`, with the primary CTA
+  opening the complete case directly. Fixed the generated brief to use evidence-adjusted scores and rigor
+  consistently (89→86; brandSafety 75→50; gate/action aligned). Added a fail-closed fixture guard so the
+  offline AI-stance script cannot replace a good demo with zero/non-moving evidence. First live script run
+  produced only irrelevant TikTok snippets, so the curated fixture was restored and remains the honest demo
+  source. 144/144 tests + production build pass; desktop browser path verified, mobile visual QA pending.
+- **Evidence-bias audit + fix design (analysis/decision — no code shipped).** Found a structural defect:
+  `evidencePressure` returns 0 for `direction: "confirm"` (`evidence-adjustment.ts:82`) and every runtime
+  provider (HN, all 5 TikHub platforms) emits only `confirm`, so **live evidence moves the score ≈ 0**;
+  the one-way damage is at the gate/confidence layer (`comment_corpus`→primary satisfies the
+  `audienceOrUseCase` gate slot `recommendation-rigor.ts:192`, lifts the 100-cap `:172`, skips the
+  fragility flip `:219` — all direction-blind). Demo "81→76" comes from hand-written `down` fixture rows,
+  not live. (Corrects an earlier note that confirm "raises" the score.) **Fix decided with Codex:** an AI
+  *stance* layer — Gemini judges supports/contradicts/irrelevant per snippet with verbatim `quote`,
+  deterministic rules map to up/down, gate rebound to ≥N `supports` rows; the LLM never sets
+  score/tier/verdict. Split for an interview deadline (`current-state.md` Next steps): P0 = an offline
+  script freezes one AI-judged fixture for the `/cases` demo (no engine change); P1 = the live stance
+  layer + gate fix + SerpApi after the interview.
+- **API-cost model verified.** `/evaluate` 评估 = one `/api/evidence/collect` per candidate → HN(free) +
+  GDELT(free) + **TikHub 5 platform calls**; **SerpApi = 0** in the evaluate path (only the `/workspace`
+  Google Trends button, 1/click). TikHub prepaid + auto-recharge-off = hard cap; a 200-empty still bills.
+  No "爆" risk for normal demo runs.
+
 ## 2026-06-15
 
 - **Evidence-first loop closed** — `/evaluate` 评估 is now async: it collects real evidence per

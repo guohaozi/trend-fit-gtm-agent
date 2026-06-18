@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getFeaturedCaseCards } from "@/lib/demo-cases";
+import { getFeaturedCaseCards, INTERVIEW_DEMO_ID } from "@/lib/demo-cases";
 import { BAND_LABELS } from "@/lib/display-labels";
 import type { Band } from "@/lib/types";
 
@@ -14,15 +14,15 @@ function bandLabel(band: Band): string {
 }
 
 export default function CasesPage() {
-  const cases = getFeaturedCaseCards();
+  const cases = getFeaturedCaseCards().filter((card) => card.id === INTERVIEW_DEMO_ID);
 
   return (
     <div className="cases-page">
       <header className="cases-page-head">
         <p className="cases-eyebrow">案例展示</p>
-        <h1>真实案例，一页看完判断逻辑。</h1>
+        <h1>一个案例，一页看完判断逻辑。</h1>
         <p>
-          每个案例都直接展开完整的评估输入、七维评分、证据修正和可下载的 GTM
+          这个面试 Demo 直接展开完整的评估输入、七维评分、证据修正和可下载的 GTM
           简报——不用填表、不用等待，直接看引擎给出的结论和理由。
         </p>
         <p className="cases-legend">

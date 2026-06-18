@@ -42,6 +42,18 @@ function collectText(node: unknown): string {
   return [props.alt, props["aria-label"], props.children].map(collectText).join(" ");
 }
 
+function collectHrefs(node: unknown): string[] {
+  if (node == null || typeof node === "boolean") return [];
+  if (Array.isArray(node)) return node.flatMap(collectHrefs);
+  if (typeof node !== "object") return [];
+
+  const props = (node as { props?: { children?: unknown; href?: unknown } }).props;
+  if (!props) return [];
+
+  const ownHref = typeof props.href === "string" ? [props.href] : [];
+  return [...ownHref, ...collectHrefs(props.children)];
+}
+
 describe("report markdown download API", () => {
   it("returns a markdown attachment for a known case", async () => {
     const response = await reportRouteGet(new Request("http://test/api/report/demo_fashion"), {
@@ -80,6 +92,20 @@ describe("report markdown download API", () => {
     assert.equal(response.status, 200);
     assert.ok((await response.text()).length > 0);
   });
+
+  it("keeps the AI-tool brief aligned with its evidence-adjusted verdict", async () => {
+    const response = await reportRouteGet(new Request("http://test/api/report/demo_ai_tool"), {
+      params: Promise.resolve({ id: "demo_ai_tool" })
+    });
+    const markdown = await response.text();
+
+    assert.match(markdown, /\*\*强烈建议跟进。\*\*/);
+    assert.match(markdown, /证据门槛后判断：\*\*强烈建议跟进\*\*/);
+    assert.match(markdown, /证据门槛：\*\*证据门槛通过\*\*/);
+    assert.match(markdown, /建议动作：\*\*自然流量推进\*\*/);
+    assert.match(markdown, /\| 品牌安全 \| 10% \| 50 \|/);
+    assert.match(markdown, /仍需补齐：暂无阻塞型证据缺口/);
+  });
 });
 
 describe("page route smoke tests", () => {
@@ -87,15 +113,18 @@ describe("page route smoke tests", () => {
     assertRenderable(HomePage(), "HomePage");
   });
 
-  it("surfaces the redesigned homepage story and primary entry points", () => {
+  it("surfaces one interview-ready demo as the primary entry point", () => {
     const text = collectText(HomePage());
+    const hrefs = collectHrefs(HomePage());
 
     assert.match(text, /产品该不该追热点？/);
-    assert.match(text, /开始评估/);
-    assert.match(text, /案例展示/);
+    assert.match(text, /查看完整 Demo/);
+    assert.match(text, /Snapforge AI × 图片前后对比/);
+    assert.ok(hrefs.includes("/cases/demo_ai_tool"));
     assert.match(text, /要不要蹭热点/);
     assert.match(text, /从热点到行动，三步完成。/);
-    assert.match(text, /适合这些增长场景。/);
+    assert.doesNotMatch(text, /中端男装 × 静奢风/);
+    assert.doesNotMatch(text, /零食 × 迪拜风开心果脆/);
   });
 
   it("renders the workspace page (and loads the WorkspaceClient module)", () => {
@@ -106,12 +135,14 @@ describe("page route smoke tests", () => {
     assertRenderable(EvaluatePage(), "EvaluatePage");
   });
 
-  it("renders the cases gallery with the evidence legend and featured cards", () => {
+  it("renders the cases gallery with only the interview demo", () => {
     const text = collectText(CasesPage());
 
     assert.match(text, /案例展示/);
     assert.match(text, /基准分 → 证据修正后/);
-    assert.match(text, /中端男装 × 静奢风/);
+    assert.match(text, /图片修图工具 × 前后对比/);
+    assert.doesNotMatch(text, /中端男装 × 静奢风/);
+    assert.doesNotMatch(text, /零食 × 迪拜风开心果脆/);
   });
 
   it("renders a one-page case detail for every featured case", async () => {
