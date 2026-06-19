@@ -1,6 +1,6 @@
 # Current State — Trend-Fit GTM Agent
 
-Last updated: 2026-06-18. Main is pushed to origin; run `git log -1` for the exact HEAD
+Last updated: 2026-06-19. Main is pushed to origin; run `git log -1` for the exact HEAD
 (do not hardcode a commit hash here — it goes stale on every commit).
 
 Compact handoff snapshot for the next Codex / Claude conversation. **Full change history
@@ -22,7 +22,65 @@ an outcome-calibrated sales predictor.
 writes a GTM brief. A "product → candidate trends" discovery layer is intentionally out of
 scope for now.
 
-## Latest conversation handoff (2026-06-18) — evidence-bias audit (analysis only, no code shipped)
+## Latest conversation handoff (2026-06-19) — evidence pipeline hardened, first AI-judged demo frozen
+
+Executes the P0 interview path the 2026-06-18 handoff laid out. Commit: `a65c902`.
+
+**First real-evidence demo case shipped: `demo_pixai` (PixAI × AI-generated original anime characters).**
+Offline script `scripts/collect-and-judge.ts` ran the full pipeline once and froze
+`data/demo_pixai_evidence.json` — NO live `/evaluate` path change, NO change to
+`scoring.ts` / `recommendation-rigor.ts` / `evidence-adjustment.ts` / the 140 existing tests.
+Live numbers from the freeze run: 104 raw candidates across 6 platforms → 48 deduped snippets
+→ 26 directional rows kept. Score moves driven by REAL quotes: brandSafety 50→25 (版权/抗议/NSFW
+verbatim from HN + TikHub), commercialIntent 75→100 (real PixAI-membership purchase-intent quote
++ SerpApi buying queries), timingSaturation 50→75 (SerpApi rising signal). The "evidence can
+contradict the optimistic baseline" claim is now demonstrable on a real case, not just fixtures.
+
+**Pipeline hardening that made the freeze possible:**
+
+- **Collection coverage now 6 platforms live.** Xiaohongshu was 404 (`web/search_notes` was the
+  old path → fixed to `web_v3/fetch_search_notes`). Reddit was 0 not because of API but because
+  `extractSnippets` capped at depth 7 while Reddit GraphQL puts posts at depth 11, and used
+  `title` not `postTitle`. Bumped depth to 14 + added `postTitle/markdown/preview` to TEXT_KEYS.
+  Reddit went from 0 → 18 snippets/case.
+- **SerpApi Google Trends wired into the offline pipeline** (`scripts/collect-and-judge.ts` only,
+  NOT the live `/evaluate` path yet — that's still P1 because gate is not stance-bound).
+  Deterministic mapping per signal — Gemini does not touch it (structured data ≠ NL).
+- **AI stance layer** (the P1 fix, but landed in the offline script as the demo-freeze prerequisite):
+  per-snippet `{dimension, stance, quote, claim}`. `supports→up / contradicts→down / irrelevant→skip`
+  by deterministic rule; AI never emits score/tier/direction/verdict. `quote` must appear verbatim
+  in the snippet text or the row is dropped (anti-hallucination). Stance prompt requires substantive
+  relevance to the actual product & trend (keyword/platform-name/market-jargon mentions →
+  irrelevant); per-dimension criteria spelled out. **Critically: the stance call does NOT receive
+  the baseline scores**, so it can't self-confirm the LLM-proposed baseline.
+- **Operational guardrails**: Gemini 503/429/500 retry with backoff (so a transient overload
+  doesn't waste already-paid TikHub calls); `--cached` flag with a `/tmp` snippet cache (so prompt
+  tweaks re-run without re-billing). Default model bumped to `gemini-3.1-flash-lite` for higher
+  free-tier RPM/RPD; verified same final scores as the earlier `gemini-2.5-flash` run.
+- **Codex-added `lib/demo-fixture-guard.ts`** rejects writing a fixture if there's no directional
+  evidence OR if evidence didn't actually move any score — kills "empty data overwrites demo".
+
+**TikHub balance prereq.** Xiaohongshu / Reddit endpoints respond **402 "Insufficient balance,
+endpoint does not accept free credit"** until prepaid balance is topped up. Free-tier credits cover
+TikTok only. With the recharge done, all 5 social endpoints return 200 + bill per call. Cost model
+unchanged from 2026-06-18: ~5 TikHub calls × N search terms per case run; SerpApi 1 call per case;
+Gemini 1 batch call per case (retries on 5xx).
+
+**Known data-quality residual.** The strict prompt + `gemini-3.1-flash-lite` together judge
+conservatively: ~5 directional rows from 48 snippets (vs ~20 with 2.5-flash). The brandSafety /
+commercialIntent / timing signals still all fire correctly for demo_pixai, but a lot of
+xiaohongshu Chinese snippets get dropped as irrelevant (二次元 notes that don't explicitly
+discuss audience/use-case fit). Fine for the interview; revisit prompt sensitivity post-interview.
+
+**Still to do for the interview demo.** Run the same pipeline for `demo_lego` (LEGO × World Cup
+2026 fan culture; pure consumer test of Xiaohongshu/TikTok evidence — World Cup 2026 is live so
+SerpApi should give strong timing). Then register both new cases in `lib/demo-cases.ts` (build a
+proper `data/demo_pixai.json` + `data/demo_lego.json` with the Chinese product profiles + the
+frozen `*_evidence.json`), point `INTERVIEW_DEMO_ID` and the featured list at them, and confirm
+`/cases/[id]` SSG + the existing 140 tests still pass. The retired `demo_ai_tool` (Snapforge)
+stays as a regression anchor in tests but disappears from the customer-facing gallery.
+
+## Prior conversation handoff (2026-06-18) — evidence-bias audit (analysis only, no code shipped)
 
 Two findings from an audit pass; both are also folded into Known issues + Next steps below.
 
@@ -365,7 +423,10 @@ items (一手 ×10) fed in; the gate moved from 证据不足 → 证据部分通
   slot / 100-cap / fragility checks only test whether non-proxy evidence *exists*, not its direction, so
   any returned text passes them. Overall band is held only by the live path lacking non-proxy
   timing/brandSafety (luck, not design). Details in the 2026-06-18 handoff; fix = the AI-stance layer in
-  Next steps. **Demo cases keep their curated fixtures — that's where the real up/down comes from.**
+  Next steps. **Update 2026-06-19:** the stance layer + Reddit/Xiaohongshu/SerpApi coverage **now
+  exist and are proven on a real case** (`demo_pixai`, frozen fixture) — but only in the offline
+  `scripts/collect-and-judge.ts` path. The live `/evaluate` request path is still confirm-only and the
+  gate is still not stance-bound; that's the P1 work after the interview.
 - Deployed to Vercel: https://trend-fit-seven.vercel.app (homepage verified live). No custom
   domain yet — the `*.vercel.app` URL is the public demo. Local dev still works via
   `npm run dev` at `http://127.0.0.1:3000`. Note: `/workspace`, `/report`, `/fit-score` and the
@@ -389,22 +450,37 @@ items (一手 ×10) fed in; the gate moved from 证据不足 → 证据部分通
 > rebuild is correct but moved to P1 — the existing engine already supports `up`/`down` pressure, it just
 > never had a provider emit them, so the *demo* needs a fixture with AI-judged up/down, not an engine change.
 
-**P0 — interview-week minimal demo path (implemented; core engine/gate unchanged):**
+**P0 — interview-week minimal demo path (mostly implemented; core engine/gate unchanged):**
 
-- **Stable interview path:** `/` and `/cases` expose only `demo_ai_tool`; the primary CTA lands directly on
-  `/cases/demo_ai_tool`. The detail page shows input → seven dimensions → curated evidence → 89→86 score
-  movement → gate verdict → aligned downloadable brief. Keep `/evaluate` out of the stage flow.
-- **Offline AI-stance script is experimental, not demo truth:** it enforces per-dimension impacts, verbatim
-  quotes, no baseline score in the stance prompt, and deterministic stance→direction mapping. The first
-  real run found no usable directional evidence (HN/GDELT 0; TikTok snippets all irrelevant), so do not
-  claim the current fixture was AI-judged. The script now fails closed unless evidence moves a score.
-- **Verification:** `npm test` (144/144) and `npm run build` pass; desktop browser click-through has zero
-  console warnings/errors. Complete a real mobile-device pass before the interview; automated viewport
-  override did not take effect in the current browser session.
-- **Interview narrative:** demo the curated `/cases` story; surface the AI stance `quote`/`claim` as the
-  auditability highlight. Do NOT live-run `/evaluate` collection on stage (8s+, external deps, and the
-  confirm-only defect). It is fine to *name* the live defect as a known gap with a designed fix — "I know
-  where my evidence layer is weak and how I'd fix it without handing the verdict to an LLM" is a strength.
+- ✅ **Pipeline hardened + first real-evidence case frozen (2026-06-19, commit `a65c902`).** Offline
+  `scripts/collect-and-judge.ts` runs the full pipeline (6 platforms incl. fixed Xiaohongshu/Reddit +
+  SerpApi + Gemini stance with verbatim quote + Gemini 503 retry + `--cached` snippet cache) and froze
+  `data/demo_pixai_evidence.json` (PixAI × AI-generated original anime characters) with score moves
+  driven by **real AI-judged quotes** — brandSafety 50→25 (版权/抗议/NSFW), commercialIntent 75→100
+  (PixAI membership purchase intent + SerpApi buying queries), timingSaturation 50→75 (SerpApi rising).
+  Codex's earlier P0 note "do not claim the fixture was AI-judged" was true for *his* run with the
+  pre-hardening pipeline; the current `data/demo_pixai_evidence.json` IS AI-judged with verbatim quote
+  per row. Codex-added `lib/demo-fixture-guard.ts` still blocks writing a fixture if evidence didn't
+  actually move a score.
+- **Stable interview path (Codex baseline, unchanged):** `/` and `/cases` currently expose only
+  `demo_ai_tool` (Snapforge curated fixture: 89→86 movement, gate verdict, brief). Keep `/evaluate` out
+  of the stage flow regardless.
+- ⏳ **Wire `demo_pixai` (and next, `demo_lego`) into the customer surface.** Build the Chinese
+  `data/demo_pixai.json` + `data/demo_lego.json` product profiles, register in `lib/demo-cases.ts`
+  (`DEMO_CASES` + `EVIDENCE_CASES`), point `INTERVIEW_DEMO_ID` + `getFeaturedCaseCards()` at them so
+  the interview lands on a real-evidence story (or keep `demo_ai_tool` as a parallel curated case).
+  Confirm `/cases/[id]` SSG + the existing 144 tests still pass.
+- ⏳ **Freeze `demo_lego` (LEGO × World Cup 2026 fan culture).** Same script, consumer test of
+  Xiaohongshu/TikTok; SerpApi should give strong timing since World Cup is live. (Pivoted from F1 →
+  World Cup for stronger "热点极热但产品契合需找角度" tension.)
+- **Verification:** `npm test` 144/144 + `npm run build` pass on `a65c902`. Desktop browser
+  click-through clean. Real-device mobile pass still TODO.
+- **Interview narrative:** demo the `/cases` story (currently `demo_ai_tool`; after wire-in,
+  `demo_pixai` is the headliner since it has real AI-judged contradictory evidence). Surface the AI
+  stance `quote`/`claim` as the auditability highlight ("AI 只读懂语言、不下裁决"). Do NOT live-run
+  `/evaluate` collection on stage (still confirm-only there). Naming the live defect as a known gap
+  with a designed fix is a strength — "I know where my evidence layer is weak and how I'd fix it
+  without handing the verdict to an LLM."
 
 **P1 — full AI-stance architecture (after the interview; touches the core engine + tests):**
 
