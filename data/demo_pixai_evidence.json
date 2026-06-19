@@ -123,5 +123,32 @@
       "sourceUrl": "https://serpapi.com/search?engine=google_trends&q=AI+art+generator&data_type=RELATED_QUERIES&date=today+12-m",
       "note": "Google Trends：时间序列近期均值在下降。（ai art generator free） (verified secondary source signal)"
     }
-  ]
+  ],
+  "expectedAdjustedScores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 100,
+    "creativeFeasibility": 100,
+    "commercialIntent": 100,
+    "brandSafety": 25,
+    "timingSaturation": 75
+  },
+  "expectedAdjustedTotal": 90,
+  "expectedAdjustedBand": "Strong Go",
+  "profileUsed": "default",
+  "expectedEvidenceGate": "partial",
+  "expectedGatedBand": "Cautious test",
+  "expectedGateMissing": ["audienceOrUseCase"],
+  "expectedDimensionCaps": ["audienceOverlap"],
+  "expectedStability": "fragile",
+  "expectedDecisionType": "small test",
+  "expectedDimensionConfidence": {
+    "audienceOverlap": "assumption",
+    "useCaseRelevance": "assumption",
+    "messageBridge": "assumption",
+    "creativeFeasibility": "evidence-confirmed (medium)",
+    "commercialIntent": "evidence-revised (medium)",
+    "brandSafety": "evidence-revised (medium)",
+    "timingSaturation": "evidence-revised (high)"
+  }
 }

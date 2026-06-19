@@ -1,5 +1,7 @@
 import aiToolDemo from "@/data/demo_ai_tool.json";
 import aiToolEvidenceDemo from "@/data/demo_ai_tool_evidence.json";
+import pixaiDemo from "@/data/demo_pixai.json";
+import pixaiEvidenceDemo from "@/data/demo_pixai_evidence.json";
 import fashionDemo from "@/data/demo_fashion.json";
 import fashionEvidenceDemo from "@/data/demo_fashion_evidence.json";
 import proteinDrinkDemo from "@/data/demo_protein_drink.json";
@@ -29,6 +31,7 @@ export const DEMO_CASES = [
   fashionDemo,
   roboticsDemo,
   aiToolDemo,
+  pixaiDemo,
   snackDemo,
   proteinDrinkDemo
 ] as DemoCase[];
@@ -39,6 +42,7 @@ export const REPORT_FILES: Record<string, string> = {
   demo_fashion: "demo_fashion_report.md",
   demo_robotics: "demo_robotics_report.md",
   demo_ai_tool: "demo_ai_tool_report.md",
+  demo_pixai: "demo_pixai_report.md",
   demo_snack: "demo_snack_report.md",
   demo_protein_drink: "demo_protein_drink_report.md"
 };
@@ -46,6 +50,7 @@ export const REPORT_FILES: Record<string, string> = {
 export const EVIDENCE_CASES = [
   fashionEvidenceDemo,
   aiToolEvidenceDemo,
+  pixaiEvidenceDemo,
   snackEvidenceDemo,
   proteinDrinkEvidenceDemo
 ] as EvidenceAdjustmentCase[];
@@ -174,6 +179,35 @@ const REPORT_COPY: Record<string, ReportCopy> = {
     avoidWords: ["替代人类", "全自动生活", "什么都能做", "科幻管家", "无懈可击"],
     creatorTypes: "优先找智能家居测评、家庭生活方式、宠物家庭和科技 YouTube 创作者，尤其是会讲缺点的测评人。",
     launchTest: "先做一条 7 天真实体验和一条隐私解释内容，观察评论区对信任、隐私、实用性的反馈，再决定是否进入付费投放。"
+  },
+  demo_pixai: {
+    productName: "PixAI",
+    trendName: "AI 生成原创动漫角色（OC）",
+    recommendation:
+      "建议跟进，但仅适合小规模测试。产品和热点契合度极高，但真实社区里存在版权争议和动漫圈反对，必须先用小测试观察舆情风向。",
+    fitRead:
+      "PixAI 的核心场景就是用 AI 生成原创角色，与「捏崽 / OC / 自设」趋势天然契合：受众重合、场景自然、卖点直连。真实证据也确认了付费意愿（用户在讨论会员是否值得），但同时把品牌安全压到了 25——日本动漫圈对 AI 艺术有强烈反对，画师抗议未授权训练，NSFW 内容也是隐忧。",
+    angle: {
+      primary: "把「拥有专属画师」从绘师手作变成人人可达的二次元体验。",
+      alternatives: ["不会画画也能有自己的 OC。", "捏崽、训 LoRA、出图——三步搞定属于你的角色。"]
+    },
+    contentIdeas: [
+      "录屏展示从描述词到 OC 成品的完整捏崽过程，强调创作乐趣而非取代画师。",
+      "做「我的 OC 设定卡」教程，引导用户用 PixAI 训练专属 LoRA。",
+      "邀请二次元创作者分享 OC 故事，把工具放在第二位，角色和情感放在第一位。",
+      "在小红书发布短笔记，避开 Reddit/X 上对 AI 艺术更敏感的英文社区。"
+    ],
+    risks: [
+      "不要使用其他画师作品训练或营销，避免「抄袭画风」争议。",
+      "在内容中清晰区分 AI 辅助与原创，尊重画师群体的诉求。",
+      "如果遇到「AI slop」「未授权训练」类负面评论，要正面回应而不是装作没看见。",
+      "NSFW 内容必须按平台规则严格管控，避免被关联到不安全品牌形象。"
+    ],
+    voice: "对二次元用户友好、尊重创作圈、不抢画师风头。把工具定位成「让你拥有专属画师」，而不是「替代画师」。",
+    useWords: ["原创角色", "OC", "捏崽", "二次元", "自设", "LoRA", "角色设定"],
+    avoidWords: ["替代画师", "免费抄袭", "AI 神作", "比画师还好", "无限二创"],
+    creatorTypes: "优先找二次元同人画师、VTuber、ACG 测评、原创角色创作者，避免对 AI 艺术持强烈反对态度的硬核画师社区。",
+    launchTest: "先在小红书做小规模捏崽内容测试（3-5 条），观察评论区对 AI 艺术、版权、付费的反应；如果舆情可控再投放，否则保持低调先把社区好感攒起来。"
   },
   demo_ai_tool: {
     productName: "Snapforge AI",
@@ -450,10 +484,10 @@ export const FEATURED_CASE_META: Array<{
     note: "适合先做内容测试，再决定是否扩大预算。"
   },
   {
-    id: "demo_ai_tool",
-    title: "图片修图工具 × 前后对比",
+    id: "demo_pixai",
+    title: "PixAI × AI 生成原创动漫角色（OC）",
     image: "/case-studies/ai-photo-before-after.png",
-    note: "适合验证转化素材，但需要提前检查平台和品牌风险。"
+    note: "契合度极高，但真实社区把品牌安全压到 25，只适合小规模测试。"
   },
   {
     id: "demo_snack",
@@ -463,7 +497,7 @@ export const FEATURED_CASE_META: Array<{
   }
 ];
 
-export const INTERVIEW_DEMO_ID = "demo_ai_tool";
+export const INTERVIEW_DEMO_ID = "demo_pixai";
 
 export type FeaturedCaseCard = (typeof FEATURED_CASE_META)[number] & {
   baselineTotal: number;

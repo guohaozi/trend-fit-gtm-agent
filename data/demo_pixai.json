@@ -1,0 +1,52 @@
+{
+  "id": "demo_pixai",
+  "product": {
+    "name": "PixAI",
+    "category": "二次元 AI 绘画平台",
+    "targetMarket": ["中国大陆", "美国", "日本", "东南亚"],
+    "audience": "二次元爱好者、ACG 与同人创作者、原创角色（OC）作者、VTuber",
+    "priceRange": "免费额度 + 订阅会员",
+    "positioning": "面向二次元的 AI 绘画与角色生成平台，支持云端 LoRA 训练自定义画风与原创角色",
+    "sellingPoints": [
+      "文生图秒出动漫角色，描述即生成",
+      "云端 LoRA 训练自己的画风与 OC（零技术门槛）",
+      "图生视频，让插画动起来"
+    ],
+    "brandTone": "二次元友好、创作者优先、社区驱动",
+    "competitors": ["NovelAI", "SeaArt", "Civitai", "Tensor.art"],
+    "campaignGoal": "注册 + 订阅转化",
+    "riskTolerance": "medium"
+  },
+  "trend": {
+    "name": "AI 生成原创动漫角色（OC）",
+    "platform": "小红书 / TikTok / Reddit / X",
+    "region": "中国大陆、美国、日本、东南亚",
+    "description": "二次元爱好者用 AI 生成原创角色（OC）、自设与同人插画，并在小红书 / TikTok / Reddit 分享捏崽过程、设定卡与角色训练。",
+    "drivenBy": "ACG 同人创作者、OC 作者、VTuber 和二次元社区",
+    "format": "捏崽过程、OC 设定卡、画风对比、LoRA 训练教程",
+    "whyPopular": "降低自创角色门槛，让没有绘画基础的二次元爱好者也能拥有专属画师与 OC",
+    "exampleContent": "创作者展示从描述词到 OC 成品的全过程，附带画风 LoRA 与设定细节",
+    "controversy": "AI 抄袭画风争议、未经授权训练、NSFW 内容流出、动漫圈对 AI 艺术的反对"
+  },
+  "scores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 100,
+    "creativeFeasibility": 100,
+    "commercialIntent": 75,
+    "brandSafety": 50,
+    "timingSaturation": 50
+  },
+  "expectedTotal": 88,
+  "expectedBand": "Strong Go",
+  "expectedQualifier": null,
+  "expectedFinalBand": "Strong Go",
+  "overrideReason": null,
+  "profileUsed": "default",
+  "expectedEvidenceGate": "fail",
+  "expectedGatedBand": "Go",
+  "expectedGateMissing": ["timingSaturation", "brandSafety", "audienceOrUseCase"],
+  "expectedDimensionCaps": ["audienceOverlap", "creativeFeasibility"],
+  "expectedStability": "fragile",
+  "expectedDecisionType": "small test"
+}

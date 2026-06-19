@@ -22,7 +22,7 @@ import WorkspacePage from "../app/workspace/page";
 // was missing: it does not render to a DOM, but importing each page module
 // evaluates its whole component/import graph, and calling the page function
 // runs the real demo-data loading path.
-const CASE_IDS = ["demo_fashion", "demo_robotics", "demo_ai_tool", "demo_snack", "demo_protein_drink"] as const;
+const CASE_IDS = ["demo_fashion", "demo_robotics", "demo_ai_tool", "demo_pixai", "demo_snack", "demo_protein_drink"] as const;
 
 function assertRenderable(node: unknown, label: string): void {
   // A React element is a truthy object; we deliberately avoid asserting the
@@ -93,18 +93,19 @@ describe("report markdown download API", () => {
     assert.ok((await response.text()).length > 0);
   });
 
-  it("keeps the AI-tool brief aligned with its evidence-adjusted verdict", async () => {
-    const response = await reportRouteGet(new Request("http://test/api/report/demo_ai_tool"), {
-      params: Promise.resolve({ id: "demo_ai_tool" })
+  it("keeps the PixAI brief aligned with its evidence-adjusted verdict", async () => {
+    const response = await reportRouteGet(new Request("http://test/api/report/demo_pixai"), {
+      params: Promise.resolve({ id: "demo_pixai" })
     });
     const markdown = await response.text();
 
-    assert.match(markdown, /\*\*强烈建议跟进。\*\*/);
-    assert.match(markdown, /证据门槛后判断：\*\*强烈建议跟进\*\*/);
-    assert.match(markdown, /证据门槛：\*\*证据门槛通过\*\*/);
-    assert.match(markdown, /建议动作：\*\*自然流量推进\*\*/);
-    assert.match(markdown, /\| 品牌安全 \| 10% \| 50 \|/);
-    assert.match(markdown, /仍需补齐：暂无阻塞型证据缺口/);
+    assert.match(markdown, /\*\*谨慎测试。\*\*/);
+    assert.match(markdown, /基准判断：\*\*强烈建议跟进\*\*/);
+    assert.match(markdown, /证据门槛后判断：\*\*谨慎测试\*\*/);
+    assert.match(markdown, /证据门槛：\*\*证据部分通过\*\*/);
+    assert.match(markdown, /建议动作：\*\*小测试\*\*/);
+    assert.match(markdown, /\| 品牌安全 \| 10% \| 25 \|/);
+    assert.match(markdown, /仍需补齐：受众或使用场景/);
   });
 });
 
@@ -119,8 +120,8 @@ describe("page route smoke tests", () => {
 
     assert.match(text, /产品该不该追热点？/);
     assert.match(text, /查看完整 Demo/);
-    assert.match(text, /Snapforge AI × 图片前后对比/);
-    assert.ok(hrefs.includes("/cases/demo_ai_tool"));
+    assert.match(text, /PixAI × AI 生成原创动漫角色/);
+    assert.ok(hrefs.includes("/cases/demo_pixai"));
     assert.match(text, /要不要蹭热点/);
     assert.match(text, /从热点到行动，三步完成。/);
     assert.doesNotMatch(text, /中端男装 × 静奢风/);
@@ -140,13 +141,13 @@ describe("page route smoke tests", () => {
 
     assert.match(text, /案例展示/);
     assert.match(text, /基准分 → 证据修正后/);
-    assert.match(text, /图片修图工具 × 前后对比/);
+    assert.match(text, /PixAI × AI 生成原创动漫角色/);
     assert.doesNotMatch(text, /中端男装 × 静奢风/);
     assert.doesNotMatch(text, /零食 × 迪拜风开心果脆/);
   });
 
   it("renders a one-page case detail for every featured case", async () => {
-    for (const id of ["demo_fashion", "demo_ai_tool", "demo_snack"]) {
+    for (const id of ["demo_fashion", "demo_pixai", "demo_snack"]) {
       const node = await CaseDetailPage({ params: Promise.resolve({ id }) });
       assertRenderable(node, `CaseDetailPage(id=${id})`);
       assert.match(collectText(node), /证据修正后/);

@@ -65,7 +65,7 @@ export default function HomePage() {
         <div className="simple-product-preview" aria-label="决策预览">
           <div className="preview-topline">
             <span>当前评估</span>
-            <strong>Snapforge AI × 图片前后对比</strong>
+            <strong>PixAI × AI 生成原创动漫角色（OC）</strong>
           </div>
           <div className="preview-score">
             <span>证据修正后</span>
