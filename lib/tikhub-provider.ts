@@ -28,7 +28,7 @@ const PLATFORMS: TikhubPlatform[] = [
   {
     key: "xiaohongshu",
     label: "小红书",
-    path: "/api/v1/xiaohongshu/web/search_notes",
+    path: "/api/v1/xiaohongshu/web_v3/fetch_search_notes",
     param: "keyword",
     searchUrl: (q) => `https://www.xiaohongshu.com/search_result?keyword=${encodeURIComponent(q)}`
   },
@@ -73,12 +73,15 @@ const TEXT_KEYS = new Set([
   "full_text",
   "display_name",
   "nickname",
-  "name"
+  "name",
+  "posttitle",
+  "markdown",
+  "preview"
 ]);
 
 /** Recursively pull human-readable text from a platform-specific JSON tree. Pure + testable. */
 export function extractSnippets(node: unknown, max = MAX_SNIPPETS, out: string[] = [], depth = 0): string[] {
-  if (out.length >= max || depth > 7 || node == null) return out;
+  if (out.length >= max || depth > 14 || node == null) return out;
   if (Array.isArray(node)) {
     for (const item of node) {
       extractSnippets(item, max, out, depth + 1);

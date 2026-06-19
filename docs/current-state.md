@@ -291,7 +291,7 @@ available in this environment.
 
 The 7 anchor scores were always an *input* (the engine can't derive them from free text). `/evaluate`
 offers a "✨ 用 AI 评分" button per candidate that calls `POST /api/evaluate/baseline`
-(`lib/baseline-scorer.ts`, **`@google/genai`**, **Gemini Flash** `gemini-2.5-flash` via `GEMINI_MODEL`,
+(`lib/baseline-scorer.ts`, **`@google/genai`**, **Gemini Flash** `gemini-3.1-flash-lite` via `GEMINI_MODEL` (was `gemini-2.5-flash`; swapped 2026-06-18 for higher free-tier RPM/RPD),
 structured `responseSchema` → 7 anchor scores + per-dimension rationale; `snapToAnchor` guards the
 anchors). The model is instructed these are **reasoned baseline hypotheses, not evidence** (no
 fabricated metrics/URLs); the deterministic engine + source-tier classifier + evidence gate still

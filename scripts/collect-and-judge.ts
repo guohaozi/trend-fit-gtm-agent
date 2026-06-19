@@ -9,7 +9,7 @@
  * classifier owns tier, and the existing engine owns the score. Preserves 采集者不能兼裁判.
  *
  * NOT wired into the live request path; changes NO engine file. Run from the project root:
- *   GEMINI_API_KEY=… TIKHUB_API_KEY=… node --import tsx scripts/collect-and-judge.ts demo_ai_tool
+ *   GEMINI_API_KEY=… TIKHUB_API_KEY=… node --import tsx scripts/collect-and-judge.ts demo_pixai
  *   node --import tsx scripts/collect-and-judge.ts demo_lego --dry   # collect+judge, print, no write
  */
 import { GoogleGenAI, Type } from "@google/genai";
@@ -18,6 +18,7 @@ import path from "node:path";
 import { collectFreeEvidence } from "../lib/free-evidence-providers";
 import { buildEvidenceDraft, type EvidenceCandidate } from "../lib/evidence-collector";
 import { adjustScores } from "../lib/evidence-adjustment";
+import { SerpApiGoogleTrendsSource } from "../lib/seo-keyword-provider";
 import { assertDemoFixtureReady } from "../lib/demo-fixture-guard";
 import { SCORE_KEYS, type ScoreKey, type Scores } from "../lib/types";
 
@@ -35,9 +36,9 @@ function loadEnvLocal(): void {
 }
 loadEnvLocal();
 
-const MODEL = process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
+const MODEL = process.env.GEMINI_MODEL?.trim() || "gemini-3.1-flash-lite";
 
-type CaseDef = { caseId: string; product: string; trend: string; trendDescription: string; baseline: Scores };
+type CaseDef = { caseId: string; product: string; trend: string; trendDescription: string; baseline: Scores; searchTerms: string[]; trendsQuery?: string };
 
 function readJson(file: string): any {
   return JSON.parse(fs.readFileSync(path.join(DATA_DIR, file), "utf8"));
@@ -45,16 +46,30 @@ function readJson(file: string): any {
 
 /** Reuse existing committed data so the product/trend/baseline aren't re-invented. */
 function loadCase(caseId: string): CaseDef {
-  if (caseId === "demo_ai_tool") {
-    const d = readJson("demo_ai_tool.json");
-    return { caseId, product: d.product.name, trend: d.trend.name, trendDescription: d.trend.description, baseline: d.scores };
+  if (caseId === "demo_pixai") {
+    // New real-evidence case. Inlined here (NOT touching the hard-asserted demo_ai_tool baseline).
+    // baseline = AI hypothesis: high fit, but brandSafety/timing held at 50 (AI-art style-theft /
+    // copyright debate + a crowded AI-art lane) so there is real risk tension to show.
+    return {
+      caseId,
+      product: "PixAI",
+      trend: "AI 生成原创动漫角色（OC）",
+      trendDescription:
+        "二次元爱好者用 AI 生成原创角色（OC）、自设与同人插画，并在小红书 / TikTok / Reddit 分享捏崽和设定。",
+      baseline: {
+        audienceOverlap: 100, useCaseRelevance: 100, messageBridge: 100, creativeFeasibility: 100,
+        commercialIntent: 75, brandSafety: 50, timingSaturation: 50
+      } as Scores,
+      searchTerms: ["PixAI", "AI 绘画", "AI anime art"],
+      trendsQuery: "AI art generator"
+    };
   }
   if (caseId === "demo_lego") {
     const s = readJson("lego_trend_shortlist.json");
-    const f1 = s.candidates.find((c: any) => c.id === "lego_f1_race_trend");
-    return { caseId, product: s.productName, trend: f1.trendName, trendDescription: f1.trendDescription, baseline: f1.baselineScores };
+    const wc = s.candidates.find((c: any) => c.id === "lego_world_cup_trend");
+    return { caseId, product: s.productName, trend: wc.trendName, trendDescription: wc.trendDescription, baseline: wc.baselineScores, searchTerms: ["世界杯 2026", "乐高 世界杯", "LEGO World Cup"], trendsQuery: "World Cup 2026" };
   }
-  throw new Error(`unknown case: ${caseId} (options: demo_ai_tool, demo_lego)`);
+  throw new Error(`unknown case: ${caseId} (options: demo_pixai, demo_lego)`);
 }
 
 // ---- AI stance layer: outputs only structured labels, never scores/tier/direction ----
@@ -91,20 +106,31 @@ function stanceSchema() {
   };
 }
 
-function stanceSystemPrompt(): string {
+function stanceSystemPrompt(def: CaseDef): string {
   return [
-    "你是一个证据立场判定器。给你一个【产品】【候选热点】和若干条从社媒/社区真实采集到的【snippet】。",
-    "对每条 snippet，判断它对 7 个『产品×趋势适配』维度分别是 supports（支持）/ contradicts（反对）/ irrelevant（无关）。",
+    "你是一个严格的证据立场判定器。下面给你一个【产品】【候选热点】，以及若干条从社媒/社区真实采集的【snippet】。",
+    `【产品】${def.product}`,
+    `【候选热点】${def.trend} —— ${def.trendDescription}`,
+    "对每条 snippet，判断它对下面 7 个「产品×趋势适配」维度分别是 supports / contradicts / irrelevant。",
     "",
-    "7 个维度（英文 key）：audienceOverlap 受众重合、useCaseRelevance 场景相关、messageBridge 卖点桥接、",
-    "creativeFeasibility 内容可执行、commercialIntent 商业意图、brandSafety 品牌安全、timingSaturation 时机与饱和。",
+    "【最重要原则——实质相关】判断必须基于 snippet 的实质内容，且必须实质针对【这个产品】【这个热点】或其受众/场景/争议。",
+    "仅仅出现某个关键词、平台名、品类名，或泛泛的商业/市场/赚钱字眼，都【不构成】判断依据 → 一律 irrelevant。",
+    "宁可漏判（irrelevant），也不要把无关内容牵强地关联到某维度。不要用世界知识补充 snippet 没写的东西。",
+    "用户名、纯标签(#xxx)、导航词、广告、与产品/热点无实质关联的内容 → irrelevant。",
     "",
-    "铁律：",
-    "1. 只依据 snippet 文本本身判断，不要用你的世界知识补充 snippet 里没有的信息。",
-    "2. quote 必须是 snippet 原文里【逐字出现】的片段；编造 quote 的判断会被丢弃。",
-    "3. 只输出立场标签，绝不输出任何分数、数字、百分比、URL 或最终建议——评分由确定性引擎决定，不是你。",
-    "4. 只有文本明确指向某维度时才给 supports/contradicts；泛泛而谈或不确定一律 irrelevant。",
-    "5. 一条 snippet 可以同时 supports 一个维度、contradicts 另一个维度。"
+    "【7 个维度 + 判定标准】（只有 snippet 实质满足时才给 supports/contradicts）：",
+    "- audienceOverlap 受众重合：snippet 显示真实用户【本身就是】这个热点/产品的目标人群（在讨论、使用、关心它）。仅提到平台名（如『小红书』）不算。",
+    "- useCaseRelevance 场景相关：snippet 显示产品融入这个热点的【使用场景】真实、自然。",
+    "- messageBridge 卖点桥接：snippet 显示这个热点能顺畅连接到产品的真实卖点。",
+    "- creativeFeasibility 内容可执行：snippet 是这类内容【真实被产出】的实例（确有人在做）。",
+    "- commercialIntent 商业意图：snippet 显示对【该产品或同类产品】的购买/付费/订阅/试用/比价意图。泛泛的『市场/赛道/股市/赚钱/创业』【不算】。",
+    "- brandSafety 品牌安全：snippet 显示争议/风险/负面（版权、抄袭、NSFW、抵制、反感）→ contradicts；显示正面/安全/被认可 → supports。",
+    "- timingSaturation 时机饱和：snippet 明确说热点【刚兴起/还新鲜】→ supports；明确说【已经烂大街/过气/卷】→ contradicts；否则 irrelevant。",
+    "",
+    "【输出红线】：",
+    "1. quote 必须是 snippet 原文里【逐字出现】的片段；编造的判断会被丢弃。",
+    "2. 只输出立场标签，绝不输出任何分数、数字、URL 或最终建议——评分由确定性引擎决定，不是你。",
+    "3. 一条 snippet 可以同时 supports 一个维度、contradicts 另一个维度。"
   ].join("\n");
 }
 
@@ -133,20 +159,32 @@ function dedupeSnippets(candidates: EvidenceCandidate[]): Snippet[] {
 
 async function judgeStance(def: CaseDef, snippets: Snippet[]): Promise<Judgement[]> {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-  const response = await ai.models.generateContent({
-    model: MODEL,
-    contents: stanceUserPrompt(def, snippets),
-    config: {
-      systemInstruction: stanceSystemPrompt(),
-      responseMimeType: "application/json",
-      responseSchema: stanceSchema(),
-      temperature: 0.2
+  const maxAttempts = 5;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const response = await ai.models.generateContent({
+        model: MODEL,
+        contents: stanceUserPrompt(def, snippets),
+        config: {
+          systemInstruction: stanceSystemPrompt(def),
+          responseMimeType: "application/json",
+          responseSchema: stanceSchema(),
+          temperature: 0.2
+        }
+      });
+      const text = response.text;
+      if (!text) throw new Error("Gemini 没有返回内容。");
+      const parsed = JSON.parse(text);
+      return Array.isArray(parsed?.judgements) ? (parsed.judgements as Judgement[]) : [];
+    } catch (e: any) {
+      const status = e?.status ?? e?.code;
+      if ((status !== 503 && status !== 429 && status !== 500) || attempt === maxAttempts) throw e;
+      const waitMs = 3000 * attempt;
+      console.log(`  Gemini ${status} 过载，${waitMs / 1000}s 后重试（${attempt}/${maxAttempts - 1}）…`);
+      await new Promise((r) => setTimeout(r, waitMs));
     }
-  });
-  const text = response.text;
-  if (!text) throw new Error("Gemini 没有返回内容。");
-  const parsed = JSON.parse(text);
-  return Array.isArray(parsed?.judgements) ? (parsed.judgements as Judgement[]) : [];
+  }
+  throw new Error("Gemini 多次重试仍失败。");
 }
 
 /**
@@ -182,6 +220,47 @@ function mapToCandidates(snippets: Snippet[], judgements: Judgement[]): Evidence
   return out;
 }
 
+// ---- SerpApi Google Trends: deterministic timing/commercial evidence (NOT via the AI layer) ----
+const SERP_SIGNAL: Record<string, { dim: ScoreKey; dir: "up" | "down"; mag: "weak" | "moderate" | "strong"; conf: "low" | "medium" | "high" }> = {
+  breakout_keyword: { dim: "timingSaturation", dir: "up", mag: "strong", conf: "high" },
+  high_growth_keyword: { dim: "timingSaturation", dir: "up", mag: "moderate", conf: "medium" },
+  moderate_growth_keyword: { dim: "timingSaturation", dir: "up", mag: "weak", conf: "medium" },
+  trend_rising: { dim: "timingSaturation", dir: "up", mag: "moderate", conf: "medium" },
+  trend_declining: { dim: "timingSaturation", dir: "down", mag: "moderate", conf: "medium" },
+  trend_saturated: { dim: "timingSaturation", dir: "down", mag: "moderate", conf: "medium" },
+  related_buying_query: { dim: "commercialIntent", dir: "up", mag: "moderate", conf: "medium" },
+  low_search_demand: { dim: "commercialIntent", dir: "down", mag: "weak", conf: "medium" }
+};
+
+async function collectSerpApiTiming(trendsQuery?: string): Promise<EvidenceCandidate[]> {
+  if (!process.env.SERPAPI_API_KEY || !trendsQuery) return [];
+  try {
+    const source = new SerpApiGoogleTrendsSource({});
+    const r = await source.collect({ product: "", market: "", trend: trendsQuery });
+    const out: EvidenceCandidate[] = [];
+    let i = 0;
+    for (const f of r.seoKeywordFindings as Array<Record<string, any>>) {
+      const m = SERP_SIGNAL[f.signal];
+      if (!m) continue;
+      out.push({
+        id: `serp-${i++}-${m.dim}`,
+        dimension: m.dim,
+        direction: m.dir,
+        magnitude: m.mag,
+        desiredConfidence: m.conf,
+        sourceUrl: f.sourceUrl ?? "https://trends.google.com",
+        verificationStatus: "verified",
+        sourceSignals: ["research_report"],
+        note: `Google Trends：${f.note ?? ""}（${f.query ?? trendsQuery}）`
+      });
+    }
+    return out;
+  } catch (e) {
+    console.log(`  SerpApi 跳过：${e instanceof Error ? e.message : String(e)}`);
+    return [];
+  }
+}
+
 function printDelta(baseline: Scores, evidenceCount: number, adjusted: ReturnType<typeof adjustScores>) {
   console.log(`\n证据 → 评分修正（${evidenceCount} 条有方向证据）：`);
   for (const key of SCORE_KEYS) {
@@ -196,6 +275,7 @@ function printDelta(baseline: Scores, evidenceCount: number, adjusted: ReturnTyp
 async function main() {
   const caseId = process.argv[2];
   const dry = process.argv.includes("--dry");
+  const cached = process.argv.includes("--cached");
   if (!caseId) {
     console.error("usage: node --import tsx scripts/collect-and-judge.ts <demo_ai_tool|demo_lego> [--dry]");
     process.exit(1);
@@ -203,11 +283,29 @@ async function main() {
   const def = loadCase(caseId);
   console.log(`\n=== ${caseId}: ${def.product} × ${def.trend} ===`);
 
-  // 1) real collect
-  const collected = await collectFreeEvidence({ trend: def.trend, product: def.product });
-  console.log(`采集到 ${collected.candidates.length} 条 candidate，来源:`, collected.bySource);
-  const snippets = dedupeSnippets(collected.candidates);
-  console.log(`去重后 ${snippets.length} 条独立 snippet 送 Gemini 判 stance…`);
+  // 1) real collect — search each REAL keyword separately. A short real term hits; a long
+  // trend-sentence + brand name does not. A real product name IS a good term (Snapforge wasn't).
+  // Cache the (paid) collected snippets to /tmp so a later Gemini failure or prompt tweak can be
+  // re-run with --cached without re-billing TikHub.
+  const cachePath = path.join("/tmp", `tf_cache_${caseId}_snippets.json`);
+  let snippets: Snippet[];
+  if (cached && fs.existsSync(cachePath)) {
+    snippets = JSON.parse(fs.readFileSync(cachePath, "utf8")) as Snippet[];
+    console.log(`复用缓存采集：${snippets.length} 条 snippet（--cached，未重新计费）`);
+  } else {
+    const allCandidates: EvidenceCandidate[] = [];
+    const bySource: Record<string, number> = {};
+    for (const term of def.searchTerms) {
+      const r = await collectFreeEvidence({ trend: term });
+      console.log(`  搜「${term}」→ ${r.candidates.length} 条`, r.bySource);
+      allCandidates.push(...r.candidates);
+      for (const [k, v] of Object.entries(r.bySource)) bySource[k] = (bySource[k] ?? 0) + v;
+    }
+    console.log(`采集合计 ${allCandidates.length} 条 candidate，来源:`, bySource);
+    snippets = dedupeSnippets(allCandidates);
+    fs.writeFileSync(cachePath, JSON.stringify(snippets, null, 2));
+    console.log(`去重后 ${snippets.length} 条独立 snippet（已缓存，下次可 --cached 复用）`);
+  }
   if (snippets.length === 0) {
     console.error("没采到任何 snippet（检查 key / 平台返回），终止。");
     process.exit(1);
@@ -220,14 +318,19 @@ async function main() {
   const downs = judged.filter((c) => c.direction === "down").length;
   console.log(`AI 判定保留 ${judged.length} 条有方向证据：↑${ups} supports / ↓${downs} contradicts`);
 
+  // SerpApi Google Trends → deterministic timing/commercial evidence (bypasses the AI stance layer).
+  const serp = await collectSerpApiTiming(def.trendsQuery);
+  console.log(`SerpApi Google Trends「${def.trendsQuery ?? "-"}」→ ${serp.length} 条 timing/commercial 证据`);
+  const allJudged = [...judged, ...serp];
+
   // 4) classifier owns tier → 5) engine adjusts the score
   const draft = buildEvidenceDraft({
     id: `${caseId}_evidence`,
     case: caseId,
     researchDate: new Date().toISOString().slice(0, 10),
-    tooling: "Live collect (HN/GDELT/TikHub) + Gemini stance layer; deterministic supports→up / contradicts→down.",
+    tooling: "Live collect (HN/GDELT/TikHub) + Gemini stance + SerpApi Google Trends; deterministic up/down.",
     baselineScores: def.baseline,
-    candidates: judged
+    candidates: allJudged
   });
   console.log(`分级后保留 ${draft.evidence.length} 条 / 丢弃 ${draft.droppedCandidates.length} 条`);
   const adjusted = adjustScores(def.baseline, draft.evidence);

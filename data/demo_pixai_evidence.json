@@ -1,0 +1,127 @@
+{
+  "id": "demo_pixai_evidence",
+  "case": "demo_pixai",
+  "researchDate": "2026-06-19",
+  "tooling": "Live collect (HN/GDELT/TikHub) + Gemini stance layer; deterministic up/down mapping. Frozen for demo.",
+  "baselineScores": {
+    "audienceOverlap": 100,
+    "useCaseRelevance": 100,
+    "messageBridge": 100,
+    "creativeFeasibility": 100,
+    "commercialIntent": 75,
+    "brandSafety": 50,
+    "timingSaturation": 50
+  },
+  "evidence": [
+    {
+      "id": "aij-0-creativeFeasibility",
+      "dimension": "creativeFeasibility",
+      "direction": "up",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "primary",
+      "sourceUrl": "https://www.tiktok.com/search?q=PixAI",
+      "note": "用户在TikTok上使用PixAI进行创作并分享，证明了该产品在动漫角色生成场景下的可执行性。「#PixAI」 (verified primary source signal)"
+    },
+    {
+      "id": "aij-1-commercialIntent",
+      "dimension": "commercialIntent",
+      "direction": "up",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "primary",
+      "sourceUrl": "https://www.reddit.com/search/?q=PixAI",
+      "note": "用户明确询问PixAI会员的付费价值，显示了直接的商业购买意图。「is PixAI's membership worth it」 (verified primary source signal)"
+    },
+    {
+      "id": "aij-2-brandSafety",
+      "dimension": "brandSafety",
+      "direction": "down",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "primary",
+      "sourceUrl": "https://www.reddit.com/search/?q=AI%20%E7%BB%98%E7%94%BB",
+      "note": "AI生成艺术引发的版权争议和抗议，对品牌形象构成负面影响。「畫被中國官方海外軍事帳號餵給AI，去下面抗議還被拉黑」 (verified primary source signal)"
+    },
+    {
+      "id": "aij-3-brandSafety",
+      "dimension": "brandSafety",
+      "direction": "down",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "primary",
+      "sourceUrl": "https://news.ycombinator.com/item?id=33380195",
+      "note": "AI生成艺术在动漫社区引发强烈抵制，反映了该领域面临的品牌安全风险。「AI-generated art sparks backlash from Japan’s anime community」 (verified primary source signal)"
+    },
+    {
+      "id": "aij-4-brandSafety",
+      "dimension": "brandSafety",
+      "direction": "down",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "primary",
+      "sourceUrl": "https://news.ycombinator.com/item?id=33369756",
+      "note": "动漫社区对AI生成艺术的愤怒抵制，直接关联到产品所处赛道的负面舆论环境。「AI-generated art sparks furious backlash from Japan’s anime community」 (verified primary source signal)"
+    },
+    {
+      "id": "serp-0-timingSaturation",
+      "dimension": "timingSaturation",
+      "direction": "up",
+      "magnitude": "strong",
+      "confidence": "high",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://serpapi.com/search?engine=google_trends&q=AI+art+generator&data_type=RELATED_QUERIES&date=today+12-m",
+      "note": "Google Trends：相关查询被标记为爆发式增长。（ai news today） (verified secondary source signal)"
+    },
+    {
+      "id": "serp-1-commercialIntent",
+      "dimension": "commercialIntent",
+      "direction": "up",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://serpapi.com/search?engine=google_trends&q=AI+art+generator&data_type=RELATED_QUERIES&date=today+12-m",
+      "note": "Google Trends：相关查询包含购买或评估意图的措辞。（best ai video generator） (verified secondary source signal)"
+    },
+    {
+      "id": "serp-2-commercialIntent",
+      "dimension": "commercialIntent",
+      "direction": "up",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://serpapi.com/search?engine=google_trends&q=AI+art+generator&data_type=RELATED_QUERIES&date=today+12-m",
+      "note": "Google Trends：相关查询包含购买或评估意图的措辞。（best ai art generator app） (verified secondary source signal)"
+    },
+    {
+      "id": "serp-3-commercialIntent",
+      "dimension": "commercialIntent",
+      "direction": "up",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://serpapi.com/search?engine=google_trends&q=AI+art+generator&data_type=RELATED_QUERIES&date=today+12-m",
+      "note": "Google Trends：相关查询包含购买或评估意图的措辞。（best art ai generator） (verified secondary source signal)"
+    },
+    {
+      "id": "serp-4-commercialIntent",
+      "dimension": "commercialIntent",
+      "direction": "up",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://serpapi.com/search?engine=google_trends&q=AI+art+generator&data_type=RELATED_QUERIES&date=today+12-m",
+      "note": "Google Trends：相关查询包含购买或评估意图的措辞。（best free ai art generator） (verified secondary source signal)"
+    },
+    {
+      "id": "serp-5-timingSaturation",
+      "dimension": "timingSaturation",
+      "direction": "down",
+      "magnitude": "moderate",
+      "confidence": "medium",
+      "sourceTier": "secondary",
+      "sourceUrl": "https://serpapi.com/search?engine=google_trends&q=AI+art+generator&data_type=RELATED_QUERIES&date=today+12-m",
+      "note": "Google Trends：时间序列近期均值在下降。（ai art generator free） (verified secondary source signal)"
+    }
+  ]
+}

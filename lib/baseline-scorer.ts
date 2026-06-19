@@ -9,7 +9,8 @@ import { SCORE_KEYS, type ScoreKey, type ScoreValue, type Scores } from "./types
 // "evidence-backed, never fabricate" rule. Runs on Gemini (AI Studio free tier).
 
 // Override with GEMINI_MODEL if a newer free-tier Flash ships (e.g. gemini-3-flash).
-export const BASELINE_MODEL = process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
+// Default = gemini-3.1-flash-lite (higher free-tier RPM/RPD than 2.5-flash).
+export const BASELINE_MODEL = process.env.GEMINI_MODEL?.trim() || "gemini-3.1-flash-lite";
 
 export type BaselineProductInput = {
   name: string;

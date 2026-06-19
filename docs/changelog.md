@@ -6,6 +6,14 @@ one-to-two-line summaries, newest first.
 
 ## 2026-06-18
 
+- **Default Gemini model bumped from `gemini-2.5-flash` to `gemini-3.1-flash-lite`** in both
+  `lib/baseline-scorer.ts` and `scripts/collect-and-judge.ts`. Reason: 3.1-flash-lite has higher
+  free-tier RPM/RPD limits, which matters now that the stance layer batches 40+ snippets/case (the
+  prior 2.5-flash run hit 503 "high demand" four times in a row before the retry loop succeeded).
+  `GEMINI_MODEL` env var still overrides.
+
+
+
 - **Single-case interview MVP.** Homepage + `/cases` now feature only `demo_ai_tool`, with the primary CTA
   opening the complete case directly. Fixed the generated brief to use evidence-adjusted scores and rigor
   consistently (89→86; brandSafety 75→50; gate/action aligned). Added a fail-closed fixture guard so the
