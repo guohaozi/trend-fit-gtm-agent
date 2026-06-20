@@ -4,6 +4,27 @@ Condensed milestone log for Codex / Claude handoff. **Full detail for any entry 
 `git log` (commit messages) and in this file's own git history** — entries here are
 one-to-two-line summaries, newest first.
 
+## 2026-06-21
+
+- **Capability boundary documented — the time paradox (see current-state.md "Capability boundary").**
+  The tool judges BEFORE a campaign, but `product × trend` co-occurrence evidence only exists AFTER
+  it. For an un-marketed product (the real use case) that search is near-empty; LEGO×World Cup only
+  worked because LEGO already ships World Cup sets. Conclusion: evidence validates the *trend's*
+  objective properties (timing/heat/brand-risk); the product↔trend match stays an LLM hypothesis the
+  gate constrains — we do not pretend it is proven. Codex's "derive a marketing angle + verify
+  premises" direction is correct but too heavy and collides with 采集者不能兼裁判, so it is logged as
+  a future direction, not built.
+- **Baseline model → `gemini-3.5-flash`, decoupled from stance.** Baseline is one low-volume call per
+  candidate, so it can afford a stronger model; it now reads `GEMINI_BASELINE_MODEL` independently.
+  The high-volume stance layer stays on `gemini-3.1-flash-lite` (high RPD for batches). (`3.5-flash`
+  id verified live — returns 503-overload, not 404, so the id resolves; baseline has no retry yet.)
+- **demo_lego (LEGO × World Cup) run with the new pipeline but NOT shipped to the frontend — kept as a
+  cautionary example.** It exposed the failure mode above: the pure-trend term `世界杯 2026` pulled
+  product-irrelevant noise (a gambling ad → commercialIntent down, a political/racial rant →
+  brandSafety down) that the stance layer strained into LEGO dimensions. Also found: Xiaohongshu
+  `web_v3` returns camelCase (`noteCard`/`displayTitle`) but the adapter still looks for snake_case
+  (`note_card`/`display_title`) → 0 notes despite a 200 + billed response. Known bug, not yet fixed.
+
 ## 2026-06-19
 
 - **Evidence pipeline five-fix hardening shipped.** Canonical sources now contribute at most once

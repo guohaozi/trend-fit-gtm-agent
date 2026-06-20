@@ -8,9 +8,10 @@ import { SCORE_KEYS, type ScoreKey, type ScoreValue, type Scores } from "./types
 // and is forbidden from inventing metrics/URLs — preserving the project's
 // "evidence-backed, never fabricate" rule. Runs on Gemini (AI Studio free tier).
 
-// Override with GEMINI_MODEL if a newer free-tier Flash ships (e.g. gemini-3-flash).
-// Default = gemini-3.1-flash-lite (higher free-tier RPM/RPD than 2.5-flash).
-export const BASELINE_MODEL = process.env.GEMINI_MODEL?.trim() || "gemini-3.1-flash-lite";
+// Baseline is one call per candidate (low volume), so it can afford a stronger model than the
+// high-volume stance layer. Default gemini-3.5-flash; override via GEMINI_BASELINE_MODEL.
+// (Stance stays on gemini-3.1-flash-lite in scripts/collect-and-judge.ts — high RPD for batches.)
+export const BASELINE_MODEL = process.env.GEMINI_BASELINE_MODEL?.trim() || "gemini-3.5-flash";
 
 export type BaselineProductInput = {
   name: string;

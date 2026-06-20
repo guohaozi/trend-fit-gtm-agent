@@ -22,6 +22,47 @@ an outcome-calibrated sales predictor.
 writes a GTM brief. A "product → candidate trends" discovery layer is intentionally out of
 scope for now.
 
+## Capability boundary — the time paradox (decided 2026-06-21, READ THIS FIRST)
+
+The deepest constraint of this project, surfaced while building demo_lego:
+
+**The tool must judge BEFORE the campaign happens, but "product × trend" co-occurrence evidence
+only exists AFTER it happens.** For a product that has NOT yet marketed the trend (the tool's
+actual use case), searching `product × trend` is near-empty. LEGO × World Cup only produced
+co-occurrence evidence because LEGO already ships official World Cup sets — that is the
+exception, not the rule. A brand-new snack brand asking "should I ride the World Cup?" would
+return basically nothing from a `snack × World Cup` search.
+
+**So fit cannot be proven by evidence for an un-marketed product. The honest capability split:**
+- **What evidence CAN do** (collectable for ANY trend, independent of whether the product
+  already markets it): the trend's *verifiable objective properties* — timing/heat (SerpApi
+  Google Trends), audience size, and crucially whether the *trend itself* carries brand-safety
+  landmines.
+- **What evidence CANNOT do**: prove the product↔trend match. That match is an **LLM hypothesis**
+  (the baseline). The gate/rigor layer constrains its optimism; we do NOT pretend it is proven.
+  Co-occurrence (LEGO World Cup sets) = *bonus validation only*, never the main signal.
+
+**Codex's proposed direction** — independently collect the trend's properties, then anchor every
+judgement on a *concrete marketing angle* — is conceptually correct. But it is **not built**, on
+purpose: (a) the "derive marketing angle → verify its premises" reasoning layer is too heavy for
+the interview deadline, and (b) *deriving the angle is itself reasoning/creativity that cannot be
+made deterministic-auditable* — it collides with the 采集者不能兼裁判 moat (it would hand the
+verdict back to the LLM). Logged as a future direction, not a near-term task.
+
+**Demo implication.** PixAI is the right flagship: AI-art's copyright/anti-AI controversy IS an
+*intrinsic property* of that trend, so brand-safety risk is the trend's core attribute and the
+evidence is real and on-topic. LEGO × World Cup exposed the failure mode: the World Cup's
+intrinsic property is "global fandom / collecting"; brand risk is edge noise — so a pure-trend
+search (`世界杯 2026`) pulled gambling ads and political/racial rants that the stance layer then
+strained into "LEGO brand safety". **LEGO stays as a cautionary example, not a shipped demo.**
+
+**Honest interview framing (this boundary is a strength, not a weakness):** "The system does not
+predict sales and does not pretend to prove product-trend fit — for a product that hasn't
+marketed yet, fit is a hypothesis. It constrains the *optimism* of that hypothesis with the
+trend's verifiable objective signals (timing, heat, brand risk) and keeps every step auditable.
+LEGO is kept on purpose to show the failure mode: searching a pure trend term pulls
+product-irrelevant noise — which is exactly why the LLM is never allowed to be the judge."
+
 ## Latest conversation handoff (2026-06-19) — evidence pipeline integrity fixes complete
 
 The five requested offline-demo pipeline fixes are implemented on
