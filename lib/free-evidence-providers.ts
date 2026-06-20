@@ -1,4 +1,4 @@
-import type { EvidenceCandidate } from "./evidence-collector";
+import type { CollectedSnippet, EvidenceCandidate } from "./evidence-collector";
 import type { EvidenceMagnitude } from "./evidence-adjustment";
 import { collectTikhubEvidence } from "./tikhub-provider";
 
@@ -43,6 +43,20 @@ function clean(text: unknown, max = 160): string {
 export type HnHit = { objectID?: string; title?: string; url?: string; points?: number; num_comments?: number };
 export type HnResponse = { hits?: HnHit[] };
 
+export function mapHnToSnippets(response: HnResponse, limit = 5, query = ""): CollectedSnippet[] {
+  return (response?.hits ?? []).filter((hit) => hit?.title && hit?.objectID).slice(0, limit).map((hit) => ({
+    id: `hn-${hit.objectID}`,
+    provider: "hackernews",
+    platform: "hackernews",
+    query,
+    text: clean(hit.title),
+    sourceUrl: `https://news.ycombinator.com/item?id=${hit.objectID}`,
+    canonicalSourceId: `hackernews:${hit.objectID}`,
+    verificationStatus: "verified",
+    sourceSignals: ["comment_corpus"]
+  }));
+}
+
 export function mapHnToCandidates(response: HnResponse, limit = 5): EvidenceCandidate[] {
   const hits = (response?.hits ?? []).filter((h) => h?.title).slice(0, limit);
   const mag = magnitudeForCount(hits.length);
@@ -51,12 +65,14 @@ export function mapHnToCandidates(response: HnResponse, limit = 5): EvidenceCand
     const note = `Hacker News：${clean(hit.title)}（${hit.points ?? 0} 分 / ${hit.num_comments ?? 0} 评论）`;
     return (["audienceOverlap", "useCaseRelevance"] as const).map((dimension) => ({
       id: `hn-${index}-${dimension}`,
+      evidenceUse: "context" as const,
       dimension,
       direction: "confirm" as const,
       magnitude: mag,
       // comment_corpus is a primary signal; cap to medium so HN doesn't over-credit.
       desiredConfidence: "medium" as const,
       sourceUrl: url,
+      canonicalSourceId: `hackernews:${hit.objectID ?? index}`,
       verificationStatus: "verified" as const,
       sourceSignals: ["comment_corpus"] as const,
       note
@@ -65,11 +81,22 @@ export function mapHnToCandidates(response: HnResponse, limit = 5): EvidenceCand
 }
 
 export async function fetchHnEvidence(query: string, limit = 5): Promise<EvidenceCandidate[]> {
+  return (await fetchHnCollection(query, limit)).candidates;
+}
+
+async function fetchHnCollection(query: string, limit = 5): Promise<{
+  candidates: EvidenceCandidate[];
+  snippets: CollectedSnippet[];
+}> {
   try {
     const url = `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(query)}&tags=story&hitsPerPage=${limit}`;
-    return mapHnToCandidates((await fetchJson(url)) as HnResponse, limit);
+    const response = (await fetchJson(url)) as HnResponse;
+    return {
+      candidates: mapHnToCandidates(response, limit),
+      snippets: mapHnToSnippets(response, limit, query)
+    };
   } catch {
-    return [];
+    return { candidates: [], snippets: [] };
   }
 }
 
@@ -81,6 +108,20 @@ export type GdeltArticle = { url?: string; title?: string; domain?: string };
 export type GdeltArtList = { articles?: GdeltArticle[] };
 export type GdeltToneBin = { bin?: number; count?: number };
 export type GdeltToneChart = { tonechart?: GdeltToneBin[] };
+
+export function mapGdeltToSnippets(artList: GdeltArtList, limit = 5, query = ""): CollectedSnippet[] {
+  return (artList?.articles ?? []).filter((article) => article?.url && article?.title).slice(0, limit).map((article, index) => ({
+    id: `gdelt-${index}`,
+    provider: "gdelt",
+    platform: "news",
+    query,
+    text: clean(article.title),
+    sourceUrl: article.url!,
+    canonicalSourceId: `gdelt:${article.url}`,
+    verificationStatus: "unverified",
+    sourceSignals: []
+  }));
+}
 
 export function averageTone(toneChart: GdeltToneChart): number | null {
   const bins = toneChart?.tonechart ?? [];
@@ -109,11 +150,13 @@ export function mapGdeltToCandidates(
     const top = articles[0];
     candidates.push({
       id: "gdelt-timing",
+      evidenceUse: "context",
       dimension: "timingSaturation",
       direction: "confirm",
       magnitude: magnitudeForCount(articles.length),
       desiredConfidence: "low",
       sourceUrl: top.url!,
+      canonicalSourceId: `gdelt:${top.url}`,
       verificationStatus: "unverified",
       note: `GDELT 新闻覆盖 ${articles.length} 条，例：${clean(top.title)}（${top.domain ?? "?"}）`
     });
@@ -123,11 +166,13 @@ export function mapGdeltToCandidates(
     const negative = avgTone < -1.5;
     candidates.push({
       id: "gdelt-brand-safety",
+      evidenceUse: "context",
       dimension: "brandSafety",
       direction: negative ? "down" : "confirm",
       magnitude: negative ? "moderate" : "weak",
       desiredConfidence: "low",
       sourceUrl: articles[0].url!,
+      canonicalSourceId: `gdelt:${articles[0].url}`,
       verificationStatus: "unverified",
       note: `GDELT 平均舆情 tone ${avgTone.toFixed(1)}（${negative ? "偏负面，存在品牌安全风险" : "中性/偏正面"}）`
     });
@@ -141,11 +186,22 @@ export function mapGdeltToCandidates(
 // volume (timing). Tone-based brandSafety needs a second `tonechart` call that trips the
 // rate limit, so it's left to `mapGdeltToCandidates(..., avgTone)` callers, not the live path.
 export async function fetchGdeltEvidence(query: string, limit = 5): Promise<EvidenceCandidate[]> {
+  return (await fetchGdeltCollection(query, limit)).candidates;
+}
+
+async function fetchGdeltCollection(query: string, limit = 5): Promise<{
+  candidates: EvidenceCandidate[];
+  snippets: CollectedSnippet[];
+}> {
   try {
     const url = `https://api.gdeltproject.org/api/v2/doc/doc?query=${encodeURIComponent(query)}&mode=artlist&format=json&maxrecords=${limit}&sort=hybridrel`;
-    return mapGdeltToCandidates((await fetchJson(url)) as GdeltArtList, null, limit);
+    const response = (await fetchJson(url)) as GdeltArtList;
+    return {
+      candidates: mapGdeltToCandidates(response, null, limit),
+      snippets: mapGdeltToSnippets(response, limit, query)
+    };
   } catch {
-    return [];
+    return { candidates: [], snippets: [] };
   }
 }
 
@@ -154,6 +210,7 @@ export async function fetchGdeltEvidence(query: string, limit = 5): Promise<Evid
 // ============================================================
 export type FreeEvidenceResult = {
   candidates: EvidenceCandidate[];
+  snippets: CollectedSnippet[];
   bySource: Record<string, number>;
 };
 
@@ -168,15 +225,16 @@ export async function collectFreeEvidence({
   // Free providers (HN / GDELT) + TikHub (paid, only when TIKHUB_API_KEY set; covers
   // 小红书 / TikTok / Instagram / X / Reddit) — all in parallel, all graceful.
   const [hackernews, gdelt, tikhub] = await Promise.all([
-    fetchHnEvidence(query),
-    fetchGdeltEvidence(trend),
+    fetchHnCollection(query),
+    fetchGdeltCollection(trend),
     collectTikhubEvidence({ trend, product })
   ]);
   return {
-    candidates: [...hackernews, ...gdelt, ...tikhub.candidates],
+    candidates: [...hackernews.candidates, ...gdelt.candidates, ...tikhub.candidates],
+    snippets: [...hackernews.snippets, ...gdelt.snippets, ...tikhub.snippets],
     bySource: {
-      hackernews: hackernews.length,
-      gdelt: gdelt.length,
+      hackernews: hackernews.snippets.length,
+      gdelt: gdelt.snippets.length,
       ...tikhub.bySource
     }
   };

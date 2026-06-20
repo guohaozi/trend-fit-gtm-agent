@@ -86,15 +86,15 @@
   "expectedAdjustedTotal": 85,
   "expectedAdjustedBand": "Strong Go",
   "profileUsed": "default",
-  "expectedEvidenceGate": "pass",
-  "expectedGatedBand": "Strong Go",
-  "expectedGateMissing": [],
+  "expectedEvidenceGate": "partial",
+  "expectedGatedBand": "Go",
+  "expectedGateMissing": ["timingSaturation", "brandSafety"],
   "expectedDimensionCaps": [
     "audienceOverlap",
     "creativeFeasibility"
   ],
   "expectedStability": "fragile",
-  "expectedDecisionType": "organic push",
+  "expectedDecisionType": "small test",
   "expectedDimensionConfidence": {
     "audienceOverlap": "evidence-confirmed (medium)",
     "useCaseRelevance": "evidence-confirmed (high)",

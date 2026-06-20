@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   averageTone,
+  mapGdeltToSnippets,
+  mapHnToSnippets,
   mapGdeltToCandidates,
   mapHnToCandidates
 } from "../lib/free-evidence-providers";
@@ -23,6 +25,13 @@ describe("free evidence providers — Hacker News", () => {
     assert.equal(candidates.length, 4);
     assert.ok(candidates.every((c) => c.sourceSignals?.includes("comment_corpus")));
     assert.ok(candidates.every((c) => c.desiredConfidence === "medium"));
+  });
+
+  it("keeps canonical post identity in structured HN snippets", () => {
+    const snippets = mapHnToSnippets(hn);
+    assert.equal(snippets[0].canonicalSourceId, "hackernews:111");
+    assert.equal(snippets[0].sourceUrl, "https://news.ycombinator.com/item?id=111");
+    assert.match(snippets[0].text, /AI photo/);
   });
 
   it("buildEvidenceDraft clamps HN evidence to medium confidence (not high)", () => {
@@ -69,6 +78,14 @@ describe("free evidence providers — GDELT", () => {
       candidates
     });
     assert.ok(draft.evidence.every((e) => e.sourceTier === "proxy" && e.confidence === "low"));
+  });
+
+  it("keeps each GDELT article as a structured snippet", () => {
+    const snippets = mapGdeltToSnippets({
+      articles: [{ url: "https://news.example.com/a", title: "PixAI launches an editor", domain: "news.example.com" }]
+    }, 5, "PixAI");
+    assert.deepEqual(snippets.map((snippet) => snippet.text), ["PixAI launches an editor"]);
+    assert.equal(snippets[0].canonicalSourceId, "gdelt:https://news.example.com/a");
   });
 
   it("returns nothing when there are no articles", () => {

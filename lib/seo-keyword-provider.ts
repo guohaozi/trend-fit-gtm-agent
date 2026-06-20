@@ -66,6 +66,7 @@ const RELATED_QUERY_STOP_WORDS = new Set([
   "where",
   "with"
 ]);
+const GENERIC_RELATED_QUERY_TOKENS = new Set(["ai", "app", "generator", "tool"]);
 const DEFAULT_SERPAPI_DATE = "today 12-m";
 const GOOGLE_TRENDS_ENGINE = "google_trends";
 const TREND_RISING_THRESHOLD = 15;
@@ -191,7 +192,9 @@ function isRelevantRelatedQuery(query: string, trendQuery: string): boolean {
   if (trendTokens.size === 0) return true;
   const relatedTokens = queryTokens(query);
   const shared = [...relatedTokens].filter((token) => trendTokens.has(token));
-  if (shared.length === 0) return false;
+  const discriminatingTrendTokens = [...trendTokens].filter((token) => !GENERIC_RELATED_QUERY_TOKENS.has(token));
+  const requiredTokens = discriminatingTrendTokens.length > 0 ? discriminatingTrendTokens : [...trendTokens];
+  if (!requiredTokens.some((token) => relatedTokens.has(token))) return false;
   const unrelated = relatedTokens.size - shared.length;
   return unrelated <= MAX_UNRELATED_RELATED_TOKENS;
 }
@@ -340,6 +343,8 @@ export function seoKeywordFindingsToCandidates(findings: SeoKeywordFinding[]): E
     const evidence = SIGNAL_TO_EVIDENCE[finding.signal];
     return {
       id: finding.id,
+      evidenceUse: "decision" as const,
+      canonicalSourceId: finding.sourceUrl,
       dimension: evidence.dimension,
       direction: evidence.direction,
       magnitude: evidence.magnitude,

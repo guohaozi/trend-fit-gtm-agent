@@ -82,4 +82,104 @@ describe("evidence collector draft builder", () => {
     );
     assert.match(draft.evidence[2].note, /UNVERIFIED/);
   });
+
+  it("counts one canonical source at most once per dimension", () => {
+    const draft = buildEvidenceDraft({
+      id: "dedupe",
+      case: "dedupe",
+      researchDate: "2026-06-19",
+      tooling: "test",
+      baselineScores,
+      candidates: [
+        {
+          id: "weak",
+          canonicalSourceId: "serp:one-report",
+          dimension: "commercialIntent",
+          direction: "up",
+          magnitude: "weak",
+          desiredConfidence: "medium",
+          sourceUrl: "https://serpapi.com/search?q=test",
+          verificationStatus: "verified",
+          sourceSignals: ["research_report"],
+          note: "weak"
+        },
+        {
+          id: "moderate",
+          canonicalSourceId: "serp:one-report",
+          dimension: "commercialIntent",
+          direction: "up",
+          magnitude: "moderate",
+          desiredConfidence: "medium",
+          sourceUrl: "https://serpapi.com/search?q=test",
+          verificationStatus: "verified",
+          sourceSignals: ["research_report"],
+          note: "moderate"
+        }
+      ]
+    });
+
+    assert.deepEqual(draft.evidence.map((item) => item.id), ["moderate"]);
+  });
+
+  it("drops conflicting directions from the same canonical source and dimension", () => {
+    const draft = buildEvidenceDraft({
+      id: "conflict",
+      case: "conflict",
+      researchDate: "2026-06-19",
+      tooling: "test",
+      baselineScores,
+      candidates: [
+        {
+          id: "up",
+          canonicalSourceId: "serp:one-report",
+          dimension: "timingSaturation",
+          direction: "up",
+          magnitude: "strong",
+          desiredConfidence: "high",
+          sourceUrl: "https://serpapi.com/search?q=test",
+          verificationStatus: "verified",
+          sourceSignals: ["research_report"],
+          note: "up"
+        },
+        {
+          id: "down",
+          canonicalSourceId: "serp:one-report",
+          dimension: "timingSaturation",
+          direction: "down",
+          magnitude: "moderate",
+          desiredConfidence: "medium",
+          sourceUrl: "https://serpapi.com/search?q=test",
+          verificationStatus: "verified",
+          sourceSignals: ["research_report"],
+          note: "down"
+        }
+      ]
+    });
+
+    assert.equal(draft.evidence.length, 0);
+    assert.equal(draft.droppedCandidates.length, 2);
+  });
+
+  it("preserves whether evidence is context or decision material", () => {
+    const draft = buildEvidenceDraft({
+      id: "context",
+      case: "context",
+      researchDate: "2026-06-19",
+      tooling: "test",
+      baselineScores,
+      candidates: [{
+        id: "raw",
+        evidenceUse: "context",
+        dimension: "audienceOverlap",
+        direction: "confirm",
+        magnitude: "weak",
+        desiredConfidence: "medium",
+        sourceUrl: "https://example.com/post",
+        verificationStatus: "verified",
+        sourceSignals: ["comment_corpus"],
+        note: "raw"
+      }]
+    });
+    assert.equal(draft.evidence[0].evidenceUse, "context");
+  });
 });

@@ -57,9 +57,7 @@ describe("SEO keyword provider", () => {
     const result = await source.collect({
       product: "protein drink",
       market: "US convenience retail",
-      trend: "grab-and-go protein",
-      queries: [],
-      limitPerQuery: 2
+      trend: "grab-and-go protein"
     });
 
     assert.equal(requested.length, 2);
@@ -98,9 +96,7 @@ describe("SEO keyword provider", () => {
     await source.collect({
       product: "snack brand x",
       market: "germany",
-      trend: "dubai chocolate",
-      queries: [],
-      limitPerQuery: 2
+      trend: "dubai chocolate"
     });
 
     // product and market must not pollute the Google Trends search term; market
@@ -135,9 +131,7 @@ describe("SEO keyword provider", () => {
     const result = await source.collect({
       product: "ultra niche widget",
       market: "nowhere market",
-      trend: "a query nobody searches",
-      queries: [],
-      limitPerQuery: 2
+      trend: "a query nobody searches"
     });
 
     assert.deepEqual(result.seoKeywordFindings, []);
@@ -285,6 +279,22 @@ describe("SEO keyword provider", () => {
         ["related_buying_query", "where to buy labubu"]
       ]
     );
+  });
+
+  it("rejects loosely related AI news and video queries for AI art", () => {
+    const findings = serpApiKeywordResearchToFindings({
+      idPrefix: "AI art generator",
+      sourceUrl: "https://serpapi.com/search?engine=google_trends&q=AI+art+generator",
+      relatedQueries: {
+        rising: [
+          { query: "ai news today", formatted_value: "Breakout" },
+          { query: "best ai video generator", formatted_value: "+200%" },
+          { query: "best ai art generator app", formatted_value: "+150%" }
+        ]
+      }
+    });
+
+    assert.deepEqual(findings.map((finding) => finding.query), ["best ai art generator app"]);
   });
 
   it("drops related queries that keep a trend token but pile on unrelated junk tokens", () => {

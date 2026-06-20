@@ -5,6 +5,7 @@ export type EvidenceDirection = "up" | "down" | "confirm";
 export type EvidenceMagnitude = "weak" | "moderate" | "strong";
 export type EvidenceConfidence = "low" | "medium" | "high";
 export type SourceTier = "primary" | "secondary" | "proxy";
+export type EvidenceUse = "context" | "decision";
 
 export type DimensionConfidenceLabel =
   | "assumption"
@@ -13,6 +14,8 @@ export type DimensionConfidenceLabel =
 
 export type EvidenceItem = {
   id: string;
+  evidenceUse?: EvidenceUse;
+  canonicalSourceId?: string;
   dimension: ScoreKey;
   direction: EvidenceDirection;
   magnitude: EvidenceMagnitude;
@@ -118,7 +121,7 @@ export function adjustScores(baseline: Scores, evidence: EvidenceItem[]): Eviden
   const stepsByDimension = {} as Record<ScoreKey, number>;
 
   for (const key of SCORE_KEYS) {
-    const items = evidence.filter((item) => item.dimension === key);
+    const items = evidence.filter((item) => item.dimension === key && item.evidenceUse !== "context");
     const net = items.reduce((sum, item) => sum + evidencePressure(item), 0);
     const steps = stepsFromNet(net);
 

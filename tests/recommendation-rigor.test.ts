@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { describe, it } from "node:test";
-import { adjustScores, type EvidenceAdjustmentCase } from "../lib/evidence-adjustment";
+import { adjustScores, type EvidenceAdjustmentCase, type EvidenceItem } from "../lib/evidence-adjustment";
 import {
   applyRecommendationRigor,
   calculateTrendFitWithProfile,
@@ -72,6 +72,27 @@ describe("v1.2 recommendation rigor layer", () => {
     assert.deepEqual(rigor.dimensionCaps, demo.expectedDimensionCaps);
     assert.equal(rigor.recommendationStability, demo.expectedStability);
     assert.equal(rigor.decisionType, demo.expectedDecisionType);
+  });
+
+  it("does not let context-only or contradicting evidence satisfy a gate slot", () => {
+    const demo = readDemo("demo_fashion.json");
+    const result = calculateTrendFitWithProfile(demo.scores, demo.product.riskTolerance, "default");
+    const base = {
+      magnitude: "moderate" as const,
+      confidence: "medium" as const,
+      sourceTier: "primary" as const,
+      sourceUrl: "https://example.com/post",
+      note: "test"
+    };
+    const evidence: EvidenceItem[] = [
+      { ...base, id: "context-audience", evidenceUse: "context", dimension: "audienceOverlap", direction: "up" },
+      { ...base, id: "negative-timing", evidenceUse: "decision", dimension: "timingSaturation", direction: "down" },
+      { ...base, id: "positive-brand", evidenceUse: "decision", dimension: "brandSafety", direction: "up" }
+    ];
+    const rigor = applyRecommendationRigor({ scores: demo.scores, result, profile: "default", evidence });
+
+    assert.deepEqual(rigor.gateMissing, ["timingSaturation", "audienceOrUseCase"]);
+    assert.equal(rigor.evidenceGate, "partial");
   });
 
   it("does not let proxy listicles earn the Strong Go gate", () => {

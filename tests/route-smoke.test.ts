@@ -105,7 +105,7 @@ describe("report markdown download API", () => {
     assert.match(markdown, /证据门槛：\*\*证据部分通过\*\*/);
     assert.match(markdown, /建议动作：\*\*小测试\*\*/);
     assert.match(markdown, /\| 品牌安全 \| 10% \| 25 \|/);
-    assert.match(markdown, /仍需补齐：受众或使用场景/);
+    assert.match(markdown, /仍需补齐：品牌安全、受众或使用场景/);
   });
 });
 

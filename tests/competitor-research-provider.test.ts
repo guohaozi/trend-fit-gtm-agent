@@ -183,7 +183,7 @@ describe("competitor research provider", () => {
     );
     assert.equal(generated.expectedAdjustedScores.timingSaturation, 25);
     assert.equal(generated.expectedAdjustedScores.brandSafety, 50);
-    assert.equal(generated.expectedEvidenceGate, "pass");
-    assert.deepEqual(generated.expectedGateMissing, []);
+    assert.equal(generated.expectedEvidenceGate, "partial");
+    assert.deepEqual(generated.expectedGateMissing, ["timingSaturation", "brandSafety"]);
   });
 });

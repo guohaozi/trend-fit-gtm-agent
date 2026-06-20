@@ -1,4 +1,4 @@
-import type { EvidenceCandidate } from "./evidence-collector";
+import type { CollectedSnippet, EvidenceCandidate } from "./evidence-collector";
 import type { EvidenceMagnitude } from "./evidence-adjustment";
 
 // TikHub (https://tikhub.io) — one paid key covers the social platforms:
@@ -7,10 +7,8 @@ import type { EvidenceMagnitude } from "./evidence-adjustment";
 // Authorization: Bearer <TIKHUB_API_KEY>. Activates only when the key is set; otherwise returns
 // nothing (the free HN/GDELT providers still run).
 //
-// Response shapes are deeply nested and differ per platform, so we use a defensive
-// deep-text extractor (pull strings under title/desc/caption/content/... keys) rather than
-// hard-coding each schema. Extracted snippets are real fetched text used as raw
-// audience/use-case language, graded by the deterministic classifier (capped to medium).
+// Each platform adapter only accepts known post-content and post-ID fields. Profile names,
+// dates, audio labels, and navigation text never become evidence snippets.
 
 const TIKHUB_BASE = "https://api.tikhub.io";
 const TIMEOUT_MS = 12000;
@@ -21,7 +19,11 @@ type TikhubPlatform = {
   label: string;
   path: string;
   param: string;
-  searchUrl: (query: string) => string;
+  textKeys: string[];
+  textContainers?: string[];
+  idKeys: string[];
+  permalinkKeys?: string[];
+  postUrl: (id: string, permalink?: string) => string;
 };
 
 const PLATFORMS: TikhubPlatform[] = [
@@ -30,77 +32,133 @@ const PLATFORMS: TikhubPlatform[] = [
     label: "小红书",
     path: "/api/v1/xiaohongshu/web_v3/fetch_search_notes",
     param: "keyword",
-    searchUrl: (q) => `https://www.xiaohongshu.com/search_result?keyword=${encodeURIComponent(q)}`
+    textKeys: ["display_title", "desc"],
+    textContainers: ["note_card"],
+    idKeys: ["note_id", "id"],
+    postUrl: (id) => `https://www.xiaohongshu.com/explore/${id}`
   },
   {
     key: "tiktok",
     label: "TikTok",
     path: "/api/v1/tiktok/app/v3/fetch_general_search_result",
     param: "keyword",
-    searchUrl: (q) => `https://www.tiktok.com/search?q=${encodeURIComponent(q)}`
+    textKeys: ["desc", "caption"],
+    textContainers: ["aweme_info"],
+    idKeys: ["aweme_id", "id"],
+    postUrl: (id) => `https://www.tiktok.com/@_/video/${id}`
   },
   {
     key: "instagram",
     label: "Instagram",
     path: "/api/v1/instagram/v3/general_search",
     param: "query",
-    searchUrl: (q) => `https://www.instagram.com/explore/search/keyword/?q=${encodeURIComponent(q)}`
+    textKeys: ["caption", "text"],
+    textContainers: ["caption"],
+    idKeys: ["shortcode", "code", "pk", "id"],
+    postUrl: (id) => `https://www.instagram.com/p/${id}/`
   },
   {
     key: "twitter",
     label: "X",
     path: "/api/v1/twitter/web/fetch_search_timeline",
     param: "keyword",
-    searchUrl: (q) => `https://twitter.com/search?q=${encodeURIComponent(q)}`
+    textKeys: ["full_text", "text"],
+    textContainers: ["legacy"],
+    idKeys: ["rest_id", "tweet_id", "id"],
+    postUrl: (id) => `https://x.com/i/web/status/${id}`
   },
   {
     key: "reddit",
     label: "Reddit",
     path: "/api/v1/reddit/app/fetch_dynamic_search",
     param: "query",
-    searchUrl: (q) => `https://www.reddit.com/search/?q=${encodeURIComponent(q)}`
+    textKeys: ["title", "selftext", "markdown"],
+    idKeys: ["name", "id"],
+    permalinkKeys: ["permalink", "url"],
+    postUrl: (id, permalink) => permalink?.startsWith("http")
+      ? permalink
+      : permalink
+        ? `https://www.reddit.com${permalink}`
+        : `https://www.reddit.com/comments/${id.replace(/^t3_/, "")}/`
   }
 ];
 
-const TEXT_KEYS = new Set([
-  "title",
-  "desc",
-  "description",
-  "caption",
-  "content",
-  "text",
-  "note",
-  "full_text",
-  "display_name",
-  "nickname",
-  "name",
-  "posttitle",
-  "markdown",
-  "preview"
-]);
+function stringField(record: Record<string, unknown>, keys: string[]): string | undefined {
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === "string" && value.trim()) return value.trim();
+    if (key === "caption" && value && typeof value === "object") {
+      const text = (value as Record<string, unknown>).text;
+      if (typeof text === "string" && text.trim()) return text.trim();
+    }
+  }
+  return undefined;
+}
 
-/** Recursively pull human-readable text from a platform-specific JSON tree. Pure + testable. */
-export function extractSnippets(node: unknown, max = MAX_SNIPPETS, out: string[] = [], depth = 0): string[] {
-  if (out.length >= max || depth > 14 || node == null) return out;
-  if (Array.isArray(node)) {
-    for (const item of node) {
-      extractSnippets(item, max, out, depth + 1);
-      if (out.length >= max) break;
+function cleanSnippetText(value: string): string {
+  return value.replace(/\s+/g, " ").trim().slice(0, 500);
+}
+
+function nestedTextField(record: Record<string, unknown>, platform: TikhubPlatform): string | undefined {
+  for (const containerKey of platform.textContainers ?? []) {
+    const container = record[containerKey];
+    if (container && typeof container === "object" && !Array.isArray(container)) {
+      const text = stringField(container as Record<string, unknown>, platform.textKeys);
+      if (text) return text;
     }
-    return out;
   }
-  if (typeof node === "object") {
-    for (const [key, value] of Object.entries(node as Record<string, unknown>)) {
-      if (typeof value === "string" && TEXT_KEYS.has(key.toLowerCase())) {
-        const snippet = value.replace(/\s+/g, " ").trim();
-        if (snippet.length >= 4 && snippet.length <= 200 && !out.includes(snippet)) out.push(snippet);
-      } else if (value && typeof value === "object") {
-        extractSnippets(value, max, out, depth + 1);
+  return undefined;
+}
+
+export function extractTikhubSnippets(
+  platformKey: string,
+  node: unknown,
+  query: string,
+  max = MAX_SNIPPETS
+): CollectedSnippet[] {
+  const platform = PLATFORMS.find((candidate) => candidate.key === platformKey);
+  if (!platform) return [];
+  const adapter = platform;
+
+  const snippets: CollectedSnippet[] = [];
+  const seen = new Set<string>();
+
+  function visit(value: unknown, depth = 0): void {
+    if (snippets.length >= max || depth > 14 || value == null) return;
+    if (Array.isArray(value)) {
+      for (const item of value) visit(item, depth + 1);
+      return;
+    }
+    if (typeof value !== "object") return;
+
+    const record = value as Record<string, unknown>;
+    const text = stringField(record, adapter.textKeys) ?? nestedTextField(record, adapter);
+    const rawId = stringField(record, adapter.idKeys);
+    if (text && rawId) {
+      const canonicalSourceId = `${adapter.key}:${rawId}`;
+      const cleaned = cleanSnippetText(text);
+      if (cleaned.length >= 4 && !seen.has(canonicalSourceId)) {
+        const permalink = adapter.permalinkKeys ? stringField(record, adapter.permalinkKeys) : undefined;
+        seen.add(canonicalSourceId);
+        snippets.push({
+          id: `tikhub-${adapter.key}-${rawId}`,
+          provider: "tikhub",
+          platform: adapter.key,
+          query,
+          text: cleaned,
+          sourceUrl: adapter.postUrl(rawId, permalink),
+          canonicalSourceId,
+          verificationStatus: "verified",
+          sourceSignals: ["comment_corpus"]
+        });
       }
-      if (out.length >= max) break;
     }
+
+    for (const child of Object.values(record)) visit(child, depth + 1);
   }
-  return out;
+
+  visit(node);
+  return snippets;
 }
 
 function magnitudeForCount(count: number): EvidenceMagnitude {
@@ -109,29 +167,29 @@ function magnitudeForCount(count: number): EvidenceMagnitude {
 
 /** Map extracted snippets to audience/use-case raw-language candidates. Pure + testable. */
 export function snippetsToCandidates(
-  platform: { key: string; label: string; searchUrl: (q: string) => string },
-  snippets: string[],
-  query: string
+  platform: { key: string; label: string },
+  snippets: CollectedSnippet[]
 ): EvidenceCandidate[] {
   const top = snippets.slice(0, MAX_SNIPPETS);
   const mag = magnitudeForCount(top.length);
-  const url = platform.searchUrl(query);
   return top.flatMap((snippet, index) =>
     (["audienceOverlap", "useCaseRelevance"] as const).map((dimension) => ({
       id: `tikhub-${platform.key}-${index}-${dimension}`,
+      evidenceUse: "context" as const,
       dimension,
       direction: "confirm" as const,
       magnitude: mag,
       desiredConfidence: "medium" as const,
-      sourceUrl: url,
-      verificationStatus: "verified" as const,
-      sourceSignals: ["comment_corpus"] as const,
-      note: `${platform.label}：${snippet.slice(0, 140)}`
+      sourceUrl: snippet.sourceUrl,
+      canonicalSourceId: snippet.canonicalSourceId,
+      verificationStatus: snippet.verificationStatus,
+      sourceSignals: [...snippet.sourceSignals],
+      note: `${platform.label}：${snippet.text.slice(0, 140)}`
     }))
   );
 }
 
-async function fetchPlatform(platform: TikhubPlatform, query: string, token: string): Promise<EvidenceCandidate[]> {
+async function fetchPlatform(platform: TikhubPlatform, query: string, token: string): Promise<CollectedSnippet[]> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
@@ -142,7 +200,7 @@ async function fetchPlatform(platform: TikhubPlatform, query: string, token: str
     });
     if (!response.ok) return [];
     const json = await response.json();
-    return snippetsToCandidates(platform, extractSnippets(json), query);
+    return extractTikhubSnippets(platform.key, json, query);
   } catch {
     return [];
   } finally {
@@ -156,16 +214,21 @@ export async function collectTikhubEvidence({
 }: {
   trend: string;
   product?: string;
-}): Promise<{ candidates: EvidenceCandidate[]; bySource: Record<string, number> }> {
+}): Promise<{ candidates: EvidenceCandidate[]; snippets: CollectedSnippet[]; bySource: Record<string, number> }> {
   const token = process.env.TIKHUB_API_KEY;
-  if (!token) return { candidates: [], bySource: {} };
+  if (!token) return { candidates: [], snippets: [], bySource: {} };
 
   const query = [trend, product].filter(Boolean).join(" ").trim() || trend;
   const results = await Promise.all(
-    PLATFORMS.map((platform) => fetchPlatform(platform, query, token).then((candidates) => ({ key: platform.key, candidates })))
+    PLATFORMS.map((platform) => fetchPlatform(platform, query, token).then((snippets) => ({ platform, snippets })))
   );
 
   const bySource: Record<string, number> = {};
-  for (const result of results) bySource[result.key] = result.candidates.length;
-  return { candidates: results.flatMap((result) => result.candidates), bySource };
+  for (const result of results) bySource[result.platform.key] = result.snippets.length;
+  const snippets = results.flatMap((result) => result.snippets);
+  return {
+    candidates: results.flatMap((result) => snippetsToCandidates(result.platform, result.snippets)),
+    snippets,
+    bySource
+  };
 }

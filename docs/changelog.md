@@ -4,6 +4,22 @@ Condensed milestone log for Codex / Claude handoff. **Full detail for any entry 
 `git log` (commit messages) and in this file's own git history** — entries here are
 one-to-two-line summaries, newest first.
 
+## 2026-06-19
+
+- **Evidence pipeline five-fix hardening shipped.** Canonical sources now contribute at most once
+  per dimension; conflicting rows from one source are dropped; SerpApi related queries must match a
+  discriminating trend token. HN/GDELT/TikHub now emit structured snippets with canonical post
+  provenance, and TikHub uses platform-specific post/body adapters instead of a generic string walk.
+- **AI semantics separated from deterministic decisions.** New `lib/evidence-stance.ts` batches 12
+  snippets, requires exact response-ID coverage, rejects duplicate dimensions and weak/non-verbatim
+  quotes, and preserves provider provenance. Raw provider rows are `context`; only decision evidence
+  moves scores. Positive gates accept non-proxy `up` (plus legacy fixture `confirm`), never `down`.
+- **Offline demo builder simplified and guarded.** `collect-and-judge.ts` now reuses the shared stance,
+  Serp, fixture-generator, and structured-snippet paths; `demo_lego` keeps the user-selected 2026
+  World Cup fan-culture case. A moved dimension requires two independent canonical sources before a fixture can
+  be frozen. No paid APIs were called in this change. Verification: TypeScript clean, 159/159 tests,
+  production build passed.
+
 ## 2026-06-18
 
 - **Default Gemini model bumped from `gemini-2.5-flash` to `gemini-3.1-flash-lite`** in both

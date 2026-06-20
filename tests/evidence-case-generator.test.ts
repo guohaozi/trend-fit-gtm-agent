@@ -92,7 +92,7 @@ describe("evidence case generator", () => {
     assert.equal(generated.expectedAdjustedTotal, 70);
     assert.equal(generated.expectedAdjustedBand, "Go");
     assert.equal(generated.expectedEvidenceGate, "partial");
-    assert.deepEqual(generated.expectedGateMissing, ["audienceOrUseCase"]);
+    assert.deepEqual(generated.expectedGateMissing, ["timingSaturation", "audienceOrUseCase"]);
     assert.deepEqual(generated.expectedDimensionConfidence.timingSaturation, "evidence-revised (high)");
   });
 });

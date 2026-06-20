@@ -118,7 +118,7 @@
   "profileUsed": "default",
   "expectedEvidenceGate": "partial",
   "expectedGatedBand": "Go",
-  "expectedGateMissing": ["audienceOrUseCase"],
+  "expectedGateMissing": ["timingSaturation", "audienceOrUseCase"],
   "expectedDimensionCaps": ["audienceOverlap", "creativeFeasibility"],
   "expectedStability": "fragile",
   "expectedDecisionType": "small test",

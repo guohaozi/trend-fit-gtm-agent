@@ -163,14 +163,17 @@ export function calculateTrendFitWithProfile(
   });
 }
 
-function hasNonProxyEvidence(evidence: EvidenceItem[], dimension: ScoreKey): boolean {
+function hasGateSupportingEvidence(evidence: EvidenceItem[], dimension: ScoreKey): boolean {
   return evidence.some(
-    (item) => item.dimension === dimension && (item.sourceTier === "primary" || item.sourceTier === "secondary")
+    (item) => item.dimension === dimension &&
+      item.evidenceUse !== "context" &&
+      (item.direction === "up" || item.direction === "confirm") &&
+      (item.sourceTier === "primary" || item.sourceTier === "secondary")
   );
 }
 
 function getDimensionCaps(scores: Scores, evidence: EvidenceItem[]): ScoreKey[] {
-  return CAP_REQUIRED_DIMS.filter((dimension) => scores[dimension] > 75 && !hasNonProxyEvidence(evidence, dimension));
+  return CAP_REQUIRED_DIMS.filter((dimension) => scores[dimension] > 75 && !hasGateSupportingEvidence(evidence, dimension));
 }
 
 function downgradeOneBand(band: Band): Band {
@@ -189,9 +192,9 @@ function requiredGateSlots(profile: WeightProfile): string[] {
 function missingGateSlots(profile: WeightProfile, evidence: EvidenceItem[]): string[] {
   return requiredGateSlots(profile).filter((slot) => {
     if (slot === "audienceOrUseCase") {
-      return !hasNonProxyEvidence(evidence, "audienceOverlap") && !hasNonProxyEvidence(evidence, "useCaseRelevance");
+      return !hasGateSupportingEvidence(evidence, "audienceOverlap") && !hasGateSupportingEvidence(evidence, "useCaseRelevance");
     }
-    return !hasNonProxyEvidence(evidence, slot as ScoreKey);
+    return !hasGateSupportingEvidence(evidence, slot as ScoreKey);
   });
 }
 
@@ -216,7 +219,7 @@ function scoreOneStepDown(scores: Scores, dimension: ScoreKey): Scores {
 
 function canFlipDownBand(scores: Scores, result: ScoringResult, profile: WeightProfile, evidence: EvidenceItem[]): boolean {
   return SCORE_KEYS.some((dimension) => {
-    if (hasNonProxyEvidence(evidence, dimension)) return false;
+    if (hasGateSupportingEvidence(evidence, dimension)) return false;
     if (scores[dimension] === 0) return false;
     const downTotal = calculateTrendFitWithProfile(scoreOneStepDown(scores, dimension), "medium", profile).total;
     return getBand(downTotal) !== result.recommendation.rawBand;
@@ -248,10 +251,10 @@ function decisionTypeFor(band: Band, stability: RecommendationStability, evidenc
   if (band === "Cautious test") return "small test";
   if (band === "Go") {
     if (stability === "fragile") return "small test";
-    return hasNonProxyEvidence(evidence, "commercialIntent") && stability === "stable" ? "organic push" : "creator seeding";
+    return hasGateSupportingEvidence(evidence, "commercialIntent") && stability === "stable" ? "organic push" : "creator seeding";
   }
   if (stability === "fragile") return "organic push";
-  return hasNonProxyEvidence(evidence, "commercialIntent") && stability === "stable" ? "paid push" : "organic push";
+  return hasGateSupportingEvidence(evidence, "commercialIntent") && stability === "stable" ? "paid push" : "organic push";
 }
 
 function nextValidationAction(missing: string[], dimensionCaps: ScoreKey[]): string {

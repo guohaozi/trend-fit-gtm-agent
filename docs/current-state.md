@@ -22,7 +22,33 @@ an outcome-calibrated sales predictor.
 writes a GTM brief. A "product → candidate trends" discovery layer is intentionally out of
 scope for now.
 
-## Latest conversation handoff (2026-06-19) — evidence pipeline hardened, first AI-judged demo frozen
+## Latest conversation handoff (2026-06-19) — evidence pipeline integrity fixes complete
+
+The five requested offline-demo pipeline fixes are implemented on
+`codex/evidence-pipeline-hardening`. No paid providers were called during this implementation.
+
+- `buildEvidenceDraft` collapses one canonical source to one pressure row per dimension and drops
+  same-source up/down conflicts. SerpApi related-query filtering now requires a discriminating trend
+  token, so generic `AI news` / `AI video generator` rows cannot support `AI art generator`.
+- HN, GDELT, and TikHub produce `CollectedSnippet` records with provider, platform, query, canonical
+  source ID, and post URL. TikHub now has platform-specific body/ID/permalink adapters; usernames,
+  dates, audio labels, and navigation strings are not evidence.
+- `lib/evidence-stance.ts` owns the constrained prompt, schema, batching (12), exact response-ID
+  coverage, unique dimensions, meaningful verbatim quote checks, and deterministic stance mapping.
+  It receives rich product/trend context but never baseline scores.
+- Evidence now distinguishes `context` from `decision`. Raw provider rows cannot move scores or
+  satisfy gates. Rigor gates require non-proxy positive decision support (`up`; legacy frozen
+  `confirm` remains compatible); negative evidence can lower a score but cannot unlock a Go gate.
+- The offline CLI now reuses shared modules and the complete fixture generator. `demo_lego` uses the
+  user-selected **2026 World Cup fan culture** case; the separate shortlist can still rank F1 first.
+  Fixture writes fail unless every moved
+  dimension has two independent canonical decision sources.
+
+Verification on the final code: TypeScript clean, 159/159 tests pass, production Next build passes.
+Next operational step is the paid/API-backed `demo_lego` run and review; it was intentionally not
+performed as part of code verification.
+
+## Earlier conversation handoff (2026-06-19, superseded) — first AI-judged demo frozen
 
 Executes the P0 interview path the 2026-06-18 handoff laid out. Commit: `a65c902`.
 

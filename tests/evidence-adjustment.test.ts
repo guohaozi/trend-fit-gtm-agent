@@ -195,6 +195,34 @@ describe("evidence adjustment model", () => {
     assert.equal(adjustment.adjusted.timingSaturation, 50);
   });
 
+  it("does not let context-only snippets move or confirm a score", () => {
+    const baseline: Scores = {
+      audienceOverlap: 75,
+      useCaseRelevance: 75,
+      messageBridge: 75,
+      creativeFeasibility: 75,
+      commercialIntent: 75,
+      brandSafety: 75,
+      timingSaturation: 75
+    };
+    const contextEvidence: EvidenceItem[] = [{
+      id: "raw-discussion",
+      evidenceUse: "context",
+      dimension: "audienceOverlap",
+      direction: "down",
+      magnitude: "strong",
+      confidence: "high",
+      sourceTier: "primary",
+      sourceUrl: "https://example.com/post",
+      note: "Raw text has not been semantically judged."
+    }];
+
+    const adjustment = adjustScores(baseline, contextEvidence);
+    assert.equal(adjustment.adjusted.audienceOverlap, 75);
+    assert.equal(adjustment.netByDimension.audienceOverlap, 0);
+    assert.equal(adjustment.confidenceByDimension.audienceOverlap, "assumption");
+  });
+
   it("computes mean confidence as a ranking signal without rewarding assumptions", () => {
     const evidenceCase = readEvidenceCase("demo_fashion_evidence.json");
     const adjustment = adjustScores(evidenceCase.baselineScores, evidenceCase.evidence);

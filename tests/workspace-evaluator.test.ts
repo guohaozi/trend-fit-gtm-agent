@@ -107,7 +107,7 @@ describe("workspace evaluator", () => {
     const result = evaluateWorkspaceShortlist(product, legoShortlist.candidates.map((candidate) => ({
       id: candidate.id,
       trendName: candidate.trendName,
-      trendDescription: candidate.trendDescription,
+      trendDescription: candidate.trendDescription ?? "",
       scores: candidate.baselineScores,
       evidence: candidate.evidence,
       oneLineVerdict: candidate.oneLineVerdict,
@@ -175,7 +175,7 @@ describe("workspace evaluator", () => {
         ...f1Candidate.scores,
         brandSafety: 100
       },
-      evidence: f1Candidate.evidence.filter((item) => item.dimension !== "brandSafety")
+      evidence: (f1Candidate.evidence ?? []).filter((item) => item.dimension !== "brandSafety")
     };
     const result = evaluateSingleWorkspaceTrend(product, candidate);
     const gaps = buildWorkspaceEvidenceGaps(result.rigor);
