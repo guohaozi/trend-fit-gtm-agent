@@ -23,6 +23,7 @@ type TikhubPlatform = {
   textContainers?: string[];
   idKeys: string[];
   permalinkKeys?: string[];
+  extraParams?: Record<string, string>;
   postUrl: (id: string, permalink?: string) => string;
 };
 
@@ -30,11 +31,14 @@ const PLATFORMS: TikhubPlatform[] = [
   {
     key: "xiaohongshu",
     label: "小红书",
-    path: "/api/v1/xiaohongshu/web_v3/fetch_search_notes",
+    // App search_notes is higher priority than Web V3 per TikHub docs (App V2 > App > Web V3) and
+    // far more stable; Web V3 was returning a blanket 400. Posts live in item.note (title/desc/id).
+    path: "/api/v1/xiaohongshu/app/search_notes",
     param: "keyword",
-    textKeys: ["display_title", "desc"],
-    textContainers: ["note_card"],
-    idKeys: ["note_id", "id"],
+    extraParams: { page: "1" },
+    textKeys: ["title", "desc"],
+    textContainers: ["note"],
+    idKeys: ["id"],
     postUrl: (id) => `https://www.xiaohongshu.com/explore/${id}`
   },
   {
@@ -193,7 +197,10 @@ async function fetchPlatform(platform: TikhubPlatform, query: string, token: str
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
-    const url = `${TIKHUB_BASE}${platform.path}?${platform.param}=${encodeURIComponent(query)}`;
+    const extra = Object.entries(platform.extraParams ?? {})
+      .map(([key, value]) => `&${key}=${encodeURIComponent(value)}`)
+      .join("");
+    const url = `${TIKHUB_BASE}${platform.path}?${platform.param}=${encodeURIComponent(query)}${extra}`;
     const response = await fetch(url, {
       headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
       signal: controller.signal

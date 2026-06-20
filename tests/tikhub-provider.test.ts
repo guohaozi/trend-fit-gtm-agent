@@ -12,9 +12,10 @@ describe("tikhub provider — structured platform adapters", () => {
       data: {
         items: [
           {
-            note_card: {
-              note_id: "note-123",
-              display_title: "静奢风穿搭分享",
+            note: {
+              id: "note-123",
+              title: "静奢风穿搭分享",
+              desc: "极简通勤穿搭，低饱和配色",
               user: { nickname: "穿搭小王" },
               music: { title: "original audio" }
             }

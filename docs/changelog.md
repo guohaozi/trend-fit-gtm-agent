@@ -6,6 +6,12 @@ one-to-two-line summaries, newest first.
 
 ## 2026-06-21
 
+- **Xiaohongshu collection fixed — wrong endpoint, not a field bug.** Web V3
+  (`web_v3/fetch_search_notes`) was returning a blanket HTTP 400 for every query while TikTok stayed
+  200, and TikHub docs rank `App V2 > App > Web V3`. Switched to `app/search_notes` (requires a `page`
+  param; posts live in `item.note` with `title`/`desc`/`id` — App uses simple keys, not Web V3's
+  camelCase). Added `extraParams` support to the platform adapter. Verified live: 3 real notes
+  extracted with real `explore/{id}` post URLs; `npm test` 160/160.
 - **Capability boundary documented — the time paradox (see current-state.md "Capability boundary").**
   The tool judges BEFORE a campaign, but `product × trend` co-occurrence evidence only exists AFTER
   it. For an un-marketed product (the real use case) that search is near-empty; LEGO×World Cup only
