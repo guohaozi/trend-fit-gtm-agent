@@ -2219,6 +2219,31 @@ th {
     linear-gradient(150deg, var(--hl-pine-deep) 0%, var(--hl-pine) 65%, #0d8278 100%);
 }
 
+.featured-case-hero__logo {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  z-index: 1;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 8px;
+  box-shadow: 0 4px 14px -6px rgba(0, 0, 0, 0.18);
+  display: flex;
+  align-items: center;
+}
+
+.featured-case-hero__logo img {
+  display: block;
+  height: 22px;
+  width: auto;
+  /* Match horizontal wordmark ratio without distorting unfamiliar dimensions. */
+  max-width: 140px;
+  object-fit: contain;
+  object-position: left center;
+}
+
 .featured-case-hero__body {
   display: flex;
   flex-direction: column;

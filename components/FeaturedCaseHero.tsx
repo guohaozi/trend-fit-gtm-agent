@@ -37,11 +37,17 @@ export function FeaturedCaseHero({ id }: Props) {
   const eyebrowSlug = id.replace(/^demo_/, "").toUpperCase();
 
   const hasCover = coverImageExists(card.image);
+  const hasLogo = card.logo ? coverImageExists(card.logo) : false;
 
   return (
     <Link className="featured-case-hero" href={`/cases/${id}`} aria-label={`查看案例 ${card.title}`}>
       <div className={`featured-case-hero__cover${hasCover ? "" : " featured-case-hero__cover--empty"}`}>
         {hasCover ? <img src={card.image} alt={`${card.title} 案例配图`} /> : null}
+        {hasLogo && card.logo ? (
+          <div className="featured-case-hero__logo">
+            <img src={card.logo} alt="" />
+          </div>
+        ) : null}
       </div>
 
       <div className="featured-case-hero__body">
