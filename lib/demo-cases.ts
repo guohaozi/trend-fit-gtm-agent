@@ -486,7 +486,7 @@ export const FEATURED_CASE_META: Array<{
   {
     id: "demo_pixai",
     title: "PixAI × AI 生成原创动漫角色（OC）",
-    image: "/case-studies/ai-photo-before-after.png",
+    image: "/case-studies/pixai-hero.png",
     note: "契合度极高，但真实社区把品牌安全压到 25，只适合小规模测试。"
   },
   {

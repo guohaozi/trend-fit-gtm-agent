@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import Link from "next/link";
 import { getDemoResult, getEvidenceResult, getFeaturedCaseCards } from "@/lib/demo-cases";
 import { BAND_LABELS } from "@/lib/display-labels";
@@ -5,6 +7,17 @@ import { BAND_LABELS } from "@/lib/display-labels";
 type Props = {
   id: string;
 };
+
+// Resolve the cover-image path against /public at module load. If the file is missing
+// (the asset hasn't been delivered yet), we skip the <img> entirely so the pine-
+// gradient placeholder carries the panel instead of the browser's broken-image glyph.
+function coverImageExists(publicPath: string): boolean {
+  try {
+    return fs.existsSync(path.join(process.cwd(), "public", publicPath.replace(/^\//, "")));
+  } catch {
+    return false;
+  }
+}
 
 export function FeaturedCaseHero({ id }: Props) {
   const card = getFeaturedCaseCards().find((entry) => entry.id === id);
@@ -23,34 +36,43 @@ export function FeaturedCaseHero({ id }: Props) {
   const safetyDropped = adjustedSafety < baselineSafety;
   const eyebrowSlug = id.replace(/^demo_/, "").toUpperCase();
 
+  const hasCover = coverImageExists(card.image);
+
   return (
     <Link className="featured-case-hero" href={`/cases/${id}`} aria-label={`查看案例 ${card.title}`}>
-      <div className="featured-case-hero__visual" aria-hidden="true">
+      <div className={`featured-case-hero__cover${hasCover ? "" : " featured-case-hero__cover--empty"}`}>
+        {hasCover ? <img src={card.image} alt={`${card.title} 案例配图`} /> : null}
+      </div>
+
+      <div className="featured-case-hero__body">
         <p className="featured-case-hero__eyebrow">案例 · {eyebrowSlug}</p>
+        <h3 className="featured-case-hero__title">{card.title}</h3>
 
-        <div className="featured-case-hero__score">
-          <span className="featured-case-hero__score-label">证据修正后</span>
-          <p className="featured-case-hero__score-row">
-            <span className="featured-case-hero__score-adjusted">{card.adjustedTotal}</span>
-            <span className="featured-case-hero__score-suffix">/ 100</span>
-          </p>
-        </div>
+        <div className="featured-case-hero__readout">
+          <div className="featured-case-hero__score">
+            <span className="featured-case-hero__score-label">证据修正后</span>
+            <p className="featured-case-hero__score-row">
+              <span className="featured-case-hero__score-adjusted">{card.adjustedTotal}</span>
+              <span className="featured-case-hero__score-suffix">/ 100</span>
+            </p>
+          </div>
 
-        <div className="featured-case-hero__verdict">
-          <span className="featured-case-hero__verdict-label">
-            {bandChanged ? "基准判断 → 证据门槛后" : "基准与证据一致"}
-          </span>
-          <p className="featured-case-hero__verdict-row">
-            {bandChanged ? (
-              <>
-                <span className="featured-case-hero__verdict-from">{baselineBand}</span>
-                <span className="featured-case-hero__verdict-arrow">→</span>
+          <div className="featured-case-hero__verdict">
+            <span className="featured-case-hero__verdict-label">
+              {bandChanged ? "基准判断 → 证据门槛后" : "基准与证据一致"}
+            </span>
+            <p className="featured-case-hero__verdict-row">
+              {bandChanged ? (
+                <>
+                  <span className="featured-case-hero__verdict-from">{baselineBand}</span>
+                  <span className="featured-case-hero__verdict-arrow">→</span>
+                  <strong className="featured-case-hero__verdict-to">{gatedBand}</strong>
+                </>
+              ) : (
                 <strong className="featured-case-hero__verdict-to">{gatedBand}</strong>
-              </>
-            ) : (
-              <strong className="featured-case-hero__verdict-to">{gatedBand}</strong>
-            )}
-          </p>
+              )}
+            </p>
+          </div>
         </div>
 
         {safetyDropped ? (
@@ -60,11 +82,7 @@ export function FeaturedCaseHero({ id }: Props) {
             <span>· 真实社区把分数拉回区间</span>
           </p>
         ) : null}
-      </div>
 
-      <div className="featured-case-hero__body">
-        <p className="featured-case-hero__kicker">案例叙述</p>
-        <h3 className="featured-case-hero__title">{card.title}</h3>
         <p className="featured-case-hero__note">{card.note}</p>
 
         <ul className="featured-case-hero__contents">
