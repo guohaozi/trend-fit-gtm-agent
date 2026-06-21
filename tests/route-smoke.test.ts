@@ -30,13 +30,37 @@ function assertRenderable(node: unknown, label: string): void {
   assert.ok(node && typeof node === "object", `${label} should return a renderable element`);
 }
 
+type ReactElementLike = {
+  type?: unknown;
+  props?: { children?: unknown; alt?: unknown; "aria-label"?: unknown; href?: unknown; [key: string]: unknown };
+};
+
+// Invoke a function component (sync server component) once to expand its tree so
+// collectText / collectHrefs can walk into rendered output instead of stopping at
+// the placeholder element. Returns the original node for host elements/strings.
+function expandFunctionComponent(node: unknown): unknown {
+  if (!node || typeof node !== "object") return node;
+  const element = node as ReactElementLike;
+  if (typeof element.type === "function") {
+    try {
+      return (element.type as (props: unknown) => unknown)(element.props ?? {});
+    } catch {
+      return null;
+    }
+  }
+  return node;
+}
+
 function collectText(node: unknown): string {
   if (node == null || typeof node === "boolean") return "";
   if (typeof node === "string" || typeof node === "number") return String(node);
   if (Array.isArray(node)) return node.map(collectText).join(" ");
   if (typeof node !== "object") return "";
 
-  const props = (node as { props?: { children?: unknown; alt?: unknown; "aria-label"?: unknown } }).props;
+  const expanded = expandFunctionComponent(node);
+  if (expanded !== node) return collectText(expanded);
+
+  const props = (node as ReactElementLike).props;
   if (!props) return "";
 
   return [props.alt, props["aria-label"], props.children].map(collectText).join(" ");
@@ -47,7 +71,10 @@ function collectHrefs(node: unknown): string[] {
   if (Array.isArray(node)) return node.flatMap(collectHrefs);
   if (typeof node !== "object") return [];
 
-  const props = (node as { props?: { children?: unknown; href?: unknown } }).props;
+  const expanded = expandFunctionComponent(node);
+  if (expanded !== node) return collectHrefs(expanded);
+
+  const props = (node as ReactElementLike).props;
   if (!props) return [];
 
   const ownHref = typeof props.href === "string" ? [props.href] : [];
@@ -121,7 +148,7 @@ describe("page route smoke tests", () => {
     const hrefs = collectHrefs(HomePage());
 
     assert.match(text, /产品该不该追热点？/);
-    assert.match(text, /查看完整 Demo/);
+    assert.match(text, /查看完整案例/);
     assert.match(text, /PixAI × AI 生成原创动漫角色/);
     assert.ok(hrefs.includes("/cases/demo_pixai"));
     assert.match(text, /要不要蹭热点/);

@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { getEvidenceResult, getFeaturedCaseCards, INTERVIEW_DEMO_ID } from "@/lib/demo-cases";
+import { FeaturedCaseHero } from "@/components/FeaturedCaseHero";
+import { getEvidenceResult, INTERVIEW_DEMO_ID } from "@/lib/demo-cases";
 import { BAND_LABELS, EVIDENCE_GATE_LABELS } from "@/lib/display-labels";
 import type { Band } from "@/lib/types";
 
@@ -24,17 +25,6 @@ export default function HomePage() {
     ["输出", "行动建议"]
   ];
 
-  const cases = getFeaturedCaseCards()
-    .filter((card) => card.id === INTERVIEW_DEMO_ID)
-    .map((card) => ({
-      title: card.title,
-      image: card.image,
-      href: `/cases/${card.id}`,
-      score: `${card.baselineTotal} → ${card.adjustedTotal}`,
-      decision: bandLabel(card.decisionBand),
-      note: card.note
-    }));
-
   return (
     <div className="simple-home">
       <section className="simple-hero" aria-label="产品展示">
@@ -46,7 +36,7 @@ export default function HomePage() {
           </p>
           <div className="simple-actions">
             <Link className="simple-primary" href={`/cases/${INTERVIEW_DEMO_ID}`}>
-              查看完整 Demo
+              查看完整案例
             </Link>
             <Link className="simple-secondary" href="#how-it-works">
               了解判断方式
@@ -125,32 +115,12 @@ export default function HomePage() {
       <section className="simple-section simple-cases" aria-label="案例展示">
         <div className="simple-section-heading">
           <h2>一个案例，完整走完判断链路。</h2>
-          <p>面试 Demo 聚焦一个产品和一个热点，展示证据如何真正改变分数和建议。</p>
+          <p>挑一个真实产品和一个候选热点，看评分、证据和门槛在同一页上如何收敛成一条可执行的判断。</p>
           <p className="simple-cases-legend">
             分数读作「<strong>基准分 → 证据修正后</strong>」：证据会把缺乏支撑的虚高分拉回真实区间。
           </p>
         </div>
-        <div className="simple-case-grid">
-          {cases.map((item) => (
-            <Link className="simple-case-card" href={item.href} key={item.title}>
-              <img src={item.image} alt={`${item.title}案例图`} />
-              <div>
-                <h3>{item.title}</h3>
-                <dl>
-                  <div>
-                    <dt>分数</dt>
-                    <dd>{item.score}</dd>
-                  </div>
-                  <div>
-                    <dt>建议</dt>
-                    <dd>{item.decision}</dd>
-                  </div>
-                </dl>
-                <p>{item.note}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
+        <FeaturedCaseHero id={INTERVIEW_DEMO_ID} />
       </section>
     </div>
   );

@@ -2171,6 +2171,266 @@ th {
 }
 
 /* ============================================================
+   Featured case hero — full-width single-case card whose visual
+   panel is the product itself (score arrow + gated verdict),
+   not a stock cover image.
+   ============================================================ */
+.featured-case-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  background: #ffffff;
+  border: 1px solid var(--hl-line);
+  border-radius: 18px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+}
+
+.featured-case-hero:hover {
+  border-color: var(--hl-pine);
+  box-shadow: 0 24px 56px -32px rgba(11, 111, 104, 0.45);
+  transform: translateY(-2px);
+}
+
+.featured-case-hero__visual {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: clamp(28px, 4vw, 44px);
+  background:
+    radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.10), transparent 55%),
+    linear-gradient(150deg, var(--hl-pine-deep) 0%, var(--hl-pine) 65%, #0d8278 100%);
+  color: #f1f6f4;
+  position: relative;
+  isolation: isolate;
+}
+
+.featured-case-hero__visual::after {
+  content: "";
+  position: absolute;
+  inset: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+.featured-case-hero__eyebrow {
+  margin: 0;
+  font-family: var(--font-data);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(241, 246, 244, 0.72);
+}
+
+.featured-case-hero__score {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.featured-case-hero__score-label {
+  font-family: var(--font-data);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(241, 246, 244, 0.62);
+}
+
+.featured-case-hero__score-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+  font-family: var(--font-serif);
+  line-height: 1;
+}
+
+.featured-case-hero__score-adjusted {
+  font-size: clamp(72px, 10vw, 108px);
+  font-weight: 500;
+  color: #ffffff;
+  letter-spacing: -0.015em;
+}
+
+.featured-case-hero__score-suffix {
+  font-family: var(--font-data);
+  font-size: clamp(16px, 1.4vw, 18px);
+  font-weight: 400;
+  color: rgba(241, 246, 244, 0.62);
+  letter-spacing: 0.04em;
+}
+
+.featured-case-hero__verdict {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.featured-case-hero__verdict-label {
+  font-family: var(--font-data);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(241, 246, 244, 0.62);
+}
+
+.featured-case-hero__verdict-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.featured-case-hero__verdict-from {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(17px, 1.7vw, 19px);
+  color: rgba(241, 246, 244, 0.55);
+  text-decoration: line-through;
+  text-decoration-color: rgba(241, 246, 244, 0.32);
+  text-decoration-thickness: 1px;
+}
+
+.featured-case-hero__verdict-arrow {
+  font-family: var(--font-data);
+  font-size: clamp(15px, 1.4vw, 17px);
+  color: rgba(241, 246, 244, 0.62);
+}
+
+.featured-case-hero__verdict-to {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(26px, 2.8vw, 32px);
+  color: #ffffff;
+  letter-spacing: 0.01em;
+}
+
+.featured-case-hero__constraint {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.16);
+  font-family: var(--font-data);
+  font-size: 13px;
+  color: rgba(241, 246, 244, 0.85);
+}
+
+.featured-case-hero__constraint em {
+  font-family: var(--font-serif);
+  font-style: normal;
+  font-weight: 500;
+  font-size: 20px;
+  color: #ffffff;
+}
+
+.featured-case-hero__body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: clamp(28px, 4vw, 44px);
+}
+
+.featured-case-hero__title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(22px, 2.6vw, 28px);
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--hl-ink);
+}
+
+.featured-case-hero__note {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--hl-muted);
+}
+
+.featured-case-hero__kicker {
+  margin: 0;
+  font-family: var(--font-data);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--hl-faint);
+}
+
+.featured-case-hero__contents {
+  list-style: none;
+  margin: 0;
+  padding: 18px 0;
+  border-top: 1px solid var(--hl-line);
+  border-bottom: 1px solid var(--hl-line);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.featured-case-hero__contents li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--hl-ink);
+}
+
+.featured-case-hero__contents li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--hl-pine);
+}
+
+.featured-case-hero__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  font-family: var(--font-data);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--hl-pine-deep);
+  letter-spacing: 0.02em;
+}
+
+.featured-case-hero__cta span {
+  transition: transform 180ms ease;
+}
+
+.featured-case-hero:hover .featured-case-hero__cta span {
+  transform: translateX(4px);
+}
+
+@media (max-width: 860px) {
+  .featured-case-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .featured-case-hero__visual {
+    min-height: 280px;
+  }
+
+  .featured-case-hero__score {
+    margin-top: 0;
+  }
+}
+
+/* ============================================================
    Workspace — elegant refresh + progressive disclosure.
    Defined last to refine the earlier .workspace-* rules.
    ============================================================ */
