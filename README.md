@@ -12,7 +12,7 @@ Trend-Fit GTM Agent 位于“趋势发现工具”和“达人/投放工具”�
 
 - 官网首页：[https://trend-fit-seven.vercel.app](https://trend-fit-seven.vercel.app)
 - 开始评估（分析师式流程）：[https://trend-fit-seven.vercel.app/evaluate](https://trend-fit-seven.vercel.app/evaluate)
-- 案例展示（一页式详情）：[https://trend-fit-seven.vercel.app/cases](https://trend-fit-seven.vercel.app/cases)
+- 旗舰案例（一页看完判断）：[https://trend-fit-seven.vercel.app/cases/demo_pixai](https://trend-fit-seven.vercel.app/cases/demo_pixai)
 - GTM 工作台（高级 / 引擎视图）：[https://trend-fit-seven.vercel.app/workspace](https://trend-fit-seven.vercel.app/workspace)
 
 本地运行：
@@ -26,13 +26,16 @@ npm run dev
 
 `/workspace` 已内置 Google Trends fixture 回放路径，因此公开演示时可以不暴露 SerpApi key。
 
-## 产品预览
+## 旗舰案例：PixAI × AI 生成原创动漫角色（OC）
 
-首页已经改成中文展示页：首屏是证据决策中心，下面依次展示可信度条、证据纪律、工作台预览和案例图。
+首页和 `/cases` 都聚焦同一个真实案例——PixAI 这个二次元 AI 绘画平台，要不要追「AI 生成原创动漫角色（OC）」这个热点。
 
-| 中端男装 × 静奢风 | AI 图片工具 × 前后对比 | 零食品牌 × 迪拜巧克力 | LEGO × F1 候选热点 |
-|---|---|---|---|
-| <img src="public/case-studies/quiet-luxury-fashion.png" width="220" alt="中端男装静奢风证据案例缩略图"> | <img src="public/case-studies/ai-photo-before-after.png" width="220" alt="AI 图片前后对比证据案例缩略图"> | <img src="public/case-studies/dubai-chocolate.png" width="220" alt="迪拜巧克力零食证据案例缩略图"> | <img src="public/case-studies/lego-f1-shortlist.png" width="220" alt="LEGO F1 候选热点排序缩略图"> |
+- 基准分（AI baseline）：**88 / 100 · 强烈建议跟进**
+- 证据修正后：**88 / 100**（商业意图 +25 与品牌安全 -25 在加权后互相抵消）
+- 证据门槛后：**谨慎测试**（脆弱 · 小测试）
+- 真正的故事：默认权重下总分没变，但日本动漫圈对 AI 艺术的真实抵制把品牌安全压到 25，门槛因此把判断收紧——分数不一定要变，建议也可能变。
+
+证据全部来自真实采集（HN/Reddit/小红书/TikTok/Instagram/X + SerpApi Google Trends），由 Gemini 立场判定器 + 确定性引擎评分，固化在 [`data/demo_pixai_evidence.json`](data/demo_pixai_evidence.json)。
 
 ## 这个项目解决什么
 
@@ -53,14 +56,15 @@ Trend-Fit 把这套判断显性化、结构化，并保留可审计的证据链�
 
 ## 当前能力
 
-- `/workspace` 可编辑产品、市场、候选热点、七维锚点分和证据行。
-- 支持单热点评分，也支持 3 个候选热点排序。
-- 七维评分固定在 `{0, 25, 50, 75, 100}` 锚点上，避免伪精度。
-- 证据只能按锚点整档修正分数，不能随意加减小数。
-- source-tier classifier 决定证据等级，防止品牌自述、榜单软文和未验证搜索结果抬高置信度。
-- Strong Go evidence gate、无证据封顶、推荐稳定性和行动类型都已接入。
-- SerpApi Google Trends 通过服务端 API 调用，浏览器不接收 key。
-- 支持 fixture 回放、JSON 导入导出、本地自动保存、Markdown 报告导出。
+- **AI baseline scorer**（Gemini）：用户输入产品 + 候选热点 → 模型按 7 维锚点给出基线评分，写明 rationale 而非编造证据。
+- **AI 立场判定器**（Gemini，离线批处理）：把外部采集的真实片段切成 batch，让模型只输出 `{dimension, stance, quote, claim}`，方向/权重/最终建议全部由确定性规则映射；AI 永远不下裁决。
+- **多平台真实采集**：HN、GDELT 免费 provider + TikHub 一把 key 覆盖小红书/TikTok/Instagram/X/Reddit（小红书走 `app/search_notes`），SerpApi 提供 Google Trends 时机/商业信号。
+- **证据完整性双道闸**：(1) 同一来源同一维度去重 + 互相矛盾 drop；(2) **双来源佐证**——任何维度若只有 1 个独立来源支撑方向，自动降级为 context（仍展示但不动分数）。
+- **Source-tier classifier** 决定证据等级，防止品牌自述、榜单软文和未验证搜索结果抬高置信度。
+- **七维评分固定在锚点** `{0, 25, 50, 75, 100}`，证据只能按锚点整档修正分数，避免伪精度。
+- **推荐严谨性门槛**：Strong Go evidence gate、无证据封顶、稳定性（fragile/robust）、行动类型（small test / full launch）都已接入；`brandSafety ≤ 25` 强制最高「谨慎测试」。
+- **`/workspace`** 可编辑产品、市场、候选热点、七维锚点分和证据行；支持单热点评分，也支持 3 候选排序、fixture 回放、JSON 导入导出、本地自动保存、Markdown 报告导出。
+- **服务端 API 安全**：SerpApi/Gemini 等所有 key 走服务端调用，浏览器不接收。
 
 当前刻意不做：
 
@@ -69,6 +73,12 @@ Trend-Fit 把这套判断显性化、结构化，并保留可审计的证据链�
 - 接入广告平台开户或投放 API。
 - 做登录、数据库、支付或云端持久化。
 - 假装权重已经用真实 campaign 结果校准过。
+
+## 能力边界——「时间悖论」
+
+工具在 campaign **之前**判断，但 `产品 × 热点` 的共现证据只在 campaign **之后**才会大量出现。对未营销过的产品(真实使用场景)，搜「产品名 + 热点词」几乎为零。
+
+结论：证据验证的是**热点本身**的客观属性(时机/热度/品牌风险)；产品↔热点的契合度仍是 LLM 假设，由 evidence gate 约束——我们不假装它已被证明。详见 [`docs/current-state.md`](docs/current-state.md) "Capability boundary"。
 
 ## 证据纪律
 
@@ -81,19 +91,21 @@ Trend-Fit 把这套判断显性化、结构化，并保留可审计的证据链�
 | **Strong Go 必须有非代理证据** | 原始高分如果只靠代理指标，会被门槛降级。 |
 | **不伪造校准** | 权重被诚实标注为专家先验，直到有真实 campaign 数据。 |
 
-例子：中端男装 × 静奢风在证据修正后是 `88 / 100`，但因为人群/场景支持仍偏代理指标，门槛后的建议是“建议跟进”，而不是“强烈建议跟进”。
+例子：PixAI × AI 生成原创动漫角色 在证据修正后总分仍是 `88 / 100`(权重抵消)，但 brandSafety 从 50 被真实社区证据压到 25，门槛因此把判断从「强烈建议跟进」收紧为「谨慎测试」——分数不一定要变，建议也可能变。
 
 ## Demo 案例
 
-| 案例 | 基准分 | 证据修正后 | 门槛后结论 | 说明 |
-|---|---:|---:|---|---|
-| 中端男装 × 静奢风 | 90 | 88 | 建议跟进 | 时机被下修，代理证据阻止 Strong Go。 |
-| AI 图片工具 × 前后对比 | 89 | 86 | 强烈建议跟进 | 场景证据通过，但品牌安全让稳定性偏脆弱。 |
-| 零食品牌 × 迪拜巧克力 | 81 | 76 | 建议跟进 | 饱和与跟风风险降低置信度。 |
-| 即饮蛋白饮料 × 日常蛋白摄入 | 78 | 85 | 强烈建议跟进 | 健康和商业信号抬高分数，但刚过阈值。 |
-| LEGO × F1 比赛周末排序 | 88 | 88 | 强烈建议跟进 | F1 在证据门槛后胜过世界杯和毕业季礼物。 |
+面向用户的旗舰案例只展示一个 PixAI（首页 + `/cases`）；其余几个保留为引擎回归 fixture，不在前端展示。
 
-报告文件在 [`outputs/`](outputs/)，结构化输入和证据在 [`data/`](data/)。
+| 案例 | 基准分 | 证据修正后 | 门槛后结论 | 说明 | 来源 |
+|---|---:|---:|---|---|---|
+| **PixAI × AI 生成原创动漫角色（OC）** | **88** | **88** | **谨慎测试** | 总分未变但 brandSafety 50→25 触发门槛收紧。 | 真实采集 + AI stance |
+| 中端男装 × 静奢风 | 90 | 88 | 建议跟进 | 时机被下修，代理证据阻止 Strong Go。 | 人工策展 fixture |
+| AI 图片工具 × 前后对比 | 89 | 86 | 强烈建议跟进 | 场景证据通过，但品牌安全让稳定性偏脆弱。 | 人工策展 fixture |
+| 零食品牌 × 迪拜巧克力 | 81 | 76 | 建议跟进 | 饱和与跟风风险降低置信度。 | 人工策展 fixture |
+| 即饮蛋白饮料 × 日常蛋白摄入 | 78 | 85 | 强烈建议跟进 | 健康和商业信号抬高分数，但刚过阈值。 | 人工策展 fixture |
+
+报告文件在 [`outputs/`](outputs/)，结构化输入和证据在 [`data/`](data/)。PixAI evidence 的离线重跑入口见下面 `scripts/collect-and-judge.ts`。
 
 ## 评分模型
 
@@ -134,14 +146,19 @@ Trend-Fit 把这套判断显性化、结构化，并保留可审计的证据链�
 | 模块 | 主要文件 |
 |---|---|
 | 评分合同 | [`lib/scoring.ts`](lib/scoring.ts)、[`tests/scoring.test.ts`](tests/scoring.test.ts) |
-| 证据修正 | [`lib/evidence-adjustment.ts`](lib/evidence-adjustment.ts)、[`tests/evidence-adjustment.test.ts`](tests/evidence-adjustment.test.ts) |
+| AI baseline scorer | [`lib/baseline-scorer.ts`](lib/baseline-scorer.ts)、[`app/api/evaluate/baseline/route.ts`](app/api/evaluate/baseline/route.ts) |
+| AI 立场判定器 | [`lib/evidence-stance.ts`](lib/evidence-stance.ts)、[`tests/evidence-stance.test.ts`](tests/evidence-stance.test.ts) |
+| 证据修正引擎 | [`lib/evidence-adjustment.ts`](lib/evidence-adjustment.ts)、[`tests/evidence-adjustment.test.ts`](tests/evidence-adjustment.test.ts) |
 | 推荐严谨性门槛 | [`lib/recommendation-rigor.ts`](lib/recommendation-rigor.ts)、[`tests/recommendation-rigor.test.ts`](tests/recommendation-rigor.test.ts) |
 | 来源等级分类器 | [`lib/source-tier-classifier.ts`](lib/source-tier-classifier.ts)、[`tests/source-tier-classifier.test.ts`](tests/source-tier-classifier.test.ts) |
-| 证据收集草稿 | [`lib/evidence-collector.ts`](lib/evidence-collector.ts)、[`lib/evidence-case-research-runner.ts`](lib/evidence-case-research-runner.ts) |
+| 证据收集 + 双来源佐证 | [`lib/evidence-collector.ts`](lib/evidence-collector.ts)、[`tests/evidence-collector.test.ts`](tests/evidence-collector.test.ts) |
+| 免费 provider（HN/GDELT/TikHub） | [`lib/free-evidence-providers.ts`](lib/free-evidence-providers.ts)、[`lib/tikhub-provider.ts`](lib/tikhub-provider.ts)、[`tests/tikhub-provider.test.ts`](tests/tikhub-provider.test.ts) |
 | Google Trends Provider | [`lib/seo-keyword-provider.ts`](lib/seo-keyword-provider.ts)、[`app/api/workspace/google-trends/route.ts`](app/api/workspace/google-trends/route.ts) |
+| Demo fixture 冻结守卫 | [`lib/demo-fixture-guard.ts`](lib/demo-fixture-guard.ts) |
 | 工作台桥接 | [`lib/workspace-evaluator.ts`](lib/workspace-evaluator.ts)、[`components/WorkspaceClient.tsx`](components/WorkspaceClient.tsx) |
 | 候选热点排序 | [`lib/trend-shortlist.ts`](lib/trend-shortlist.ts)、[`tests/trend-shortlist.test.ts`](tests/trend-shortlist.test.ts) |
 | 报告输出 | [`lib/report-markdown.ts`](lib/report-markdown.ts)、[`app/api/report/[id]/route.ts`](app/api/report/[id]/route.ts) |
+| 旗舰案例 hero 组件 | [`components/FeaturedCaseHero.tsx`](components/FeaturedCaseHero.tsx) |
 
 本地 strategy skills 在 [`skills/`](skills/) 下：
 
@@ -156,16 +173,17 @@ Trend-Fit 把这套判断显性化、结构化，并保留可审计的证据链�
 
 | 路由 | 用途 |
 |---|---|
-| `/` | 中文官网首页：两个主入口「开始评估」「案例展示」。 |
-| `/evaluate` | 分析师式评估：填产品画像 + 候选热点七维打分 → 确定性评分、门槛裁决、证据缺口、可下载 GTM 简报。 |
-| `/cases` | 案例画廊。 |
-| `/cases/[id]` | 一页式案例详情（输入 + 评分 + 证据修正 + 简报，直出无等待，SSG 预渲染 fashion / ai_tool / snack）。 |
+| `/` | 中文官网首页：FeaturedCaseHero 把 PixAI 案例作为单一展示入口。 |
+| `/evaluate` | 分析师式评估：填产品画像 + 候选热点 → AI baseline 评分 + 七维确定性引擎 + 门槛裁决 + 证据缺口 + 可下载 GTM 简报。 |
+| `/cases` | 案例展示页：与首页同样的 FeaturedCaseHero。 |
+| `/cases/[id]` | 一页式案例详情（输入 + 评分 + 证据修正 + 简报，直出无等待，SSG 预渲染 fashion / pixai / snack）。 |
 | `/workspace` | 高级 / 引擎视图：评分、排序、证据行、fixture 回放、导入导出、Markdown 导出。 |
+| `/api/evaluate/baseline` | 服务端 Gemini baseline scorer，返回 7 维锚点分 + rationale。 |
 | `/api/report/[id]` | 下载已知案例的 Markdown 报告，未知 id 会回退到默认 demo。 |
 | `/api/workspace/google-trends` | 服务端 SerpApi Google Trends 调用，或 fixture 回放。 |
+| `/api/evidence/collect` | 把候选证据收集成 Draft（去重、源等级、双来源佐证、降级 context）。 |
 
-`/cases/[id]` 与 `/api/report/[id]` 的有效案例 id：`demo_fashion`、`demo_robotics`、
-`demo_ai_tool`、`demo_snack`、`demo_protein_drink`（未知 id 回退到默认 demo）。
+`/cases/[id]` 与 `/api/report/[id]` 的有效案例 id：`demo_fashion`、`demo_pixai`、`demo_ai_tool`、`demo_snack`、`demo_protein_drink`、`demo_robotics`（未知 id 回退到默认 demo）。
 
 ## API 示例
 
@@ -213,16 +231,23 @@ curl -X POST https://trend-fit-seven.vercel.app/api/workspace/google-trends \
 | `npm run dev` | 启动 Next.js 开发服务。 |
 | `npm run build` | 构建生产版本。 |
 | `npm start` | 运行生产构建。 |
-| `npm test` | 运行所有 Node 测试。 |
+| `npm test` | 运行所有 Node 测试（164 个）。 |
 | `npm run evidence:case` | 从显式证据数据生成 evidence case。 |
 | `npm run evidence:case:research` | 运行研究 provider 管线，写入 `data/*_evidence.json` 和 `outputs/*_evidence_case.md`。 |
+| `node --import tsx scripts/collect-and-judge.ts demo_pixai` | 实采集 + Gemini stance 立场判定 + 冻结 demo fixture；`--cached` 复用 `/tmp` snippet 缓存不重计 TikHub，`--dry` 只打印不写文件，`--inspect` 列出每个维度的方向性证据。 |
 
 ## 环境变量
 
 | 变量 | 是否必须 | 用途 |
 |---|---|---|
+| `GEMINI_API_KEY` | live `/evaluate` baseline + 离线 stance 需要 | Google AI Studio key（一把覆盖 baseline 和 stance）。 |
+| `GEMINI_BASELINE_MODEL` | 可选 | 覆盖 baseline 模型，默认 `gemini-3.5-flash`。 |
+| `GEMINI_MODEL` | 可选 | 覆盖 stance 模型（仅 `scripts/collect-and-judge.ts` 使用），默认 `gemini-3.1-flash-lite`。 |
+| `TIKHUB_API_KEY` | 仅离线重采集需要 | TikHub 一把 key 覆盖小红书/TikTok/Instagram/X/Reddit；Vercel 不需要。 |
 | `SERPAPI_API_KEY` | 仅真实 Google Trends 调用需要 | 服务端 SerpApi Google Trends key；fixture 回放不需要。 |
 | `OPENCLI_BIN` | 可选 | 覆盖 `opencli` 二进制路径。 |
+
+公开 Vercel demo 只需要 `GEMINI_API_KEY`（用于 `/evaluate` baseline）。TikHub/SerpApi 的实采集在本地离线脚本里运行，结果固化为 fixture 后由前端回放，所以 Vercel 不需要它们的 key。
 
 ## 验证
 
@@ -235,10 +260,10 @@ npm run build
 
 CI 通过 [`.github/workflows/ci.yml`](.github/workflows/ci.yml) 在 push 和 pull request 时运行 `npm ci`、`npm test` 和 `npm run build`。
 
-本次首页改版还需要浏览器检查：
+UI 改动需要浏览器检查：
 
-- 桌面视口：首屏能打开，无横向溢出，案例图正常加载。
-- 手机视口：标题、按钮、决策面板和案例卡片不重叠。
+- 桌面视口：首屏能打开，无横向溢出，FeaturedCaseHero 视觉面板与内容面板各占约半宽。
+- 手机视口（≤860px）：hero 卡片自动堆叠成单列，标题、按钮、约束 pill 不重叠。
 
 ## 目录结构
 
@@ -260,8 +285,10 @@ trend-fit-gtm-agent/
 
 - 已部署到 Vercel（[trend-fit-seven.vercel.app](https://trend-fit-seven.vercel.app)），暂未绑定自定义域名。
 - 热点仍需要人工输入；产品到热点的自动发现暂不在本版范围内。
-- TikTok、小红书、市场评论、社媒语言等 live provider 还没有接入工作台 UI。
-- 如果旧 SerpApi key 曾在聊天中共享，公开部署前必须轮换。
+- 离线 `collect-and-judge.ts` 才是真正多平台采集 + AI stance 全管线；live `/evaluate` 目前只跑 baseline，stance 层尚未上线（P1，详见 [`docs/current-state.md`](docs/current-state.md)）。
+- TikHub 多平台采集需要付费 key，公开 demo 走 fixture 回放。
+- 旗舰案例视觉面板目前是纯数据排版；PixAI logo 或样图待补素材。
+- 如果旧 SerpApi/Gemini/TikHub key 曾在聊天或截图里出现过，公开部署前必须轮换。
 
 ## 技术栈
 
