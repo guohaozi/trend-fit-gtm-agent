@@ -72,6 +72,7 @@ export function buildStanceSystemPrompt(context: StanceCaseContext): string {
     "对每条 snippet 独立判断，不要受同批其他 snippet 影响。每个输入 snippetId 必须恰好返回一次。",
     "每个维度最多返回一次：audienceOverlap、useCaseRelevance、messageBridge、creativeFeasibility、commercialIntent、brandSafety、timingSaturation。",
     "立场只能是 supports、contradicts、irrelevant。仅关键词重合、用户名、纯标签、导航词、日期、音频名一律 irrelevant。",
+    `若 snippet 明显在讲另一个产品/公司/无关主题（例如与「${context.productName}」名字相近但实为他者），该维度一律 irrelevant，不得给 supports/contradicts。不要在 claim 里写「无关」却又给方向。`,
     "quote 必须是 snippet 中逐字存在、能独立支撑判断的原文；纯标签或过短片段无效。",
     "AI 只做语义标签，不输出分数、权重、来源等级或最终建议。"
   ].join("\n");
@@ -130,6 +131,16 @@ function isMeaningfulQuote(quote: string, text: string): boolean {
   return !/^(original audio|use template|explore|search|home)$/i.test(value);
 }
 
+/**
+ * A directional stance must not also declare the snippet irrelevant. When the model writes that the
+ * content is about another product/topic ("无关" / "unrelated"), it has effectively voted irrelevant
+ * — emitting supports/contradicts anyway is self-contradictory noise (e.g. a "Pixar in a Box" link
+ * fuzzy-matched to "PixAI"). Drop it deterministically so such items never become evidence.
+ */
+function claimDisclaimsRelevance(claim: string): boolean {
+  return /无关|unrelated|irrelevant|无关联/i.test(claim);
+}
+
 export function mapStanceJudgementsToCandidates(
   snippets: CollectedSnippet[],
   judgements: StanceJudgement[]
@@ -144,6 +155,7 @@ export function mapStanceJudgementsToCandidates(
       const dimension = impact.dimension as ScoreKey;
       if (!SCORE_KEYS.includes(dimension)) continue;
       if (impact.stance !== "supports" && impact.stance !== "contradicts") continue;
+      if (claimDisclaimsRelevance(impact.claim ?? "")) continue;
       const quote = impact.quote?.trim() ?? "";
       if (!isMeaningfulQuote(quote, snippet.text)) continue;
       candidates.push({

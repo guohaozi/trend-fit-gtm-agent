@@ -1,6 +1,6 @@
 # Current State — Trend-Fit GTM Agent
 
-Last updated: 2026-06-19. Main is pushed to origin; run `git log -1` for the exact HEAD
+Last updated: 2026-06-21. Main is pushed to origin; run `git log -1` for the exact HEAD
 (do not hardcode a commit hash here — it goes stale on every commit).
 
 Compact handoff snapshot for the next Codex / Claude conversation. **Full change history

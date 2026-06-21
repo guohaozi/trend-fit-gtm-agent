@@ -75,6 +75,18 @@ describe("evidence stance", () => {
     }]), /duplicate dimension.*audienceOverlap/i);
   });
 
+  it("drops impacts whose claim declares the snippet unrelated to the product", () => {
+    const source = snippet("s1", "Pixar in a Box – Khan Academy free animation course");
+    const judgements: StanceJudgement[] = [{
+      snippetId: "s1",
+      impacts: [
+        { dimension: "brandSafety", stance: "contradicts", quote: "Pixar in a Box – Khan Academy", claim: "该内容指向皮克斯动画工作室的教育项目，与PixAI平台无关。" }
+      ]
+    }];
+    const candidates = mapStanceJudgementsToCandidates([source], judgements);
+    assert.deepEqual(candidates, [], "a self-declared-irrelevant claim must not become directional evidence");
+  });
+
   it("keeps only meaningful verbatim quotes and preserves source provenance", () => {
     const source = snippet("s1", "#PixAI PixAI users compare LoRA workflows for original characters");
     const judgements: StanceJudgement[] = [{

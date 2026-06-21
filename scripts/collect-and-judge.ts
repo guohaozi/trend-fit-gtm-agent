@@ -13,7 +13,7 @@ import { pathToFileURL } from "node:url";
 import { assertDemoFixtureReady } from "../lib/demo-fixture-guard";
 import { adjustScores } from "../lib/evidence-adjustment";
 import { generateEvidenceAdjustmentCaseFromDraft } from "../lib/evidence-case-generator";
-import { buildEvidenceDraft, type CollectedSnippet, type EvidenceCandidate } from "../lib/evidence-collector";
+import { buildEvidenceDraft, requireSourceCorroboration, type CollectedSnippet, type EvidenceCandidate } from "../lib/evidence-collector";
 import { collectFreeEvidence } from "../lib/free-evidence-providers";
 import {
   buildStanceSystemPrompt,
@@ -227,8 +227,28 @@ async function main(): Promise<void> {
     baselineScores: def.baseline,
     candidates: [...judged, ...serp]
   });
+  // Single-source directional signals (e.g. a lone Google-Trends datapoint) are recorded but demoted
+  // to context so they cannot move a score on their own — same bar the freeze guard enforces.
+  draft.evidence = requireSourceCorroboration(draft.evidence);
   const adjustment = adjustScores(def.baseline, draft.evidence);
   printDelta(def.baseline, adjustment);
+
+  if (process.argv.includes("--inspect")) {
+    console.log("\nPer-dimension directional evidence (sourceId | direction | magnitude | note):");
+    for (const key of SCORE_KEYS) {
+      const items = draft.evidence.filter(
+        (item) => item.dimension === key && item.evidenceUse !== "context" && item.direction !== "confirm"
+      );
+      if (items.length === 0) continue;
+      const sources = new Set(items.map((item) => item.canonicalSourceId ?? item.sourceUrl));
+      console.log(`\n  ${key} — ${items.length} items, ${sources.size} independent source(s):`);
+      for (const item of items) {
+        console.log(`    [${item.canonicalSourceId ?? item.sourceUrl}] ${item.direction}/${item.magnitude} :: ${item.note.slice(0, 90)}`);
+      }
+    }
+    console.log("");
+  }
+
   assertDemoFixtureReady({ evidence: draft.evidence, baseline: def.baseline, adjusted: adjustment.adjusted });
 
   const fixture = generateEvidenceAdjustmentCaseFromDraft({

@@ -1,8 +1,8 @@
 {
   "id": "demo_pixai_evidence",
   "case": "demo_pixai",
-  "researchDate": "2026-06-19",
-  "tooling": "Live collect (HN/GDELT/TikHub) + Gemini stance layer; deterministic up/down mapping. Frozen for demo.",
+  "researchDate": "2026-06-21",
+  "tooling": "HN/GDELT/TikHub structured collection + Gemini gemini-3.1-flash-lite stance + SerpApi Google Trends; deterministic scoring.",
   "baselineScores": {
     "audienceOverlap": 100,
     "useCaseRelevance": 100,
@@ -14,114 +14,268 @@
   },
   "evidence": [
     {
-      "id": "aij-0-creativeFeasibility",
-      "dimension": "creativeFeasibility",
+      "id": "stance-snippet-0-useCaseRelevance",
+      "evidenceUse": "decision",
+      "canonicalSourceId": "hackernews:43748500",
+      "dimension": "useCaseRelevance",
       "direction": "up",
       "magnitude": "weak",
       "confidence": "medium",
       "sourceTier": "primary",
-      "sourceUrl": "https://www.tiktok.com/search?q=PixAI",
-      "note": "用户在TikTok上使用PixAI进行创作并分享，证明了该产品在动漫角色生成场景下的可执行性。「#PixAI」 (verified primary source signal)"
+      "sourceUrl": "https://news.ycombinator.com/item?id=43748500",
+      "note": "PixAI 具备展示 AI 生成艺术作品的画廊功能，与用户分享原创角色插画的趋势相符。「Pixai Art Gallery」 (verified primary source signal)"
     },
     {
-      "id": "aij-1-commercialIntent",
+      "id": "stance-snippet-11-messageBridge",
+      "evidenceUse": "context",
+      "canonicalSourceId": "instagram:DS9-xHIjA9p",
+      "dimension": "messageBridge",
+      "direction": "up",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "primary",
+      "sourceUrl": "https://www.instagram.com/p/DS9-xHIjA9p/",
+      "note": "官方宣传强调了工具的可定制性，直接支持了用户通过 PixAI 生成原创动漫角色的核心卖点。「You can easily make stunning anime art with customizable tools」 (verified primary source signal)（单一来源，未达双来源佐证门槛，仅作背景）"
+    },
+    {
+      "id": "stance-snippet-12-useCaseRelevance",
+      "evidenceUse": "decision",
+      "canonicalSourceId": "instagram:18089930273297089",
+      "dimension": "useCaseRelevance",
+      "direction": "up",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "primary",
+      "sourceUrl": "https://www.instagram.com/p/18089930273297089/",
+      "note": "PixAI提供可定制工具，支持用户生成动漫艺术作品，与AI生成原创动漫角色（OC）的趋势相符。「You can easily make stunning anime art with customizable tools」 (verified primary source signal)"
+    },
+    {
+      "id": "stance-snippet-13-audienceOverlap",
+      "evidenceUse": "decision",
+      "canonicalSourceId": "instagram:DVqdOTGD4vg",
+      "dimension": "audienceOverlap",
+      "direction": "up",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "primary",
+      "sourceUrl": "https://www.instagram.com/p/DVqdOTGD4vg/",
+      "note": "PixAI通过社交媒体大使运营，直接触达二次元AI艺术爱好者群体。「PixAI.artのソーシャルメディアアンバサダーのmikiです」 (verified primary source signal)"
+    },
+    {
+      "id": "stance-snippet-18-commercialIntent",
+      "evidenceUse": "decision",
+      "canonicalSourceId": "reddit:t3_1sa4cds",
       "dimension": "commercialIntent",
       "direction": "up",
       "magnitude": "weak",
       "confidence": "medium",
-      "sourceTier": "primary",
-      "sourceUrl": "https://www.reddit.com/search/?q=PixAI",
-      "note": "用户明确询问PixAI会员的付费价值，显示了直接的商业购买意图。「is PixAI's membership worth it」 (verified primary source signal)"
+      "sourceTier": "proxy",
+      "sourceUrl": "https://www.reddit.com/comments/1sa4cds/",
+      "note": "用户对PixAI会员及其视频功能表现出付费意愿与价值评估，体现了商业转化潜力。「is PixAI's membership worth it for its video features?」 (single social thread outside raw audience/use-case language)"
     },
     {
-      "id": "aij-2-brandSafety",
+      "id": "stance-snippet-25-useCaseRelevance",
+      "evidenceUse": "decision",
+      "canonicalSourceId": "tiktok:7441235770121178410",
+      "dimension": "useCaseRelevance",
+      "direction": "down",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "primary",
+      "sourceUrl": "https://www.tiktok.com/@_/video/7441235770121178410",
+      "note": "明确指出使用的工具为reme合成器，而非PixAI。「软件：reme合成器」 (verified primary source signal)"
+    },
+    {
+      "id": "stance-snippet-26-useCaseRelevance",
+      "evidenceUse": "decision",
+      "canonicalSourceId": "instagram:DX3cgJQFPcD",
+      "dimension": "useCaseRelevance",
+      "direction": "down",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "primary",
+      "sourceUrl": "https://www.instagram.com/p/DX3cgJQFPcD/",
+      "note": "明确指出使用的工具为ChatGPT，而非PixAI。「ChatGPT一键把照片变蜡笔画」 (verified primary source signal)"
+    },
+    {
+      "id": "stance-snippet-27-useCaseRelevance",
+      "evidenceUse": "decision",
+      "canonicalSourceId": "instagram:18083775887081158",
+      "dimension": "useCaseRelevance",
+      "direction": "down",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "primary",
+      "sourceUrl": "https://www.instagram.com/p/18083775887081158/",
+      "note": "明确指出使用的工具为ChatGPT，而非PixAI。「ChatGPT一键把照片变蜡笔画」 (verified primary source signal)"
+    },
+    {
+      "id": "stance-snippet-28-useCaseRelevance",
+      "evidenceUse": "decision",
+      "canonicalSourceId": "instagram:DX1_rTYEybW",
+      "dimension": "useCaseRelevance",
+      "direction": "down",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "primary",
+      "sourceUrl": "https://www.instagram.com/p/DX1_rTYEybW/",
+      "note": "明确指出使用的工具为GPT，而非PixAI。「GPT Prompt 如下」 (verified primary source signal)"
+    },
+    {
+      "id": "stance-snippet-35-useCaseRelevance",
+      "evidenceUse": "decision",
+      "canonicalSourceId": "hackernews:38248038",
+      "dimension": "useCaseRelevance",
+      "direction": "up",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "primary",
+      "sourceUrl": "https://news.ycombinator.com/item?id=38248038",
+      "note": "该工具定位与PixAI的二次元AI绘画及角色生成功能存在重合。「AI Anime Pixel Art Generator」 (verified primary source signal)"
+    },
+    {
+      "id": "stance-snippet-36-useCaseRelevance",
+      "evidenceUse": "decision",
+      "canonicalSourceId": "hackernews:23480988",
+      "dimension": "useCaseRelevance",
+      "direction": "up",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "primary",
+      "sourceUrl": "https://news.ycombinator.com/item?id=23480988",
+      "note": "展示了AI生成动漫风格艺术的场景，与PixAI的二次元绘画定位相关「AI Anime Style Arts Gallery」 (verified primary source signal)"
+    },
+    {
+      "id": "stance-snippet-37-brandSafety",
+      "evidenceUse": "decision",
+      "canonicalSourceId": "hackernews:34718909",
       "dimension": "brandSafety",
       "direction": "down",
       "magnitude": "weak",
       "confidence": "medium",
       "sourceTier": "primary",
-      "sourceUrl": "https://www.reddit.com/search/?q=AI%20%E7%BB%98%E7%94%BB",
-      "note": "AI生成艺术引发的版权争议和抗议，对品牌形象构成负面影响。「畫被中國官方海外軍事帳號餵給AI，去下面抗議還被拉黑」 (verified primary source signal)"
+      "sourceUrl": "https://news.ycombinator.com/item?id=34718909",
+      "note": "AI在动漫领域的应用引发了行业恐慌，对品牌声誉构成潜在负面影响「Netflix’s anime AI art causes background artist panic」 (verified primary source signal)"
     },
     {
-      "id": "aij-3-brandSafety",
+      "id": "stance-snippet-38-brandSafety",
+      "evidenceUse": "decision",
+      "canonicalSourceId": "hackernews:33380195",
       "dimension": "brandSafety",
       "direction": "down",
       "magnitude": "weak",
       "confidence": "medium",
       "sourceTier": "primary",
       "sourceUrl": "https://news.ycombinator.com/item?id=33380195",
-      "note": "AI生成艺术在动漫社区引发强烈抵制，反映了该领域面临的品牌安全风险。「AI-generated art sparks backlash from Japan’s anime community」 (verified primary source signal)"
+      "note": "AI生成艺术在日本动漫社区引发抵制，不利于PixAI在核心市场的品牌形象「AI-generated art sparks backlash from Japan’s anime community」 (verified primary source signal)"
     },
     {
-      "id": "aij-4-brandSafety",
+      "id": "stance-snippet-39-brandSafety",
+      "evidenceUse": "decision",
+      "canonicalSourceId": "hackernews:33369756",
       "dimension": "brandSafety",
       "direction": "down",
       "magnitude": "weak",
       "confidence": "medium",
       "sourceTier": "primary",
       "sourceUrl": "https://news.ycombinator.com/item?id=33369756",
-      "note": "动漫社区对AI生成艺术的愤怒抵制，直接关联到产品所处赛道的负面舆论环境。「AI-generated art sparks furious backlash from Japan’s anime community」 (verified primary source signal)"
+      "note": "强烈的社区抵制情绪对PixAI的品牌安全构成威胁「AI-generated art sparks furious backlash from Japan’s anime community」 (verified primary source signal)"
     },
     {
-      "id": "serp-0-timingSaturation",
-      "dimension": "timingSaturation",
+      "id": "stance-snippet-43-useCaseRelevance",
+      "evidenceUse": "decision",
+      "canonicalSourceId": "tiktok:7640804971687972116",
+      "dimension": "useCaseRelevance",
       "direction": "up",
-      "magnitude": "strong",
-      "confidence": "high",
-      "sourceTier": "secondary",
-      "sourceUrl": "https://serpapi.com/search?engine=google_trends&q=AI+art+generator&data_type=RELATED_QUERIES&date=today+12-m",
-      "note": "Google Trends：相关查询被标记为爆发式增长。（ai news today） (verified secondary source signal)"
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "primary",
+      "sourceUrl": "https://www.tiktok.com/@_/video/7640804971687972116",
+      "note": "明确展示了AI生成动漫女孩的用例，符合PixAI的核心功能「#AIイラスト #可愛い女の子 #アニメ好き AIアニメイラスト。」 (verified primary source signal)"
     },
     {
-      "id": "serp-1-commercialIntent",
+      "id": "stance-snippet-44-creativeFeasibility",
+      "evidenceUse": "decision",
+      "canonicalSourceId": "tiktok:7641762878579592461",
+      "dimension": "creativeFeasibility",
+      "direction": "up",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "primary",
+      "sourceUrl": "https://www.tiktok.com/@_/video/7641762878579592461",
+      "note": "展示了从生成到动画化的创作流程，验证了AI辅助创作的可行性「I made in chat gpt then ai animated」 (verified primary source signal)"
+    },
+    {
+      "id": "stance-snippet-46-creativeFeasibility",
+      "evidenceUse": "decision",
+      "canonicalSourceId": "twitter:2066853399887499286",
+      "dimension": "creativeFeasibility",
+      "direction": "up",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "primary",
+      "sourceUrl": "https://x.com/i/web/status/2066853399887499286",
+      "note": "展示了AI在短时间内完成高质量动漫场景创作的能力，与PixAI的图生视频卖点契合「I used GPT Image 2.0 and Seedance 2.0 to create an entire cinematic animated scene in minutes」 (verified primary source signal)"
+    },
+    {
+      "id": "stance-snippet-47-creativeFeasibility",
+      "evidenceUse": "decision",
+      "canonicalSourceId": "twitter:2068300260930470180",
+      "dimension": "creativeFeasibility",
+      "direction": "up",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "primary",
+      "sourceUrl": "https://x.com/i/web/status/2068300260930470180",
+      "note": "验证了从分镜到动画的AI创作工作流，支持PixAI的创作工具定位「I used ChatGPT Image 2.0 to create anime battle scene storyboard. Then Seedance 2.0 turned it into a cinematic animated battle scene.」 (verified primary source signal)"
+    },
+    {
+      "id": "stance-snippet-48-useCaseRelevance",
+      "evidenceUse": "decision",
+      "canonicalSourceId": "twitter:2066129327750877653",
+      "dimension": "useCaseRelevance",
+      "direction": "up",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "primary",
+      "sourceUrl": "https://x.com/i/web/status/2066129327750877653",
+      "note": "用户展示了利用AI工具进行动漫角色叙事与动画制作的流程，与PixAI的图生视频及角色生成功能高度相关。「I used ChatGPT Image 2.0 to create an entire anime short film storyboard. Then Seedance 2.0 turned it into a cinematic animated scene in minutes.」 (verified primary source signal)"
+    },
+    {
+      "id": "stance-snippet-49-audienceOverlap",
+      "evidenceUse": "decision",
+      "canonicalSourceId": "reddit:t3_1uajyps",
+      "dimension": "audienceOverlap",
+      "direction": "up",
+      "magnitude": "weak",
+      "confidence": "medium",
+      "sourceTier": "primary",
+      "sourceUrl": "https://www.reddit.com/comments/1uajyps/",
+      "note": "目标受众（二次元爱好者）正在寻找高质量的动漫风格AI模型，这与PixAI作为二次元AI绘画平台的定位重合。「Any models with cartoon/anime style that do not give off this awful \"AI gloss\"?」 (single social thread used only as raw audience/use-case language)"
+    },
+    {
+      "id": "ai-art-generator-buying-1",
+      "evidenceUse": "decision",
+      "canonicalSourceId": "https://serpapi.com/search?engine=google_trends&q=AI+art+generator&data_type=RELATED_QUERIES&date=today+12-m",
       "dimension": "commercialIntent",
       "direction": "up",
       "magnitude": "moderate",
       "confidence": "medium",
       "sourceTier": "secondary",
       "sourceUrl": "https://serpapi.com/search?engine=google_trends&q=AI+art+generator&data_type=RELATED_QUERIES&date=today+12-m",
-      "note": "Google Trends：相关查询包含购买或评估意图的措辞。（best ai video generator） (verified secondary source signal)"
+      "note": "相关查询包含购买或评估意图的措辞。 Google Trends query: best ai art generator. Growth: +170%. (verified secondary source signal)"
     },
     {
-      "id": "serp-2-commercialIntent",
-      "dimension": "commercialIntent",
-      "direction": "up",
-      "magnitude": "moderate",
-      "confidence": "medium",
-      "sourceTier": "secondary",
-      "sourceUrl": "https://serpapi.com/search?engine=google_trends&q=AI+art+generator&data_type=RELATED_QUERIES&date=today+12-m",
-      "note": "Google Trends：相关查询包含购买或评估意图的措辞。（best ai art generator app） (verified secondary source signal)"
-    },
-    {
-      "id": "serp-3-commercialIntent",
-      "dimension": "commercialIntent",
-      "direction": "up",
-      "magnitude": "moderate",
-      "confidence": "medium",
-      "sourceTier": "secondary",
-      "sourceUrl": "https://serpapi.com/search?engine=google_trends&q=AI+art+generator&data_type=RELATED_QUERIES&date=today+12-m",
-      "note": "Google Trends：相关查询包含购买或评估意图的措辞。（best art ai generator） (verified secondary source signal)"
-    },
-    {
-      "id": "serp-4-commercialIntent",
-      "dimension": "commercialIntent",
-      "direction": "up",
-      "magnitude": "moderate",
-      "confidence": "medium",
-      "sourceTier": "secondary",
-      "sourceUrl": "https://serpapi.com/search?engine=google_trends&q=AI+art+generator&data_type=RELATED_QUERIES&date=today+12-m",
-      "note": "Google Trends：相关查询包含购买或评估意图的措辞。（best free ai art generator） (verified secondary source signal)"
-    },
-    {
-      "id": "serp-5-timingSaturation",
+      "id": "ai-art-generator-declining",
+      "evidenceUse": "context",
+      "canonicalSourceId": "https://serpapi.com/search?engine=google_trends&q=AI+art+generator&data_type=RELATED_QUERIES&date=today+12-m",
       "dimension": "timingSaturation",
       "direction": "down",
       "magnitude": "moderate",
       "confidence": "medium",
       "sourceTier": "secondary",
       "sourceUrl": "https://serpapi.com/search?engine=google_trends&q=AI+art+generator&data_type=RELATED_QUERIES&date=today+12-m",
-      "note": "Google Trends：时间序列近期均值在下降。（ai art generator free） (verified secondary source signal)"
+      "note": "时间序列近期均值在下降。 Google Trends query: image generator. Change: -18.56%. (verified secondary source signal)（单一来源，未达双来源佐证门槛，仅作背景）"
     }
   ],
   "expectedAdjustedScores": {
@@ -131,24 +285,27 @@
     "creativeFeasibility": 100,
     "commercialIntent": 100,
     "brandSafety": 25,
-    "timingSaturation": 75
+    "timingSaturation": 50
   },
-  "expectedAdjustedTotal": 90,
-  "expectedAdjustedBand": "Strong Go",
+  "expectedAdjustedTotal": 88,
+  "expectedAdjustedBand": "Cautious test",
   "profileUsed": "default",
   "expectedEvidenceGate": "partial",
   "expectedGatedBand": "Cautious test",
-  "expectedGateMissing": ["audienceOrUseCase"],
-  "expectedDimensionCaps": ["audienceOverlap"],
+  "expectedGateMissing": [
+    "timingSaturation",
+    "brandSafety"
+  ],
+  "expectedDimensionCaps": [],
   "expectedStability": "fragile",
   "expectedDecisionType": "small test",
   "expectedDimensionConfidence": {
-    "audienceOverlap": "assumption",
-    "useCaseRelevance": "assumption",
+    "audienceOverlap": "evidence-revised (medium)",
+    "useCaseRelevance": "evidence-revised (medium)",
     "messageBridge": "assumption",
-    "creativeFeasibility": "evidence-confirmed (medium)",
+    "creativeFeasibility": "evidence-revised (medium)",
     "commercialIntent": "evidence-revised (medium)",
     "brandSafety": "evidence-revised (medium)",
-    "timingSaturation": "evidence-revised (high)"
+    "timingSaturation": "assumption"
   }
 }

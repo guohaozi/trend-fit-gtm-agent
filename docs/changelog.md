@@ -6,6 +6,32 @@ one-to-two-line summaries, newest first.
 
 ## 2026-06-21
 
+- **demo_pixai re-run with the post-Codex pipeline — fixture refreshed, two real defects fixed along the way.**
+  Re-ran the full collect-and-judge pipeline (51 unique snippets across HN/Xiaohongshu/TikTok/IG/X/Reddit,
+  22 stance-judged + 2 SerpApi). Final fixture: brandSafety **50→25** backed by 3 real HN backlash
+  threads (Netflix anime AI panic, two Japan-anime-community抵制), commercialIntent 75→100, total 88
+  Cautious test / fragile / small test. Two defects surfaced and were fixed with TDD before freezing:
+  - **Engine vs guard mismatch on corroboration.** `adjustScores` moved a dimension on net-pressure
+    alone, but the freeze guard required ≥2 independent canonical sources. A single Google-Trends
+    datapoint could therefore push timingSaturation down and then deadlock the freeze. Added
+    `requireSourceCorroboration` in `lib/evidence-collector.ts`: any directional item whose dimension
+    lacks a second independent source is demoted to `context` (still recorded and visible, but no
+    longer score-moving). Called from the demo freeze script today; live `/evaluate` adopts it once
+    that path emits directional evidence.
+  - **Stance self-contradiction noise (Pixar ≈ PixAI).** Gemini fuzzy-matched a `Pixar in a Box –
+    Khan Academy` HN link to PixAI, wrote `"与 PixAI 平台无关"` in its claim, and still emitted
+    `contradicts` for brandSafety. Added `claimDisclaimsRelevance` deterministic drop in
+    `mapStanceJudgementsToCandidates` so any directional impact whose claim disclaims relevance is
+    discarded; also tightened the stance system prompt to mark same-name-different-thing as
+    `irrelevant`. Both fixes have TDD coverage in `tests/evidence-collector.test.ts` and
+    `tests/evidence-stance.test.ts`.
+  - Loosened the route-smoke "仍需补齐" assertion from a hard-coded slot list to membership of `品牌安全`
+    only — the second slot varies with each fresh evidence run, the brandSafety drop does not.
+  - Xiaohongshu adapter works (cached run yielded 9 real Xiaohongshu snippets), but the stance layer
+    judged this run's 9 as `irrelevant` — only 3–4 of the cached texts are arguably on-topic and they
+    would only land on already-capped dimensions, so this is保守 stance doing its job rather than a
+    regression. Verified: 164/164 tests, build green, `/cases/demo_pixai` renders 21 source links
+    with no Pixar item.
 - **Xiaohongshu collection fixed — wrong endpoint, not a field bug.** Web V3
   (`web_v3/fetch_search_notes`) was returning a blanket HTTP 400 for every query while TikTok stayed
   200, and TikHub docs rank `App V2 > App > Web V3`. Switched to `app/search_notes` (requires a `page`

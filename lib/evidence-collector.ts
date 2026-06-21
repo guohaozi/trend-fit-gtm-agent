@@ -109,6 +109,35 @@ export type DroppedEvidenceCandidate = {
   reasons: string[];
 };
 
+/**
+ * Enforce "two independent sources to move a dimension" as a transformation rather than a hard fail.
+ * Any directional (non-confirm) decision item whose dimension is backed by fewer than two independent
+ * canonical sources is demoted to context: still recorded and visible, but no longer score-moving.
+ * This mirrors the demo-fixture guard's rule (lib/demo-fixture-guard.ts) so a single Google-Trends
+ * datapoint or one stray social post cannot single-handedly revise a score. Used by the offline demo
+ * freeze; the live /evaluate path can adopt it once it emits directional evidence.
+ */
+export function requireSourceCorroboration(evidence: EvidenceItem[]): EvidenceItem[] {
+  const sourcesByDimension = new Map<ScoreKey, Set<string>>();
+  for (const item of evidence) {
+    if (item.evidenceUse === "context" || item.direction === "confirm") continue;
+    const sources = sourcesByDimension.get(item.dimension) ?? new Set<string>();
+    sources.add(item.canonicalSourceId ?? item.sourceUrl);
+    sourcesByDimension.set(item.dimension, sources);
+  }
+
+  return evidence.map((item) => {
+    if (item.evidenceUse === "context" || item.direction === "confirm") return item;
+    const sources = sourcesByDimension.get(item.dimension);
+    if (sources && sources.size >= 2) return item;
+    return {
+      ...item,
+      evidenceUse: "context" as const,
+      note: `${item.note}（单一来源，未达双来源佐证门槛，仅作背景）`
+    };
+  });
+}
+
 export type EvidenceDraft = {
   id: string;
   case: string;
