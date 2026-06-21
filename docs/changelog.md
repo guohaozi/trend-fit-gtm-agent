@@ -6,6 +6,30 @@ one-to-two-line summaries, newest first.
 
 ## 2026-06-21
 
+- **PixAI hero shipped with real assets.** User dropped `public/case-studies/作品.png` (1000×998 anime
+  artwork) and `public/case-studies/logo.png` (224×108 PixAI wordmark). The hero cover slot now uses
+  the artwork as the left visual panel; the wordmark is overlaid top-left inside a white pill with
+  backdrop-blur so it reads against any underlying color. Added optional `logo` field to
+  `FEATURED_CASE_META`. `FeaturedCaseHero` checks `fs.existsSync` at render time and omits the `<img>`
+  entirely when an asset is missing (pine-gradient placeholder takes over instead of the browser
+  broken-image glyph), so missing files degrade gracefully.
+- **FeaturedCaseHero component — full-width hero replaces the 3-col grid for the single demo.** Both
+  the homepage section and `/cases` gallery now render one shared `<FeaturedCaseHero>` instead of a
+  filtered 3-col grid that left the lone PixAI card sitting in the left third. Layout: cover image
+  fills the entire left panel; right panel carries the eyebrow, title, a two-column readout
+  (`88 / 100` + band transition `强烈建议跟进 → 谨慎测试` with strike-through on the baseline band),
+  a brand-safety constraint pill in pine-wash, the narrative note, a 3-item "what's inside" list, and
+  the `查看完整案例 →` CTA. Stacks below 860px. Customer-facing copy purged of "面试 Demo" wording.
+  Test helper `collectText`/`collectHrefs` in `route-smoke.test.ts` now expands function components
+  once before walking so component refactors stay testable. 164/164 tests, build green.
+- **README rewritten to match the current product surface.** The old README still listed 4 placeholder
+  case thumbnails (including Snapforge's backpack and a LEGO F1 card that never shipped), tagged
+  `demo_ai_tool` as the customer-facing demo, and never mentioned the AI baseline, AI stance, TikHub
+  multi-platform collection, the two-source corroboration rule, the time-paradox capability boundary,
+  the `collect-and-judge.ts` offline script, or the GEMINI/TIKHUB env vars. Rewrote around the actual
+  shape: one flagship case (PixAI), current capabilities + the time-paradox boundary section, a
+  per-row real-collected vs. curated-fixture tag on the demo table, updated architecture / routes /
+  env vars / scripts, and a clean 当前缺口.
 - **demo_pixai re-run with the post-Codex pipeline — fixture refreshed, two real defects fixed along the way.**
   Re-ran the full collect-and-judge pipeline (51 unique snippets across HN/Xiaohongshu/TikTok/IG/X/Reddit,
   22 stance-judged + 2 SerpApi). Final fixture: brandSafety **50→25** backed by 3 real HN backlash

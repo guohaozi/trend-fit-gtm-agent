@@ -63,7 +63,82 @@ trend's verifiable objective signals (timing, heat, brand risk) and keeps every 
 LEGO is kept on purpose to show the failure mode: searching a pure trend term pulls
 product-irrelevant noise — which is exactly why the LLM is never allowed to be the judge."
 
-## Latest conversation handoff (2026-06-19) — evidence pipeline integrity fixes complete
+## Latest conversation handoff (2026-06-21) — flagship case + demo refresh shipped end-to-end
+
+The portfolio surface is now what an interviewer should see: one focused, real-evidence case
+(PixAI × AI 生成原创动漫角色) with real assets, real numbers, and customer-facing copy. No
+outstanding UI blockers for the interview.
+
+**What landed in this session (newest commit first; `git log --oneline -5` for HEAD):**
+
+1. **PixAI hero shipped with real assets** ([9ce8711](https://github.com/guohaozi/trend-fit-gtm-agent/commit/9ce8711)).
+   `public/case-studies/作品.png` (1000×998 anime artwork) is the full left visual panel;
+   `public/case-studies/logo.png` (224×108 PixAI wordmark) is overlaid top-left inside a white
+   pill (backdrop-blur for legibility on any underlying color). Optional `logo` field added to
+   `FEATURED_CASE_META`. **Note the Chinese filename** — Next/React handles URL-encoding fine
+   here, but if Vercel ever serves it wrong, rename to ASCII and update the meta.
+2. **Cover-slot graceful degradation** ([3fedd71](https://github.com/guohaozi/trend-fit-gtm-agent/commit/3fedd71)).
+   `FeaturedCaseHero` runs `fs.existsSync` at render time and **omits the `<img>` entirely** when
+   an asset is missing — pine-gradient placeholder takes over instead of a browser broken-image
+   glyph. Same logic applies to the logo overlay.
+3. **README aligned with current product** ([83b4c24](https://github.com/guohaozi/trend-fit-gtm-agent/commit/83b4c24)).
+   Removed 4 stale placeholder thumbnails + the `demo_ai_tool`-as-flagship framing; added AI
+   baseline + AI stance + multi-platform collection + two-source corroboration + time-paradox
+   boundary + `collect-and-judge.ts` script + GEMINI/TIKHUB env vars. Demo case table now tags
+   each row as real-collected vs. curated-fixture.
+4. **FeaturedCaseHero — single full-width hero replacing the 3-col grid** ([34b2f6c](https://github.com/guohaozi/trend-fit-gtm-agent/commit/34b2f6c)).
+   Old grid left the lone PixAI card in the left third + reused Snapforge's backpack PNG. New
+   layout: cover image left, content right (eyebrow, title, two-column readout with band
+   transition `强烈建议跟进 → 谨慎测试` strike-through, brand-safety constraint pill, narrative
+   note, "what's inside" list, CTA). All "面试 Demo" customer-facing copy purged → user-facing
+   language. Test helper `collectText`/`collectHrefs` in `route-smoke.test.ts` now expands
+   function components once before walking — so component-extraction refactors stay testable.
+5. **demo_pixai fixture re-frozen + two real defects fixed with TDD** ([09dd985](https://github.com/guohaozi/trend-fit-gtm-agent/commit/09dd985)).
+   - **`requireSourceCorroboration` in `lib/evidence-collector.ts`** — any directional item whose
+     dimension lacks a second independent canonical source is demoted to `context` (still
+     recorded and visible, no longer score-moving). Mirrors the freeze guard's bar as a
+     transformation rather than a hard fail, so a lone Google-Trends datapoint can't single-
+     handedly revise a score. Wired into the offline freeze script; **the live `/evaluate`
+     path can adopt it once it emits directional evidence** (P1, see Next steps).
+   - **`claimDisclaimsRelevance` in `lib/evidence-stance.ts`** — Gemini occasionally writes
+     `"与 PixAI 平台无关"` in a claim and still emits `contradicts`. The deterministic guard
+     drops such self-contradictory rows; the stance system prompt was also tightened to mark
+     same-name-different-thing (Pixar ≈ PixAI) as `irrelevant`.
+   - Both fixes have TDD coverage in `tests/evidence-collector.test.ts` and
+     `tests/evidence-stance.test.ts`.
+6. **Xiaohongshu collection root-caused + fixed** ([ce9dc9a](https://github.com/guohaozi/trend-fit-gtm-agent/commit/ce9dc9a)).
+   TikHub `web_v3/fetch_search_notes` was returning blanket HTTP 400; per TikHub docs the
+   priority is `App V2 > App > Web V3`. Switched to `app/search_notes` (requires `page` param;
+   simple `note.title/desc/id` keys, not Web V3's camelCase). Added `extraParams` support to the
+   platform adapter. Verified live with 9 real Xiaohongshu snippets in the cached run.
+
+**Real-collection numbers from the latest demo_pixai freeze** (cached, 51 unique snippets across
+HN/Xiaohongshu/TikTok/IG/X/Reddit; 22 stance-judged + 2 SerpApi after corroboration):
+
+- **brandSafety 50 → 25** backed by 3 real HN backlash threads — Netflix anime AI panic + two
+  Japan-anime-community抵制 quotes (verbatim).
+- **commercialIntent 75 → 100** (one PixAI-membership purchase-intent Reddit thread +
+  SerpApi "best ai art generator +170%" buying query).
+- **timingSaturation 50 → 50** — the single SerpApi `-18.56%` datapoint was demoted to context
+  by the new corroboration rule (only 1 independent source).
+- **Total 88 → 88** (commercial-up and brand-safety-down cancel under default weights), but the
+  band still changes via the gate: baseline `强烈建议跟进` → gated `谨慎测试`, fragile, small
+  test. **This is the real story to lead with** — the score can stay constant while the
+  recommendation changes, which makes "evidence-constrained, never fabricate" tangible.
+
+**Verification.** `npm test` 164/164, `npm run build` green, browser-verified `/cases` and `/`
+on a 1280-wide viewport: 2-column hero with 作品 cover + logo overlay, no broken-image glyphs,
+21 real source links in `EvidenceComparison` with no Pixar noise.
+
+**What's not done (and intentionally so for the interview):**
+- Live `/evaluate` still emits only `confirm` rows; the AI-stance layer exists only in
+  `scripts/collect-and-judge.ts`. P1 below.
+- LEGO × World Cup stays as a cautionary example only, not on frontend (the time-paradox
+  section explains why a pure-trend search pulled gambling ads / political rants).
+- No mobile-device pass on the new hero — only Chrome viewport-resize verified (≤860px stacks
+  cleanly per CSS, but a real device is the missing check).
+
+## Earlier conversation handoff (2026-06-19, superseded by 2026-06-21 above) — evidence pipeline integrity fixes complete
 
 The five requested offline-demo pipeline fixes are implemented on
 `codex/evidence-pipeline-hardening`. No paid providers were called during this implementation.
@@ -393,17 +468,18 @@ capped as proxy), `organic push`; evidence snack raw `76` gate `pass` Go, modera
   `evidence-collector`. `campaign-generator` only emits a full plan after gate pass;
   `outreach-copy` switches to creator discovery when evidence is thin.
 
-Routes: `/`, `/evaluate`, `/cases`, `/cases/[id]` (SSG: demo_fashion / demo_ai_tool /
-demo_snack), `/workspace`, `/api/report/[id]`, `/api/workspace/google-trends`,
-`/api/evaluate/baseline` (LLM baseline scoring), `/api/evidence/collect` (free Reddit/HN/GDELT
-evidence). Valid case ids
-for `/cases/[id]` + `/api/report/[id]`: `demo_fashion|demo_robotics|demo_ai_tool|demo_snack|
-demo_protein_drink` (unknown → default demo). The `?case=`/`?profile=` query params went away
-with the retired demo tour; weight profiles still exist in code
-(`default|brand_awareness|ecommerce_conversion|b2b_pipeline|creator_seeding|risk_sensitive`,
-default used by `/evaluate` unless changed).
+Routes: `/`, `/evaluate`, `/cases` (now renders the shared `FeaturedCaseHero` for the single
+flagship case, not a 3-col grid), `/cases/[id]` (SSG: **demo_fashion / demo_pixai / demo_snack**),
+`/workspace`, `/api/report/[id]`, `/api/workspace/google-trends`, `/api/evaluate/baseline`
+(LLM baseline scoring), `/api/evidence/collect` (free Reddit/HN/GDELT evidence). Valid case ids
+for `/cases/[id]` + `/api/report/[id]`: `demo_fashion|demo_robotics|demo_ai_tool|demo_pixai|
+demo_snack|demo_protein_drink` (unknown → default demo). `demo_ai_tool` (Snapforge) stays in
+data + tests as a regression anchor but is NOT in `FEATURED_CASE_META` / customer-facing pages.
+The `?case=`/`?profile=` query params went away with the retired demo tour; weight profiles
+still exist in code (`default|brand_awareness|ecommerce_conversion|b2b_pipeline|creator_seeding|
+risk_sensitive`, default used by `/evaluate` unless changed).
 
-Verification: `npm test` → **140 passing**; `npm run build` succeeds; CI
+Verification: `npm test` → **164 passing**; `npm run build` succeeds; CI
 (`.github/workflows/ci.yml`) runs `npm ci`, `npm test`, `npm run build` on push/PR. Route smoke
 tests cover `/`, `/evaluate`, `/cases`, `/cases/[id]`, `/workspace`, the `/api/report/[id]`
 download, and `/api/evaluate/baseline` (503 no-key + 400 bad-input + access-gate paths). Browser
@@ -483,17 +559,22 @@ items (一手 ×10) fed in; the gate moved from 证据不足 → 证据部分通
 
 ## Known issues
 
-- **Live evidence never moves the score; it only one-sidedly inflates the gate (structural bias, P0).**
+- **Live evidence never moves the score; it only one-sidedly inflates the gate (structural bias, P1).**
   All runtime providers (HN + TikHub) emit `direction: "confirm"`, and `evidencePressure` treats confirm
   as 0 pressure (`evidence-adjustment.ts:82`) — so live evidence moves the 7 scores ≈ 0 (no live `down`
   source either). The damage is at the gate/confidence layer: `comment_corpus` → primary, and the gate
   slot / 100-cap / fragility checks only test whether non-proxy evidence *exists*, not its direction, so
   any returned text passes them. Overall band is held only by the live path lacking non-proxy
-  timing/brandSafety (luck, not design). Details in the 2026-06-18 handoff; fix = the AI-stance layer in
-  Next steps. **Update 2026-06-19:** the stance layer + Reddit/Xiaohongshu/SerpApi coverage **now
-  exist and are proven on a real case** (`demo_pixai`, frozen fixture) — but only in the offline
-  `scripts/collect-and-judge.ts` path. The live `/evaluate` request path is still confirm-only and the
-  gate is still not stance-bound; that's the P1 work after the interview.
+  timing/brandSafety (luck, not design). **Update 2026-06-21:** the stance layer + Reddit/Xiaohongshu/
+  SerpApi coverage **exist and are proven on a real case** (`demo_pixai`, frozen fixture);
+  `requireSourceCorroboration` is also implemented as a pure function ready for reuse — but ALL of this
+  is currently only in the offline `scripts/collect-and-judge.ts` path. The live `/evaluate` request
+  path is still confirm-only and the gate is still not stance-bound; that's the **clear P1 work** —
+  largely a wiring job now that the pieces exist.
+- **PixAI cover asset filename has Chinese characters** (`public/case-studies/作品.png`). React/Next
+  URL-encode the path automatically and Chrome serves it fine; verified locally + on a 1280-wide
+  preview. **If Vercel ever serves it wrong, rename to ASCII** (e.g. `pixai-cover.png`) and update
+  `FEATURED_CASE_META[demo_pixai].image`. The logo path is already ASCII so unaffected.
 - Deployed to Vercel: https://trend-fit-seven.vercel.app (homepage verified live). No custom
   domain yet — the `*.vercel.app` URL is the public demo. Local dev still works via
   `npm run dev` at `http://127.0.0.1:3000`. Note: `/workspace`, `/report`, `/fit-score` and the
@@ -513,43 +594,38 @@ items (一手 ×10) fed in; the gate moved from 证据不足 → 证据部分通
 
 ## Next steps
 
-> Reframed 2026-06-18 around an interview deadline (demo must be showable next week). The full AI-stance
-> rebuild is correct but moved to P1 — the existing engine already supports `up`/`down` pressure, it just
-> never had a provider emit them, so the *demo* needs a fixture with AI-judged up/down, not an engine change.
+> Updated 2026-06-21: P0 is essentially shipped. Codex picks this up — start at P1 unless you spot
+> something we missed in the interview narrative pass.
 
-**P0 — interview-week minimal demo path (mostly implemented; core engine/gate unchanged):**
+**P0 — interview-week demo path (shipped end-to-end):**
 
-- ✅ **Pipeline hardened + first real-evidence case frozen (2026-06-19, commit `a65c902`).** Offline
-  `scripts/collect-and-judge.ts` runs the full pipeline (6 platforms incl. fixed Xiaohongshu/Reddit +
-  SerpApi + Gemini stance with verbatim quote + Gemini 503 retry + `--cached` snippet cache) and froze
-  `data/demo_pixai_evidence.json` (PixAI × AI-generated original anime characters) with score moves
-  driven by **real AI-judged quotes** — brandSafety 50→25 (版权/抗议/NSFW), commercialIntent 75→100
-  (PixAI membership purchase intent + SerpApi buying queries), timingSaturation 50→75 (SerpApi rising).
-  Codex's earlier P0 note "do not claim the fixture was AI-judged" was true for *his* run with the
-  pre-hardening pipeline; the current `data/demo_pixai_evidence.json` IS AI-judged with verbatim quote
-  per row. Codex-added `lib/demo-fixture-guard.ts` still blocks writing a fixture if evidence didn't
-  actually move a score.
-- **Stable interview path (Codex baseline, unchanged):** `/` and `/cases` currently expose only
-  `demo_ai_tool` (Snapforge curated fixture: 89→86 movement, gate verdict, brief). Keep `/evaluate` out
-  of the stage flow regardless.
-- ⏳ **Wire `demo_pixai` (and next, `demo_lego`) into the customer surface.** Build the Chinese
-  `data/demo_pixai.json` + `data/demo_lego.json` product profiles, register in `lib/demo-cases.ts`
-  (`DEMO_CASES` + `EVIDENCE_CASES`), point `INTERVIEW_DEMO_ID` + `getFeaturedCaseCards()` at them so
-  the interview lands on a real-evidence story (or keep `demo_ai_tool` as a parallel curated case).
-  Confirm `/cases/[id]` SSG + the existing 144 tests still pass.
-- ⏳ **Freeze `demo_lego` (LEGO × World Cup 2026 fan culture).** Same script, consumer test of
-  Xiaohongshu/TikTok; SerpApi should give strong timing since World Cup is live. (Pivoted from F1 →
-  World Cup for stronger "热点极热但产品契合需找角度" tension.)
-- **Verification:** `npm test` 144/144 + `npm run build` pass on `a65c902`. Desktop browser
-  click-through clean. Real-device mobile pass still TODO.
-- **Interview narrative:** demo the `/cases` story (currently `demo_ai_tool`; after wire-in,
-  `demo_pixai` is the headliner since it has real AI-judged contradictory evidence). Surface the AI
-  stance `quote`/`claim` as the auditability highlight ("AI 只读懂语言、不下裁决"). Do NOT live-run
-  `/evaluate` collection on stage (still confirm-only there). Naming the live defect as a known gap
-  with a designed fix is a strength — "I know where my evidence layer is weak and how I'd fix it
-  without handing the verdict to an LLM."
+- ✅ Pipeline hardened + first real-evidence case frozen (2026-06-19).
+- ✅ Engine vs guard mismatch fixed: `requireSourceCorroboration` in `lib/evidence-collector.ts`
+  (2026-06-21) — single-source directional rows now demote to `context` so a lone Google-Trends
+  datapoint can't single-handedly move a score. TDD coverage.
+- ✅ Stance self-contradiction noise (Pixar≈PixAI) blocked: `claimDisclaimsRelevance` deterministic
+  drop + tightened stance system prompt (2026-06-21). TDD coverage.
+- ✅ `demo_pixai` wired into the customer surface as the single flagship — registered in
+  `lib/demo-cases.ts`, `INTERVIEW_DEMO_ID = "demo_pixai"`, `FEATURED_CASE_META` lists only PixAI,
+  homepage + `/cases` use the shared `FeaturedCaseHero`. Snapforge (`demo_ai_tool`) stays in data
+  + regression tests but NOT on customer pages.
+- ✅ Real PixAI assets wired (2026-06-21): `作品.png` cover + `logo.png` overlay with backdrop-blur
+  pill. Graceful degradation via `fs.existsSync` if assets disappear.
+- ✅ README aligned with current product surface (2026-06-21).
+- ⏸ `demo_lego` deliberately NOT shipped to frontend — kept as a cautionary example only (see
+  "Capability boundary" up top). If a future case maker wants to revive it, the failure mode to fix
+  is the pure-trend query pulling product-irrelevant noise.
+- ⏳ **Real-device mobile pass** on `/` and `/cases` (Chrome viewport resize was clean, but a real
+  phone has not been used). The new hero stacks below 860px in CSS; verify the cover image isn't
+  letterboxed weirdly on small screens and the logo pill doesn't crowd the corner radius.
+- **Interview narrative.** Lead with the band transition: **`88 → 88` total stays constant, but
+  baseline `强烈建议跟进` → gated `谨慎测试`** because brandSafety drops 50→25 from real社区抵制
+  quotes. This is the cleanest "evidence-constrained, never fabricate" demo because it shows the
+  recommendation can change *even when the score doesn't*. Surface the AI stance `quote`/`claim`
+  as the auditability highlight ("AI 只读懂语言、不下裁决"). Do NOT live-run `/evaluate` on
+  stage — it's still confirm-only; demo the frozen `/cases/demo_pixai` instead.
 
-**P1 — full AI-stance architecture (after the interview; touches the core engine + tests):**
+**P1 — Live `/evaluate` stance layer (the actual gap remaining, after the interview):**
 
 - **AI stance layer in live `/evaluate`** via an injectable fetcher (so tests mock it, like the SerpApi
   fetcher). Batch 10–15 snippets/candidate in one Gemini call. AI emits only `{dimension, stance, quote,
@@ -604,6 +680,6 @@ items (一手 ×10) fed in; the gate moved from 证据不足 → 证据部分通
 ```bash
 cd /Users/guo/gtm/trend-fit-gtm-agent
 git status --short --branch   # expect: ## main...origin/main, clean
-git log -3 --oneline          # newest commit = your starting point
-npm test                      # 140 passing
+git log -3 --oneline          # newest commit = your starting point; latest = PixAI hero with real assets
+npm test                      # 164 passing
 ```
